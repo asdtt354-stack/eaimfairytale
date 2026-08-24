@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>나만의 동화책 제작 & 서재</title>
+  <!-- PDF 변환 라이브러리 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 720px; margin: 30px auto; padding: 20px; background: #f0f4f8; color: #333; }
@@ -13,8 +14,11 @@
     .tab-btn { flex: 1; padding: 10px; background: none; border: none; font-size: 16px; font-weight: bold; color: #6b7280; cursor: pointer; border-radius: 8px; }
     .tab-btn.active { background: #e0e7ff; color: #4338ca; }
 
+    /* API 키 상자 */
     .api-key-box { background: #eef2ff; border: 1px solid #c7d2fe; padding: 14px; border-radius: 10px; margin-bottom: 20px; }
-    .api-key-box label { color: #3730a3; font-weight: bold; }
+    .api-key-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .api-key-header label { color: #3730a3; font-weight: bold; }
+    .api-key-clear { background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer; text-decoration: underline; }
     
     .input-group { margin-bottom: 14px; }
     label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
@@ -43,7 +47,6 @@
     .controls button.read-btn { background: #10b981; color: white; flex-basis: 100%; font-size: 15px; }
     .controls button.read-btn:hover { background: #059669; }
     
-    /* 반복재생 토글 버튼 스타일 */
     .controls button.loop-btn { background: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; }
     .controls button.loop-btn.active { background: #8b5cf6; color: white; border-color: #7c3aed; font-weight: bold; }
     
@@ -78,8 +81,11 @@
   <!-- 1. 제작 탭 -->
   <div id="create-view">
     <div class="api-key-box">
-      <label for="apiKey">🔑 Google AI Studio API Key</label>
-      <input type="password" id="apiKey" placeholder="API 키를 입력하세요" style="margin-top: 6px;">
+      <div class="api-key-header">
+        <label for="apiKey">🔑 Google AI Studio API Key (자동 저장됨)</label>
+        <button class="api-key-clear" onclick="clearSavedApiKey()">키 지우기</button>
+      </div>
+      <input type="password" id="apiKey" placeholder="API 키를 입력하세요" oninput="saveApiKeyToStorage()">
     </div>
     
     <div class="input-group">
@@ -140,12 +146,35 @@
   let currentStoryBookObject = null;
   let db;
   let isPlaying = false;
-  let isRepeatMode = false; // 반복 재생 상태
-  let isLibraryPlayingMode = false; // 서재 전체 재생 여부
+  let isRepeatMode = false;
+  let isLibraryPlayingMode = false;
   let allLibraryBooks = [];
   let currentLibraryIndex = 0;
 
-  // DB 초기화
+  // --- API 키 로컬 스토리지 관리 ---
+  const API_STORAGE_KEY = "gemini_fairytale_api_key";
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const savedKey = localStorage.getItem(API_STORAGE_KEY);
+    if (savedKey) {
+      document.getElementById('apiKey').value = savedKey;
+    }
+  });
+
+  function saveApiKeyToStorage() {
+    const key = document.getElementById('apiKey').value.trim();
+    if (key) {
+      localStorage.setItem(API_STORAGE_KEY, key);
+    }
+  }
+
+  function clearSavedApiKey() {
+    localStorage.removeItem(API_STORAGE_KEY);
+    document.getElementById('apiKey').value = '';
+    alert('저장된 API 키가 삭제되었습니다.');
+  }
+
+  // --- DB 초기화 ---
   const dbRequest = indexedDB.open("FairytaleAppDB", 1);
   dbRequest.onupgradeneeded = (e) => {
     db = e.target.result;
@@ -182,6 +211,9 @@
       document.getElementById('apiKey').focus();
       return;
     }
+
+    // 입력된 키 로컬스토리지에 저장
+    saveApiKeyToStorage();
 
     const config = lengthConfig[lengthVal];
     btn.disabled = true;
@@ -293,7 +325,7 @@
     throw new Error('이미지 없음');
   }
 
-  // 2. 반복 재생 모드 토글
+  // 2. 반복 모드 토글
   function toggleRepeatMode() {
     isRepeatMode = !isRepeatMode;
     const loopBtn = document.getElementById('loopBtn');
@@ -306,16 +338,14 @@
     }
   }
 
-  // 3. 스마트 연속 & 반복 낭독 엔진
+  // 3. 연속 & 반복 낭독 엔진
   async function startContinuousReading(onCompleteCallback = null) {
     if (!currentStoryBookObject) return;
     stopVoice();
     isPlaying = true;
 
-    // 제목 읽기
     await readSingleSnippet(`제목: ${currentStoryBookObject.title}`);
 
-    // 각 페이지 순차 낭독
     for (let i = 0; i < currentStoryBookObject.pages.length; i++) {
       if (!isPlaying) break;
 
@@ -332,13 +362,10 @@
 
     document.querySelectorAll('.page-item').forEach(el => el.classList.remove('reading-now'));
 
-    // 정지 버튼이 눌리지 않았고 정상 완료된 경우
     if (isPlaying) {
       if (onCompleteCallback && typeof onCompleteCallback === 'function') {
-        // 서재 전체 재생 콜백 처리
         onCompleteCallback();
       } else if (isRepeatMode) {
-        // 단권 반복 재생 활성화 시 1.5초 후 재시작
         setTimeout(() => {
           if (isPlaying && isRepeatMode) {
             startContinuousReading();
@@ -365,7 +392,7 @@
     });
   }
 
-  // 4. 서재 전체 연속 & 반복 재생
+  // 4. 서재 전체 재생
   async function playAllBooksSequentially() {
     if (allLibraryBooks.length === 0) {
       alert('서재에 저장된 책이 없습니다.');
@@ -381,7 +408,6 @@
 
     if (currentLibraryIndex >= allLibraryBooks.length) {
       if (isRepeatMode) {
-        // 서재 반복 모드: 처음 책부터 다시 루프
         currentLibraryIndex = 0;
       } else {
         alert('📚 서재의 모든 동화책 연속 재생이 완료되었습니다!');
@@ -403,7 +429,7 @@
     }, 1000);
   }
 
-  // 5. 서재 관리 및 뷰어
+  // 5. 서재 관리
   function saveCurrentStoryToDB() {
     if (!currentStoryBookObject) return;
     const tx = db.transaction("books", "readwrite");
@@ -465,7 +491,7 @@
       const imgHtml = p.imageBase64 ? `<img src="data:image/png;base64,${p.imageBase64}" class="page-img">` : `<span>(삽화 없음)</span>`;
       pageDiv.innerHTML = `
         <div class="page-img-container">${imgHtml}</div>
-        <div class="page-text"><b>${p.page_num}p.</b> ${p.text}</div>
+        <div class="page-text"><b>${p.page_num}p.</b> ${page.text}</div>
       `;
       viewer.appendChild(pageDiv);
     });

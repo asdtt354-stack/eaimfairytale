@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>나만의 동화책 제작 & 서재</title>
-  <!-- PDF 변환 라이브러리 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 720px; margin: 30px auto; padding: 20px; background: #f0f4f8; color: #333; }
@@ -18,7 +17,10 @@
     .api-key-box { background: #eef2ff; border: 1px solid #c7d2fe; padding: 14px; border-radius: 10px; margin-bottom: 20px; }
     .api-key-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .api-key-header label { color: #3730a3; font-weight: bold; }
-    .api-key-clear { background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer; text-decoration: underline; }
+    .api-key-actions { display: flex; gap: 8px; align-items: center; }
+    .api-status { font-size: 12px; color: #10b981; font-weight: bold; display: none; }
+    .api-btn-small { background: #6366f1; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+    .api-btn-clear { background: none; border: none; color: #ef4444; font-size: 11px; cursor: pointer; text-decoration: underline; }
     
     .input-group { margin-bottom: 14px; }
     label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
@@ -47,19 +49,16 @@
     .page-img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .page-loading-text { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 16px; color: #6b7280; font-weight: 600; }
 
-    /* 그림 위 반투명 글래스 자막 박스 */
     .page-overlay-box { position: absolute; bottom: 0; left: 0; width: 100%; box-sizing: border-box; background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.45) 75%, rgba(0,0,0,0) 100%); padding: 36px 22px 20px 22px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
     .page-text { font-size: 16.5px; line-height: 1.8; color: #ffffff; text-align: left; word-break: keep-all; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
     .page-num-badge { display: inline-block; background: rgba(255, 255, 255, 0.25); color: #fff; padding: 2px 8px; border-radius: 6px; font-size: 13px; font-weight: bold; margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.4); }
 
-    /* 페이지 이동 컨트롤 */
     .page-nav-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; background: #f8fafc; padding: 10px 16px; border-radius: 12px; border: 1px solid #e2e8f0; }
     .page-nav-btn { background: #3b82f6; color: white; border: none; padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
     .page-nav-btn:hover { background: #2563eb; }
     .page-nav-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
     .page-indicator { font-size: 14.5px; font-weight: bold; color: #475569; }
 
-    /* 제어 버튼 바 */
     .controls { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
     .controls button { flex: 1; min-width: 90px; padding: 12px; background: #e5e7eb; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
     .controls button.read-btn { background: #10b981; color: white; flex-basis: 100%; font-size: 15px; }
@@ -72,7 +71,6 @@
     .controls button.pdf-btn { background: #f59e0b; color: white; }
     .controls button.stop { background: #fee2e2; color: #991b1b; }
 
-    /* 서재 목록 스타일 */
     .library-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .library-play-all { background: #3b82f6; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; }
     .library-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 10px; }
@@ -90,20 +88,23 @@
 <div class="card">
   <h2>📖 나만의 동화책 제작 & 서재</h2>
 
-  <!-- 탭 메뉴 -->
   <div class="tab-nav">
     <button class="tab-btn active" id="tabCreateBtn" onclick="switchTab('create')">✍️ 새 동화 만들기</button>
     <button class="tab-btn" id="tabLibraryBtn" onclick="switchTab('library')">📚 내 서재 보관함</button>
   </div>
 
-  <!-- 1. 제작 탭 -->
   <div id="create-view">
+    <!-- API 키 설정 영역 (이중 저장 지원) -->
     <div class="api-key-box">
       <div class="api-key-header">
-        <label for="apiKey">🔑 Google AI Studio API Key (자동 저장됨)</label>
-        <button class="api-key-clear" onclick="clearSavedApiKey()">키 지우기</button>
+        <label for="apiKey">🔑 Google AI Studio API Key</label>
+        <div class="api-key-actions">
+          <span class="api-status" id="apiStatus">💾 저장됨</span>
+          <button class="api-btn-small" onclick="saveApiKeyManually()">키 저장</button>
+          <button class="api-btn-clear" onclick="clearSavedApiKey()">삭제</button>
+        </div>
       </div>
-      <input type="password" id="apiKey" placeholder="API 키를 입력하세요" oninput="saveApiKeyToStorage()">
+      <input type="password" id="apiKey" placeholder="API 키를 입력하세요" onchange="saveApiKeyManually()" oninput="handleKeyTyping()">
     </div>
     
     <div class="input-group">
@@ -119,7 +120,6 @@
       <input type="text" id="lesson" value="실수를 두려워하지 않고 다시 도전하는 용기">
     </div>
     
-    <!-- 분량 선택 -->
     <div class="input-group">
       <label for="storyLength">⏱ 이야기 분량</label>
       <select id="storyLength">
@@ -130,7 +130,6 @@
       </select>
     </div>
 
-    <!-- 🎙 목소리 캐릭터 선택 -->
     <div class="input-group">
       <label for="voiceStyle">🎙 낭독 목소리 선택</label>
       <select id="voiceStyle">
@@ -145,7 +144,6 @@
     <div id="status-log"></div>
   </div>
 
-  <!-- 2. 서재 탭 -->
   <div id="library-view" style="display: none;">
     <div class="library-header">
       <span style="font-weight: bold; color: #4b5563;">보관된 동화 목록</span>
@@ -156,15 +154,11 @@
     </div>
   </div>
 
-  <!-- 3. 📖 그림 위 텍스트 오버레이 뷰어 영역 -->
   <div id="book-container">
     <div class="story-title" id="story-main-title"></div>
     
-    <div class="book-page-wrapper" id="story-pages-wrapper">
-      <!-- 페이지별 풀사이즈 삽화 + 자막이 주입됩니다 -->
-    </div>
+    <div class="book-page-wrapper" id="story-pages-wrapper"></div>
 
-    <!-- 페이지 이동 바 -->
     <div class="page-nav-bar">
       <button class="page-nav-btn" id="prevPageBtn" onclick="goToPrevPage()">◀ 이전 페이지</button>
       <span class="page-indicator" id="pageIndicator">1 / 1</span>
@@ -172,7 +166,6 @@
     </div>
   </div>
   
-  <!-- 4. 컨트롤 패널 -->
   <div class="controls" id="controlPanel" style="display: none;">
     <button class="read-btn" id="readBtn" onclick="startContinuousReading()">📢 동화 낭독하기</button>
     <button class="loop-btn" id="loopBtn" onclick="toggleRepeatMode()">🔁 반복 재생: OFF</button>
@@ -194,7 +187,6 @@
   let currentLibraryIndex = 0;
   let currentPageIndex = 0;
 
-  // 브라우저 음성 목록
   let availableVoices = [];
   function initVoices() {
     availableVoices = window.speechSynthesis.getVoices();
@@ -204,38 +196,79 @@
   }
   initVoices();
 
-  // API 키 로컬 스토리지
+  // --- 💡 [핵심] API 키 이중 저장소 (localStorage + IndexedDB 설정 테이블) ---
   const API_STORAGE_KEY = "gemini_fairytale_api_key";
 
-  window.addEventListener('DOMContentLoaded', () => {
-    const savedKey = localStorage.getItem(API_STORAGE_KEY);
-    if (savedKey) {
-      document.getElementById('apiKey').value = savedKey;
-    }
-  });
+  function handleKeyTyping() {
+    saveApiKeyManually();
+  }
 
-  function saveApiKeyToStorage() {
+  function saveApiKeyManually() {
     const key = document.getElementById('apiKey').value.trim();
-    if (key) localStorage.setItem(API_STORAGE_KEY, key);
+    if (!key) return;
+
+    // 1. localStorage에 저장
+    try {
+      localStorage.setItem(API_STORAGE_KEY, key);
+    } catch(e) {}
+
+    // 2. IndexedDB 환경설정 테이블에 이중 백업 저장
+    if (db) {
+      try {
+        const tx = db.transaction("settings", "readwrite");
+        tx.objectStore("settings").put({ key: "apiKey", value: key });
+      } catch(e) {}
+    }
+
+    // 상태 표시 애니메이션
+    const status = document.getElementById('apiStatus');
+    status.style.display = 'inline';
+    setTimeout(() => { status.style.display = 'none'; }, 2000);
   }
 
   function clearSavedApiKey() {
-    localStorage.removeItem(API_STORAGE_KEY);
+    try { localStorage.removeItem(API_STORAGE_KEY); } catch(e) {}
+    if (db) {
+      try {
+        const tx = db.transaction("settings", "readwrite");
+        tx.objectStore("settings").delete("apiKey");
+      } catch(e) {}
+    }
     document.getElementById('apiKey').value = '';
     alert('저장된 API 키가 삭제되었습니다.');
   }
 
-  // DB 초기화
-  const dbRequest = indexedDB.open("FairytaleAppDB", 1);
+  // --- DB 초기화 및 키 복원 ---
+  const dbRequest = indexedDB.open("FairytaleAppDB", 2); // 버전 2 (설정 스토어 추가)
   dbRequest.onupgradeneeded = (e) => {
     db = e.target.result;
     if (!db.objectStoreNames.contains("books")) {
       db.createObjectStore("books", { keyPath: "id", autoIncrement: true });
     }
+    if (!db.objectStoreNames.contains("settings")) {
+      db.createObjectStore("settings", { keyPath: "key" });
+    }
   };
   dbRequest.onsuccess = (e) => {
     db = e.target.result;
     loadLibraryList();
+
+    // 1차: localStorage에서 키 복원
+    let loadedKey = "";
+    try { loadedKey = localStorage.getItem(API_STORAGE_KEY); } catch(e) {}
+
+    if (loadedKey) {
+      document.getElementById('apiKey').value = loadedKey;
+    } else {
+      // 2차: IndexedDB에서 백업 키 복원
+      const tx = db.transaction("settings", "readonly");
+      const req = tx.objectStore("settings").get("apiKey");
+      req.onsuccess = () => {
+        if (req.result && req.result.value) {
+          document.getElementById('apiKey').value = req.result.value;
+        }
+      };
+    }
   };
 
   const lengthConfig = {
@@ -264,7 +297,8 @@
       return;
     }
 
-    saveApiKeyToStorage();
+    saveApiKeyManually(); // 생성 시 확실하게 저장
+
     const config = lengthConfig[lengthVal];
     btn.disabled = true;
     controlPanel.style.display = 'none';
@@ -370,7 +404,7 @@
     throw new Error('이미지 없음');
   }
 
-  // 2. 📖 풀사이즈 삽화 + 텍스트 오버레이 렌더링
+  // 2. 뷰어 렌더링
   function renderBookPages(book) {
     const wrapper = document.getElementById('story-pages-wrapper');
     wrapper.innerHTML = '';
@@ -421,7 +455,7 @@
   function goToPrevPage() { showPage(currentPageIndex - 1); }
   function goToNextPage() { showPage(currentPageIndex + 1); }
 
-  // 3. 🎙 캐릭터별 목소리 매핑 & 낭독 엔진
+  // 3. 목소리 매핑 & 낭독 엔진
   async function startContinuousReading(onCompleteCallback = null) {
     if (!currentStoryBookObject) return;
     stopVoice();
@@ -460,32 +494,29 @@
 
       const voiceStyle = document.getElementById('voiceStyle').value;
       
-      // 목소리 캐릭터별 피치(음높이), 속도(템포) 세부 조율
       switch (voiceStyle) {
-        case 'cheerful_kid': // 발랄한 어린이 친구
+        case 'cheerful_kid':
           utterance.rate = 1.05;
           utterance.pitch = 1.35;
           break;
-        case 'wise_grandpa': // 지혜로운 할아버지
+        case 'wise_grandpa':
           utterance.rate = 0.78;
           utterance.pitch = 0.65;
           break;
-        case 'pro_actor': // 전문 구연 성우
+        case 'pro_actor':
           utterance.rate = 0.92;
           utterance.pitch = 1.15;
           break;
-        case 'warm_mom': // 다정한 엄마/이모 (기본값)
+        case 'warm_mom':
         default:
           utterance.rate = 0.86;
           utterance.pitch = 1.08;
           break;
       }
 
-      // 기기에 설치된 한국어 전용 보이스 탐색 매핑
       if (availableVoices.length === 0) initVoices();
       const koVoices = availableVoices.filter(v => v.lang.startsWith('ko'));
       if (koVoices.length > 0) {
-        // 남성/여성 음성이 분리 지원되는 환경일 경우 성격 매핑
         if (voiceStyle === 'wise_grandpa') {
           const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남성') || v.name.includes('Minho'));
           if (maleVoice) utterance.voice = maleVoice;
@@ -516,7 +547,7 @@
     }
   }
 
-  // 4. 서재 전체 연속 재생
+  // 4. 서재 전체 재생
   async function playAllBooksSequentially() {
     if (allLibraryBooks.length === 0) {
       alert('서재에 저장된 책이 없습니다.');
@@ -555,7 +586,7 @@
     }, 1000);
   }
 
-  // 5. 서재 저장 & 불러오기
+  // 5. 서재 관리
   function saveCurrentStoryToDB() {
     if (!currentStoryBookObject) return;
     const tx = db.transaction("books", "readwrite");

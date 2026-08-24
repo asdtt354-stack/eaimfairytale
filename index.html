@@ -118,6 +118,8 @@
       <label>교훈 / 주제</label>
       <input type="text" id="lesson" value="실수를 두려워하지 않고 다시 도전하는 용기">
     </div>
+    
+    <!-- 분량 선택 -->
     <div class="input-group">
       <label for="storyLength">⏱ 이야기 분량</label>
       <select id="storyLength">
@@ -125,6 +127,17 @@
         <option value="3" selected>3분 (약 6페이지)</option>
         <option value="5">5분 (약 8페이지)</option>
         <option value="10">10분 (약 10페이지)</option>
+      </select>
+    </div>
+
+    <!-- 🎙 목소리 캐릭터 선택 -->
+    <div class="input-group">
+      <label for="voiceStyle">🎙 낭독 목소리 선택</label>
+      <select id="voiceStyle">
+        <option value="warm_mom" selected>🌸 다정한 이야기 엄마 / 이모 (따뜻하고 편안한 톤)</option>
+        <option value="cheerful_kid">🧒 발랄한 어린이 친구 (밝고 쾌활한 모험 톤)</option>
+        <option value="wise_grandpa">🧙‍♂️ 지혜로운 마법사 할아버지 (차분하고 묵직한 저음)</option>
+        <option value="pro_actor">🎭 감정 풍부한 동화 구연 성우 (생동감 넘치는 표준 톤)</option>
       </select>
     </div>
 
@@ -180,6 +193,16 @@
   let allLibraryBooks = [];
   let currentLibraryIndex = 0;
   let currentPageIndex = 0;
+
+  // 브라우저 음성 목록
+  let availableVoices = [];
+  function initVoices() {
+    availableVoices = window.speechSynthesis.getVoices();
+  }
+  if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = initVoices;
+  }
+  initVoices();
 
   // API 키 로컬 스토리지
   const API_STORAGE_KEY = "gemini_fairytale_api_key";
@@ -270,7 +293,7 @@
     {
       "page_num": 1,
       "text": "1페이지 상세 본문...",
-      "image_prompt": "1페이지 장면에 어울리는 구체적인 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm pastel colors"
+      "image_prompt": "1페이지 장면에 어울리는 구체적인 영문 프롬프트, cute soft watercolor children's book illustration style, bright, pastel colors"
     }
   ]
 }
@@ -361,7 +384,6 @@
         ? `<img src="data:image/png;base64,${p.imageBase64}" class="page-img" alt="삽화 ${p.page_num}">` 
         : `<div class="page-loading-text">🎨 (삽화 없음)</div>`;
 
-      // 그림 위에 텍스트 박스가 겹쳐 올라가는 구조
       pageDiv.innerHTML = `
         ${imgHtml}
         <div class="page-overlay-box">
@@ -399,7 +421,7 @@
   function goToPrevPage() { showPage(currentPageIndex - 1); }
   function goToNextPage() { showPage(currentPageIndex + 1); }
 
-  // 3. 낭독 + 자동 책장 넘김 연동 엔진
+  // 3. 🎙 캐릭터별 목소리 매핑 & 낭독 엔진
   async function startContinuousReading(onCompleteCallback = null) {
     if (!currentStoryBookObject) return;
     stopVoice();
@@ -435,8 +457,45 @@
       const cleanText = text.replace(/[*#]/g, '');
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = 'ko-KR';
-      utterance.rate = 0.88;
-      utterance.pitch = 1.1;
+
+      const voiceStyle = document.getElementById('voiceStyle').value;
+      
+      // 목소리 캐릭터별 피치(음높이), 속도(템포) 세부 조율
+      switch (voiceStyle) {
+        case 'cheerful_kid': // 발랄한 어린이 친구
+          utterance.rate = 1.05;
+          utterance.pitch = 1.35;
+          break;
+        case 'wise_grandpa': // 지혜로운 할아버지
+          utterance.rate = 0.78;
+          utterance.pitch = 0.65;
+          break;
+        case 'pro_actor': // 전문 구연 성우
+          utterance.rate = 0.92;
+          utterance.pitch = 1.15;
+          break;
+        case 'warm_mom': // 다정한 엄마/이모 (기본값)
+        default:
+          utterance.rate = 0.86;
+          utterance.pitch = 1.08;
+          break;
+      }
+
+      // 기기에 설치된 한국어 전용 보이스 탐색 매핑
+      if (availableVoices.length === 0) initVoices();
+      const koVoices = availableVoices.filter(v => v.lang.startsWith('ko'));
+      if (koVoices.length > 0) {
+        // 남성/여성 음성이 분리 지원되는 환경일 경우 성격 매핑
+        if (voiceStyle === 'wise_grandpa') {
+          const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남성') || v.name.includes('Minho'));
+          if (maleVoice) utterance.voice = maleVoice;
+          else utterance.voice = koVoices[0];
+        } else {
+          const femaleVoice = koVoices.find(v => v.name.includes('Female') || v.name.includes('여성') || v.name.includes('Yuna') || v.name.includes('Sora') || v.name.includes('Google'));
+          if (femaleVoice) utterance.voice = femaleVoice;
+          else utterance.voice = koVoices[0];
+        }
+      }
 
       utterance.onend = () => resolve();
       utterance.onerror = () => resolve();
@@ -555,7 +614,7 @@
     tx.oncomplete = () => loadLibraryList();
   }
 
-  // 6. PDF 다운로드 (그림 위 텍스트 배치 스타일 유지)
+  // 6. PDF 다운로드
   function exportToPDF() {
     if (!currentStoryBookObject) return;
     

@@ -13,8 +13,8 @@
     
     .input-group { margin-bottom: 14px; }
     label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
-    input { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 8px; font-size: 15px; }
-    input:focus { outline: none; border-color: #6366f1; }
+    input, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 8px; font-size: 15px; background: white; }
+    input:focus, select:focus { outline: none; border-color: #6366f1; }
     
     button.primary-btn { width: 100%; padding: 14px; background: #6366f1; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
     button.primary-btn:hover { background: #4f46e5; }
@@ -26,9 +26,9 @@
     .story-title { font-size: 22px; font-weight: bold; color: #1e293b; text-align: center; margin-bottom: 20px; }
     
     .page-item { background: #fffbeb; border: 1px solid #fef3c7; border-radius: 14px; padding: 18px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-    .page-img-container { width: 100%; max-width: 400px; aspect-ratio: 1/1; background: #f3f4f6; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #e5e7eb; }
+    .page-img-container { width: 100%; max-width: 420px; aspect-ratio: 1/1; background: #f3f4f6; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #e5e7eb; }
     .page-img { width: 100%; height: 100%; object-fit: cover; }
-    .page-text { font-size: 16px; line-height: 1.8; color: #4b5563; text-align: center; word-break: keep-all; }
+    .page-text { font-size: 16px; line-height: 1.85; color: #374151; text-align: left; word-break: keep-all; width: 100%; padding: 0 8px; box-sizing: border-box; }
     
     .controls { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
     .controls button { flex: 1; min-width: 100px; padding: 12px; background: #e5e7eb; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600; }
@@ -60,6 +60,17 @@
     <label>교훈 / 주제</label>
     <input type="text" id="lesson" value="실수를 두려워하지 않고 다시 도전하는 용기">
   </div>
+  
+  <!-- 분량 선택 드롭다운 -->
+  <div class="input-group">
+    <label for="storyLength">⏱ 이야기 분량 (낭독 시간)</label>
+    <select id="storyLength">
+      <option value="2">2분 (약 4페이지 - 짧고 경쾌한 이야기)</option>
+      <option value="3" selected>3분 (약 6페이지 - 기승전결이 풍부한 이야기)</option>
+      <option value="5">5분 (약 8페이지 - 대화와 묘사가 풍부한 모험담)</option>
+      <option value="10">10분 (약 10페이지 - 깊이 있는 장편 베드타임 스토리)</option>
+    </select>
+  </div>
 
   <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎨 동화 & 삽화 제작하기</button>
   <div id="status-log"></div>
@@ -77,11 +88,20 @@
 <script>
   let currentStoryNarration = "";
 
+  // 분량별 설정 매핑
+  const lengthConfig = {
+    "2": { pages: 4, charCountPerPage: "150~180자 (4~5문장)", totalDesc: "낭독 시 약 2분 소요" },
+    "3": { pages: 6, charCountPerPage: "160~200자 (5~6문장)", totalDesc: "낭독 시 약 3분 소요" },
+    "5": { pages: 8, charCountPerPage: "200~250자 (6~7문장)", totalDesc: "낭독 시 약 5분 소요" },
+    "10": { pages: 10, charCountPerPage: "280~320자 (8~10문장)", totalDesc: "낭독 시 약 10분 소요" }
+  };
+
   async function generateStoryAndImages() {
     const apiKey = document.getElementById('apiKey').value.trim();
     const char = document.getElementById('character').value.trim();
     const bg = document.getElementById('background').value.trim();
     const lesson = document.getElementById('lesson').value.trim();
+    const lengthVal = document.getElementById('storyLength').value;
     const btn = document.getElementById('generateBtn');
     const readBtn = document.getElementById('readBtn');
     const statusLog = document.getElementById('status-log');
@@ -93,20 +113,27 @@
       return;
     }
 
+    const config = lengthConfig[lengthVal];
+
     btn.disabled = true;
     readBtn.disabled = true;
-    statusLog.innerText = '1/5. 동화 스토리를 작성 중입니다...';
+    statusLog.innerText = `1/${config.pages + 1}. ${lengthVal}분 분량의 스토리를 깊이 있게 작성 중입니다...`;
     viewer.innerHTML = '';
     currentStoryNarration = "";
     stopVoice();
 
     const promptText = `
 너는 유아/아동용 그림동화 전문 작가야.
-아래 설정을 바탕으로 4개 장면(기승전결)의 동화책 JSON 데이터를 만들어줘.
+아래 설정을 바탕으로 총 ${config.pages}개 장면에 걸친 ${lengthVal}분 분량(${config.totalDesc})의 풍성한 동화책 JSON 데이터를 만들어줘.
 
 - 주인공: ${char}
 - 배경: ${bg}
 - 주제/교훈: ${lesson}
+
+[작성 가이드라인]
+1. 단순 요약이 아닌, 등장인물의 대화, 감정 표현, 구체적인 상황 묘사를 충분히 넣어줘.
+2. 각 페이지(총 ${config.pages}페이지)당 한국어 본문 길이는 반드시 **${config.charCountPerPage}** 내외로 넉넉하게 작성해줘.
+3. 아동용으로 친근하고 다정한 구어체('~했어요', '~했답니다')를 사용해.
 
 [반드시 준수할 출력 규격: 순수 JSON만 출력]
 {
@@ -114,30 +141,15 @@
   "pages": [
     {
       "page_num": 1,
-      "text": "1페이지 한국어 본문 ('~했어요' 구어체)",
+      "text": "1페이지 상세 본문...",
       "image_prompt": "1페이지 장면에 어울리는 구체적인 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm pastel colors"
-    },
-    {
-      "page_num": 2,
-      "text": "2페이지 한국어 본문",
-      "image_prompt": "2페이지 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm pastel colors"
-    },
-    {
-      "page_num": 3,
-      "text": "3페이지 한국어 본문",
-      "image_prompt": "3페이지 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm pastel colors"
-    },
-    {
-      "page_num": 4,
-      "text": "4페이지 한국어 본문",
-      "image_prompt": "4페이지 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm pastel colors"
     }
   ]
 }
+(총 ${config.pages}개의 객체가 pages 배열에 들어가야 함)
 `;
 
     try {
-      // 1. 스토리 및 이미지 프롬프트 JSON 생성
       const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -156,10 +168,9 @@
       viewer.innerHTML = `<div class="story-title">📖 ${storyData.title}</div>`;
       currentStoryNarration = `${storyData.title}. `;
 
-      // 2. 각 페이지별 삽화 생성 및 렌더링
       for (let i = 0; i < storyData.pages.length; i++) {
         const page = storyData.pages[i];
-        statusLog.innerText = `${i + 2}/5. ${page.page_num}페이지 삽화를 그리는 중입니다...`;
+        statusLog.innerText = `${i + 2}/${storyData.pages.length + 1}. ${page.page_num}페이지 삽화를 그리는 중입니다... (${i + 1}/${storyData.pages.length})`;
 
         const pageDiv = document.createElement('div');
         pageDiv.className = 'page-item';
@@ -183,7 +194,7 @@
         }
       }
 
-      statusLog.innerText = '✅ 동화책이 완성되었습니다! 아래 [낭독하기] 버튼을 눌러보세요.';
+      statusLog.innerText = '✅ 동화책이 완성되었습니다! 아래 [동화 낭독하기] 버튼을 눌러보세요.';
       readBtn.disabled = false;
 
     } catch (err) {

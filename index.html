@@ -25,14 +25,16 @@
     #story-viewer { margin-top: 24px; }
     .story-title { font-size: 22px; font-weight: bold; color: #1e293b; text-align: center; margin-bottom: 20px; }
     
-    /* 동화책 페이지 스타일 */
     .page-item { background: #fffbeb; border: 1px solid #fef3c7; border-radius: 14px; padding: 18px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
     .page-img-container { width: 100%; max-width: 380px; aspect-ratio: 1/1; background: #f3f4f6; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #e5e7eb; }
     .page-img { width: 100%; height: 100%; object-fit: cover; }
     .page-text { font-size: 16px; line-height: 1.8; color: #4b5563; text-align: center; word-break: keep-all; }
     
-    .controls { display: flex; gap: 10px; margin-top: 14px; }
-    .controls button { flex: 1; padding: 10px; background: #e5e7eb; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600; }
+    .controls { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+    .controls button { flex: 1; min-width: 100px; padding: 12px; background: #e5e7eb; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600; }
+    .controls button.read-btn { background: #10b981; color: white; flex-basis: 100%; font-size: 15px; }
+    .controls button.read-btn:hover { background: #059669; }
+    .controls button.read-btn:disabled { background: #9ca3af; cursor: not-allowed; }
     .controls button.stop { background: #fee2e2; color: #991b1b; }
   </style>
 </head>
@@ -59,12 +61,14 @@
     <input type="text" id="lesson" value="실수를 두려워하지 않고 다시 도전하는 용기">
   </div>
 
-  <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎨 동화 & 삽화 생성 시작</button>
+  <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎨 동화 & 삽화 생성하기</button>
   <div id="status-log"></div>
 
   <div id="story-viewer"></div>
   
+  <!-- 오디오 컨트롤 영역 -->
   <div class="controls">
+    <button class="read-btn" id="readBtn" onclick="startStoryNarration()" disabled>📢 동화 낭독하기</button>
     <button onclick="pauseVoice()">⏸ 일시정지</button>
     <button onclick="resumeVoice()">▶ 이어듣기</button>
     <button class="stop" onclick="stopVoice()">⏹ 정지</button>
@@ -72,12 +76,16 @@
 </div>
 
 <script>
+  // 생성된 전체 텍스트를 저장할 전역 변수
+  let currentStoryNarration = "";
+
   async function generateStoryAndImages() {
     const apiKey = document.getElementById('apiKey').value.trim();
     const char = document.getElementById('character').value.trim();
     const bg = document.getElementById('background').value.trim();
     const lesson = document.getElementById('lesson').value.trim();
     const btn = document.getElementById('generateBtn');
+    const readBtn = document.getElementById('readBtn');
     const statusLog = document.getElementById('status-log');
     const viewer = document.getElementById('story-viewer');
 
@@ -88,8 +96,10 @@
     }
 
     btn.disabled = true;
-    statusLog.innerText = '1/5. Gemini 3 Flash가 스토리를 구상 중입니다...';
+    readBtn.disabled = true;
+    statusLog.innerText = '1/5. Gemini 3 Flash가 스토리를 작성 중입니다...';
     viewer.innerHTML = '';
+    currentStoryNarration = "";
     stopVoice();
 
     const promptText = `
@@ -129,7 +139,6 @@
 `;
 
     try {
-      // 1. Gemini 3 Flash로 동화 스토리 및 이미지 프롬프트 JSON 생성
       const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -145,12 +154,9 @@
       const rawJson = geminiData.candidates[0].content.parts[0].text;
       const storyData = JSON.parse(rawJson);
 
-      // 제목 렌더링
       viewer.innerHTML = `<div class="story-title">📖 ${storyData.title}</div>`;
+      currentStoryNarration = `${storyData.title}. `;
 
-      let fullNarration = `${storyData.title}. `;
-
-      // 2. 각 페이지별 컨테이너 생성 및 Imagen 3로 삽화 렌더링
       for (let i = 0; i < storyData.pages.length; i++) {
         const page = storyData.pages[i];
         statusLog.innerText = `${i + 2}/5. ${page.page_num}페이지 삽화를 그리고 있습니다...`;
@@ -164,9 +170,8 @@
           <div class="page-text"><b>${page.page_num}p.</b> ${page.text}</div>
         `;
         viewer.appendChild(pageDiv);
-        fullNarration += ` ${page.text}`;
+        currentStoryNarration += ` ${page.text}`;
 
-        // Imagen 3 API 호출
         try {
           const imgBase64 = await generateImage(apiKey, page.image_prompt);
           const imgContainer = document.getElementById(`img-container-${i}`);
@@ -178,8 +183,8 @@
         }
       }
 
-      statusLog.innerText = '✅ 완성되었습니다! 낭독을 시작합니다.';
-      speakStory(fullNarration);
+      statusLog.innerText = '✅ 동화책이 완성되었습니다! 아래 [낭독하기] 버튼을 누르면 읽어줍니다.';
+      readBtn.disabled = false; // 생성이 완료되면 낭독 버튼 활성화
 
     } catch (err) {
       statusLog.innerText = `⚠️ 오류: ${err.message}`;
@@ -188,7 +193,6 @@
     }
   }
 
-  // Google Imagen 3 API 호출 함수
   async function generateImage(apiKey, prompt) {
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`, {
       method: 'POST',
@@ -208,7 +212,12 @@
     return data.predictions[0].bytesBase64Encoded;
   }
 
-  // TTS 음성 재생
+  // 낭독 버튼 클릭 시 호출
+  function startStoryNarration() {
+    if (!currentStoryNarration) return;
+    speakStory(currentStoryNarration);
+  }
+
   function speakStory(text) {
     window.speechSynthesis.cancel();
     const cleanText = text.replace(/[*#]/g, '');

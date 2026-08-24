@@ -2,12 +2,19 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>나만의 동화책 제작</title>
+  <title>나만의 동화책 제작 & 서재</title>
+  <!-- PDF 변환 라이브러리 CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 680px; margin: 30px auto; padding: 20px; background: #f0f4f8; color: #333; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 720px; margin: 30px auto; padding: 20px; background: #f0f4f8; color: #333; }
     .card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
     h2 { margin-top: 0; color: #2c3e50; font-size: 22px; text-align: center; }
     
+    /* 탭 메뉴 */
+    .tab-nav { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+    .tab-btn { flex: 1; padding: 10px; background: none; border: none; font-size: 16px; font-weight: bold; color: #6b7280; cursor: pointer; border-radius: 8px; }
+    .tab-btn.active { background: #e0e7ff; color: #4338ca; }
+
     .api-key-box { background: #eef2ff; border: 1px solid #c7d2fe; padding: 14px; border-radius: 10px; margin-bottom: 20px; }
     .api-key-box label { color: #3730a3; font-weight: bold; }
     
@@ -16,86 +23,132 @@
     input, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 8px; font-size: 15px; background: white; }
     input:focus, select:focus { outline: none; border-color: #6366f1; }
     
-    button.primary-btn { width: 100%; padding: 14px; background: #6366f1; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
+    button.primary-btn { width: 100%; padding: 14px; background: #6366f1; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     button.primary-btn:hover { background: #4f46e5; }
     button.primary-btn:disabled { background: #a5b4fc; cursor: not-allowed; }
     
     #status-log { margin-top: 15px; font-size: 14px; color: #6366f1; text-align: center; font-weight: 600; }
     
+    /* 동화책 출력 스타일 */
     #story-viewer { margin-top: 24px; }
     .story-title { font-size: 22px; font-weight: bold; color: #1e293b; text-align: center; margin-bottom: 20px; }
-    
-    .page-item { background: #fffbeb; border: 1px solid #fef3c7; border-radius: 14px; padding: 18px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .page-item { background: #fffbeb; border: 1px solid #fef3c7; border-radius: 14px; padding: 18px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; page-break-inside: avoid; }
     .page-img-container { width: 100%; max-width: 420px; aspect-ratio: 1/1; background: #f3f4f6; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #e5e7eb; }
     .page-img { width: 100%; height: 100%; object-fit: cover; }
     .page-text { font-size: 16px; line-height: 1.85; color: #374151; text-align: left; word-break: keep-all; width: 100%; padding: 0 8px; box-sizing: border-box; }
     
+    /* 제어 및 저장 버튼 */
     .controls { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-    .controls button { flex: 1; min-width: 100px; padding: 12px; background: #e5e7eb; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600; }
+    .controls button { flex: 1; min-width: 90px; padding: 12px; background: #e5e7eb; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600; }
     .controls button.read-btn { background: #10b981; color: white; flex-basis: 100%; font-size: 15px; }
-    .controls button.read-btn:hover { background: #059669; }
-    .controls button.read-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+    .controls button.save-btn { background: #8b5cf6; color: white; }
+    .controls button.pdf-btn { background: #f59e0b; color: white; }
     .controls button.stop { background: #fee2e2; color: #991b1b; }
+
+    /* 서재 목록 스타일 */
+    .library-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 10px; }
+    .library-info { flex: 1; text-align: left; }
+    .library-info h4 { margin: 0 0 4px 0; color: #1f2937; }
+    .library-info p { margin: 0; font-size: 12px; color: #6b7280; }
+    .library-actions { display: flex; gap: 6px; }
+    .library-actions button { padding: 6px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; }
+    .btn-load { background: #6366f1; color: white; }
+    .btn-delete { background: #ef4444; color: white; }
   </style>
 </head>
 <body>
 
 <div class="card">
-  <h2>📖 나만의 동화책 제작</h2>
+  <h2>📖 나만의 동화책 제작 & 서재</h2>
 
-  <div class="api-key-box">
-    <label for="apiKey">🔑 API Key</label>
-    <input type="password" id="apiKey" placeholder="API 키를 입력하세요" style="margin-top: 6px;">
-  </div>
-  
-  <div class="input-group">
-    <label>주인공</label>
-    <input type="text" id="character" value="호기심 많은 아기 고양이 나비">
-  </div>
-  <div class="input-group">
-    <label>배경</label>
-    <input type="text" id="background" value="구름 위에 떠 있는 무지개 마을">
-  </div>
-  <div class="input-group">
-    <label>교훈 / 주제</label>
-    <input type="text" id="lesson" value="실수를 두려워하지 않고 다시 도전하는 용기">
-  </div>
-  
-  <!-- 분량 선택 드롭다운 -->
-  <div class="input-group">
-    <label for="storyLength">⏱ 이야기 분량 (낭독 시간)</label>
-    <select id="storyLength">
-      <option value="2">2분 (약 4페이지 - 짧고 경쾌한 이야기)</option>
-      <option value="3" selected>3분 (약 6페이지 - 기승전결이 풍부한 이야기)</option>
-      <option value="5">5분 (약 8페이지 - 대화와 묘사가 풍부한 모험담)</option>
-      <option value="10">10분 (약 10페이지 - 깊이 있는 장편 베드타임 스토리)</option>
-    </select>
+  <!-- 탭 메뉴 -->
+  <div class="tab-nav">
+    <button class="tab-btn active" id="tabCreateBtn" onclick="switchTab('create')">✍️ 새 동화 만들기</button>
+    <button class="tab-btn" id="tabLibraryBtn" onclick="switchTab('library')">📚 내 서재 보관함</button>
   </div>
 
-  <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎨 동화 & 삽화 제작하기</button>
-  <div id="status-log"></div>
+  <!-- 1. 새 동화 제작 탭 -->
+  <div id="create-view">
+    <div class="api-key-box">
+      <label for="apiKey">🔑 API Key</label>
+      <input type="password" id="apiKey" placeholder="Google AI Studio API 키를 입력하세요" style="margin-top: 6px;">
+    </div>
+    
+    <div class="input-group">
+      <label>주인공</label>
+      <input type="text" id="character" value="호기심 많은 아기 고양이 나비">
+    </div>
+    <div class="input-group">
+      <label>배경</label>
+      <input type="text" id="background" value="구름 위에 떠 있는 무지개 마을">
+    </div>
+    <div class="input-group">
+      <label>교훈 / 주제</label>
+      <input type="text" id="lesson" value="실수를 두려워하지 않고 다시 도전하는 용기">
+    </div>
+    <div class="input-group">
+      <label for="storyLength">⏱ 이야기 분량 (낭독 시간)</label>
+      <select id="storyLength">
+        <option value="2">2분 (약 4페이지)</option>
+        <option value="3" selected>3분 (약 6페이지)</option>
+        <option value="5">5분 (약 8페이지)</option>
+        <option value="10">10분 (약 10페이지)</option>
+      </select>
+    </div>
 
-  <div id="story-viewer"></div>
+    <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎨 동화 & 삽화 제작하기</button>
+    <div id="status-log"></div>
+  </div>
+
+  <!-- 2. 내 서재 탭 -->
+  <div id="library-view" style="display: none;">
+    <div id="library-list">
+      <p style="text-align: center; color: #6b7280;">저장된 동화책이 없습니다.</p>
+    </div>
+  </div>
+
+  <!-- 3. 동화책 출력 영역 (PDF 저장 타겟) -->
+  <div id="story-export-target">
+    <div id="story-viewer"></div>
+  </div>
   
-  <div class="controls">
-    <button class="read-btn" id="readBtn" onclick="startStoryNarration()" disabled>📢 동화 낭독하기</button>
+  <!-- 4. 하단 제어/내보내기 바 -->
+  <div class="controls" id="controlPanel" style="display: none;">
+    <button class="read-btn" id="readBtn" onclick="startStoryNarration()">📢 동화 낭독하기</button>
     <button onclick="pauseVoice()">⏸ 일시정지</button>
     <button onclick="resumeVoice()">▶ 이어듣기</button>
     <button class="stop" onclick="stopVoice()">⏹ 정지</button>
+    <button class="save-btn" onclick="saveCurrentStoryToDB()">💾 내 서재에 저장</button>
+    <button class="pdf-btn" onclick="exportToPDF()">📄 PDF 책 다운로드</button>
   </div>
 </div>
 
 <script>
   let currentStoryNarration = "";
+  let currentStoryBookObject = null; // 현재 생성/조회 중인 동화책 전체 객체
+  let db;
 
-  // 분량별 설정 매핑
-  const lengthConfig = {
-    "2": { pages: 4, charCountPerPage: "150~180자 (4~5문장)", totalDesc: "낭독 시 약 2분 소요" },
-    "3": { pages: 6, charCountPerPage: "160~200자 (5~6문장)", totalDesc: "낭독 시 약 3분 소요" },
-    "5": { pages: 8, charCountPerPage: "200~250자 (6~7문장)", totalDesc: "낭독 시 약 5분 소요" },
-    "10": { pages: 10, charCountPerPage: "280~320자 (8~10문장)", totalDesc: "낭독 시 약 10분 소요" }
+  // --- 1. IndexedDB 초기화 ---
+  const dbRequest = indexedDB.open("FairytaleAppDB", 1);
+  dbRequest.onupgradeneeded = (e) => {
+    db = e.target.result;
+    if (!db.objectStoreNames.contains("books")) {
+      db.createObjectStore("books", { keyPath: "id", autoIncrement: true });
+    }
+  };
+  dbRequest.onsuccess = (e) => {
+    db = e.target.result;
+    loadLibraryList();
   };
 
+  const lengthConfig = {
+    "2": { pages: 4, charCountPerPage: "150~180자 (4~5문장)", totalDesc: "낭독 약 2분" },
+    "3": { pages: 6, charCountPerPage: "160~200자 (5~6문장)", totalDesc: "낭독 약 3분" },
+    "5": { pages: 8, charCountPerPage: "200~250자 (6~7문장)", totalDesc: "낭독 약 5분" },
+    "10": { pages: 10, charCountPerPage: "280~320자 (8~10문장)", totalDesc: "낭독 약 10분" }
+  };
+
+  // --- 2. 동화 및 삽화 생성 ---
   async function generateStoryAndImages() {
     const apiKey = document.getElementById('apiKey').value.trim();
     const char = document.getElementById('character').value.trim();
@@ -103,9 +156,9 @@
     const lesson = document.getElementById('lesson').value.trim();
     const lengthVal = document.getElementById('storyLength').value;
     const btn = document.getElementById('generateBtn');
-    const readBtn = document.getElementById('readBtn');
     const statusLog = document.getElementById('status-log');
     const viewer = document.getElementById('story-viewer');
+    const controlPanel = document.getElementById('controlPanel');
 
     if (!apiKey) {
       alert('API 키를 입력해 주세요.');
@@ -114,26 +167,25 @@
     }
 
     const config = lengthConfig[lengthVal];
-
     btn.disabled = true;
-    readBtn.disabled = true;
-    statusLog.innerText = `1/${config.pages + 1}. ${lengthVal}분 분량의 스토리를 깊이 있게 작성 중입니다...`;
+    controlPanel.style.display = 'none';
+    statusLog.innerText = `1/${config.pages + 1}. 스토리를 구성 중입니다...`;
     viewer.innerHTML = '';
     currentStoryNarration = "";
     stopVoice();
 
     const promptText = `
 너는 유아/아동용 그림동화 전문 작가야.
-아래 설정을 바탕으로 총 ${config.pages}개 장면에 걸친 ${lengthVal}분 분량(${config.totalDesc})의 풍성한 동화책 JSON 데이터를 만들어줘.
+아래 설정을 바탕으로 총 ${config.pages}개 장면에 걸친 ${lengthVal}분 분량의 동화책 JSON 데이터를 만들어줘.
 
 - 주인공: ${char}
 - 배경: ${bg}
 - 주제/교훈: ${lesson}
 
 [작성 가이드라인]
-1. 단순 요약이 아닌, 등장인물의 대화, 감정 표현, 구체적인 상황 묘사를 충분히 넣어줘.
-2. 각 페이지(총 ${config.pages}페이지)당 한국어 본문 길이는 반드시 **${config.charCountPerPage}** 내외로 넉넉하게 작성해줘.
-3. 아동용으로 친근하고 다정한 구어체('~했어요', '~했답니다')를 사용해.
+1. 등장인물의 대화, 감정 표현, 구체적인 상황 묘사를 충분히 넣어줘.
+2. 각 페이지(총 ${config.pages}페이지)당 한국어 본문 길이는 반드시 **${config.charCountPerPage}** 내외로 작성해줘.
+3. 아동용 친근한 구어체('~했어요', '~했답니다') 사용.
 
 [반드시 준수할 출력 규격: 순수 JSON만 출력]
 {
@@ -142,11 +194,10 @@
     {
       "page_num": 1,
       "text": "1페이지 상세 본문...",
-      "image_prompt": "1페이지 장면에 어울리는 구체적인 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm pastel colors"
+      "image_prompt": "1페이지 장면에 어울리는 구체적인 영문 프롬프트, cute soft watercolor children's book illustration style, bright, pastel colors"
     }
   ]
 }
-(총 ${config.pages}개의 객체가 pages 배열에 들어가야 함)
 `;
 
     try {
@@ -162,40 +213,46 @@
       const geminiData = await geminiRes.json();
       if (geminiData.error) throw new Error(geminiData.error.message);
 
-      const rawJson = geminiData.candidates[0].content.parts[0].text;
-      const storyData = JSON.parse(rawJson);
+      const storyData = JSON.parse(geminiData.candidates[0].content.parts[0].text);
+      currentStoryBookObject = {
+        title: storyData.title,
+        createdAt: new Date().toLocaleString(),
+        pages: []
+      };
 
       viewer.innerHTML = `<div class="story-title">📖 ${storyData.title}</div>`;
       currentStoryNarration = `${storyData.title}. `;
 
       for (let i = 0; i < storyData.pages.length; i++) {
         const page = storyData.pages[i];
-        statusLog.innerText = `${i + 2}/${storyData.pages.length + 1}. ${page.page_num}페이지 삽화를 그리는 중입니다... (${i + 1}/${storyData.pages.length})`;
+        statusLog.innerText = `${i + 2}/${storyData.pages.length + 1}. ${page.page_num}페이지 삽화를 그리는 중... (${i + 1}/${storyData.pages.length})`;
 
         const pageDiv = document.createElement('div');
         pageDiv.className = 'page-item';
         pageDiv.innerHTML = `
-          <div class="page-img-container" id="img-container-${i}">
-            <span>🎨 삽화 그리는 중...</span>
-          </div>
+          <div class="page-img-container" id="img-container-${i}"><span>🎨 삽화 그리는 중...</span></div>
           <div class="page-text"><b>${page.page_num}p.</b> ${page.text}</div>
         `;
         viewer.appendChild(pageDiv);
         currentStoryNarration += ` ${page.text}`;
 
+        let imgBase64 = "";
         try {
-          const imgBase64 = await generateGeminiImage(apiKey, page.image_prompt);
-          const imgContainer = document.getElementById(`img-container-${i}`);
-          imgContainer.innerHTML = `<img src="data:image/png;base64,${imgBase64}" class="page-img" alt="삽화 ${page.page_num}">`;
+          imgBase64 = await generateGeminiImage(apiKey, page.image_prompt);
+          document.getElementById(`img-container-${i}`).innerHTML = `<img src="data:image/png;base64,${imgBase64}" class="page-img">`;
         } catch (imgErr) {
-          console.error(`Page ${i+1} Image Error:`, imgErr);
-          const imgContainer = document.getElementById(`img-container-${i}`);
-          imgContainer.innerHTML = `<span>⚠️ 삽화 생성 실패</span>`;
+          document.getElementById(`img-container-${i}`).innerHTML = `<span>⚠️ 삽화 생성 실패</span>`;
         }
+
+        currentStoryBookObject.pages.push({
+          page_num: page.page_num,
+          text: page.text,
+          imageBase64: imgBase64
+        });
       }
 
-      statusLog.innerText = '✅ 동화책이 완성되었습니다! 아래 [동화 낭독하기] 버튼을 눌러보세요.';
-      readBtn.disabled = false;
+      statusLog.innerText = '✅ 완성이 완료되었습니다! 저장하거나 낭독을 시작해 보세요.';
+      controlPanel.style.display = 'flex';
 
     } catch (err) {
       statusLog.innerText = `⚠️ 오류: ${err.message}`;
@@ -209,23 +266,117 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ text: `Children's storybook illustration: ${prompt}` }]
-        }]
+        contents: [{ parts: [{ text: `Children's storybook illustration: ${prompt}` }] }]
       })
     });
-
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
-
     const parts = data.candidates?.[0]?.content?.parts || [];
     for (const part of parts) {
-      if (part.inlineData && part.inlineData.data) {
-        return part.inlineData.data;
-      }
+      if (part.inlineData && part.inlineData.data) return part.inlineData.data;
     }
+    throw new Error('이미지 없음');
+  }
 
-    throw new Error('이미지 데이터가 없습니다.');
+  // --- 3. 내 서재 (IndexedDB) 저장 & 불러오기 ---
+  function saveCurrentStoryToDB() {
+    if (!currentStoryBookObject) return;
+    const tx = db.transaction("books", "readwrite");
+    const store = tx.objectStore("books");
+    store.add(currentStoryBookObject);
+    tx.oncomplete = () => {
+      alert(`[${currentStoryBookObject.title}]이(가) 내 서재에 안전하게 저장되었습니다!`);
+      loadLibraryList();
+    };
+  }
+
+  function loadLibraryList() {
+    if (!db) return;
+    const tx = db.transaction("books", "readonly");
+    const store = tx.objectStore("books");
+    const req = store.getAll();
+    const listEl = document.getElementById("library-list");
+
+    req.onsuccess = () => {
+      const books = req.result;
+      if (books.length === 0) {
+        listEl.innerHTML = `<p style="text-align: center; color: #6b7280;">저장된 동화책이 없습니다.</p>`;
+        return;
+      }
+      listEl.innerHTML = books.map(book => `
+        <div class="library-item">
+          <div class="library-info">
+            <h4>📖 ${book.title}</h4>
+            <p>생성일: ${book.createdAt} (총 ${book.pages.length}페이지)</p>
+          </div>
+          <div class="library-actions">
+            <button class="btn-load" onclick="displaySavedBook(${book.id})">열기</button>
+            <button class="btn-delete" onclick="deleteSavedBook(${book.id})">삭제</button>
+          </div>
+        </div>
+      `).join('');
+    };
+  }
+
+  function displaySavedBook(id) {
+    const tx = db.transaction("books", "readonly");
+    const store = tx.objectStore("books");
+    const req = store.get(id);
+
+    req.onsuccess = () => {
+      const book = req.result;
+      if (!book) return;
+      currentStoryBookObject = book;
+      const viewer = document.getElementById('story-viewer');
+      viewer.innerHTML = `<div class="story-title">📖 ${book.title}</div>`;
+      currentStoryNarration = `${book.title}. `;
+
+      book.pages.forEach(p => {
+        const pageDiv = document.createElement('div');
+        pageDiv.className = 'page-item';
+        const imgHtml = p.imageBase64 ? `<img src="data:image/png;base64,${p.imageBase64}" class="page-img">` : `<span>(삽화 없음)</span>`;
+        pageDiv.innerHTML = `
+          <div class="page-img-container">${imgHtml}</div>
+          <div class="page-text"><b>${p.page_num}p.</b> ${p.text}</div>
+        `;
+        viewer.appendChild(pageDiv);
+        currentStoryNarration += ` ${p.text}`;
+      });
+
+      document.getElementById('controlPanel').style.display = 'flex';
+      switchTab('create');
+      window.scrollTo({ top: viewer.offsetTop, behavior: 'smooth' });
+    };
+  }
+
+  function deleteSavedBook(id) {
+    if (!confirm('이 동화책을 서재에서 삭제하시겠습니까?')) return;
+    const tx = db.transaction("books", "readwrite");
+    tx.objectStore("books").delete(id);
+    tx.oncomplete = () => loadLibraryList();
+  }
+
+  // --- 4. PDF 책 다운로드 ---
+  function exportToPDF() {
+    if (!currentStoryBookObject) return;
+    const element = document.getElementById('story-export-target');
+    const opt = {
+      margin: 10,
+      filename: `${currentStoryBookObject.title}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+  }
+
+  // --- 5. 탭 전환 & 오디오 재생 ---
+  function switchTab(tab) {
+    document.getElementById('create-view').style.display = tab === 'create' ? 'block' : 'none';
+    document.getElementById('library-view').style.display = tab === 'library' ? 'block' : 'none';
+    document.getElementById('tabCreateBtn').className = `tab-btn ${tab === 'create' ? 'active' : ''}`;
+    document.getElementById('tabLibraryBtn').className = `tab-btn ${tab === 'library' ? 'active' : ''}`;
+    if (tab === 'library') loadLibraryList();
   }
 
   function startStoryNarration() {
@@ -240,7 +391,6 @@
     utterance.lang = 'ko-KR';
     utterance.rate = 0.88;
     utterance.pitch = 1.1;
-
     window.speechSynthesis.speak(utterance);
   }
 

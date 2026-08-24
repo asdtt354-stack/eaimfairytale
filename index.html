@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Gemini 2.5 Flash Image 동화책 리더</title>
+  <title>나만의 동화책 제작</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 680px; margin: 30px auto; padding: 20px; background: #f0f4f8; color: #333; }
     .card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
@@ -41,11 +41,11 @@
 <body>
 
 <div class="card">
-  <h2>📖 Gemini 2.5 Flash Image 동화책</h2>
+  <h2>📖 나만의 동화책 제작</h2>
 
   <div class="api-key-box">
-    <label for="apiKey">🔑 Google AI Studio API Key</label>
-    <input type="password" id="apiKey" placeholder="AI Studio API 키를 입력하세요" style="margin-top: 6px;">
+    <label for="apiKey">🔑 API Key</label>
+    <input type="password" id="apiKey" placeholder="API 키를 입력하세요" style="margin-top: 6px;">
   </div>
   
   <div class="input-group">
@@ -61,7 +61,7 @@
     <input type="text" id="lesson" value="실수를 두려워하지 않고 다시 도전하는 용기">
   </div>
 
-  <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎨 동화 & 삽화 생성하기</button>
+  <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎨 동화 & 삽화 제작하기</button>
   <div id="status-log"></div>
 
   <div id="story-viewer"></div>
@@ -95,7 +95,7 @@
 
     btn.disabled = true;
     readBtn.disabled = true;
-    statusLog.innerText = '1/5. Gemini 3 Flash가 스토리를 작성 중입니다...';
+    statusLog.innerText = '1/5. 동화 스토리를 작성 중입니다...';
     viewer.innerHTML = '';
     currentStoryNarration = "";
     stopVoice();
@@ -115,29 +115,29 @@
     {
       "page_num": 1,
       "text": "1페이지 한국어 본문 ('~했어요' 구어체)",
-      "image_prompt": "1페이지 장면에 어울리는 구체적인 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm colors"
+      "image_prompt": "1페이지 장면에 어울리는 구체적인 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm pastel colors"
     },
     {
       "page_num": 2,
       "text": "2페이지 한국어 본문",
-      "image_prompt": "2페이지 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm colors"
+      "image_prompt": "2페이지 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm pastel colors"
     },
     {
       "page_num": 3,
       "text": "3페이지 한국어 본문",
-      "image_prompt": "3페이지 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm colors"
+      "image_prompt": "3페이지 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm pastel colors"
     },
     {
       "page_num": 4,
       "text": "4페이지 한국어 본문",
-      "image_prompt": "4페이지 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm colors"
+      "image_prompt": "4페이지 영문 프롬프트, cute soft watercolor children's book illustration style, bright, warm pastel colors"
     }
   ]
 }
 `;
 
     try {
-      // 1. Gemini 3 Flash를 통해 스토리 생성
+      // 1. 스토리 및 이미지 프롬프트 JSON 생성
       const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -156,16 +156,16 @@
       viewer.innerHTML = `<div class="story-title">📖 ${storyData.title}</div>`;
       currentStoryNarration = `${storyData.title}. `;
 
-      // 2. Gemini 2.5 Flash Image 모델로 각 페이지 삽화 생성
+      // 2. 각 페이지별 삽화 생성 및 렌더링
       for (let i = 0; i < storyData.pages.length; i++) {
         const page = storyData.pages[i];
-        statusLog.innerText = `${i + 2}/5. Gemini 2.5 Flash Image로 ${page.page_num}페이지 삽화 생성 중...`;
+        statusLog.innerText = `${i + 2}/5. ${page.page_num}페이지 삽화를 그리는 중입니다...`;
 
         const pageDiv = document.createElement('div');
         pageDiv.className = 'page-item';
         pageDiv.innerHTML = `
           <div class="page-img-container" id="img-container-${i}">
-            <span>🎨 이미지 렌더링 중...</span>
+            <span>🎨 삽화 그리는 중...</span>
           </div>
           <div class="page-text"><b>${page.page_num}p.</b> ${page.text}</div>
         `;
@@ -179,11 +179,11 @@
         } catch (imgErr) {
           console.error(`Page ${i+1} Image Error:`, imgErr);
           const imgContainer = document.getElementById(`img-container-${i}`);
-          imgContainer.innerHTML = `<span>⚠️ 이미지 생성 실패: ${imgErr.message}</span>`;
+          imgContainer.innerHTML = `<span>⚠️ 삽화 생성 실패</span>`;
         }
       }
 
-      statusLog.innerText = '✅ 동화책이 완성되었습니다! [낭독하기] 버튼을 누르면 읽어줍니다.';
+      statusLog.innerText = '✅ 동화책이 완성되었습니다! 아래 [낭독하기] 버튼을 눌러보세요.';
       readBtn.disabled = false;
 
     } catch (err) {
@@ -193,14 +193,13 @@
     }
   }
 
-  // Gemini 2.5 Flash Image (gemini-2.5-flash-image) 호출 함수
   async function generateGeminiImage(apiKey, prompt) {
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{
-          parts: [{ text: `Generate an illustration for a children's storybook: ${prompt}` }]
+          parts: [{ text: `Children's storybook illustration: ${prompt}` }]
         }]
       })
     });
@@ -208,7 +207,6 @@
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
 
-    // 반환된 parts 중 inlineData(Base64 이미지) 추출
     const parts = data.candidates?.[0]?.content?.parts || [];
     for (const part of parts) {
       if (part.inlineData && part.inlineData.data) {
@@ -216,7 +214,7 @@
       }
     }
 
-    throw new Error('이미지 데이터를 찾을 수 없습니다.');
+    throw new Error('이미지 데이터가 없습니다.');
   }
 
   function startStoryNarration() {

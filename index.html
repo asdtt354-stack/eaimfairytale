@@ -100,6 +100,51 @@
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12); 
     }
     
+    /* 📸 사진 업로드 전용 UI */
+    .photo-upload-box {
+      background: #fffbeb;
+      border: 2px dashed #fcd34d;
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .photo-preview-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .photo-preview-img {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #f59e0b;
+      display: none;
+    }
+    .photo-btn {
+      background: #f59e0b;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .photo-clear-btn {
+      background: #fee2e2;
+      color: #991b1b;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      display: none;
+    }
+
     button.primary-btn { 
       width: 100%; 
       padding: 15px; 
@@ -156,23 +201,28 @@
     .page-text { font-size: 14.5px; line-height: 1.7; color: #ffffff; text-align: left; word-break: keep-all; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.7); font-weight: 500; }
     .page-num-badge { display: inline-block; background: rgba(251, 191, 36, 0.95); color: #78350f; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; margin-bottom: 6px; }
 
-    .dialogue-char { color: #93c5fd; font-weight: 700; }
+    .dialogue-char { font-weight: 800; margin-right: 4px; }
+    .dialogue-hero { color: #93c5fd; }
+    .dialogue-villain { color: #f87171; }
+    .dialogue-elder { color: #fde047; }
+    .emotion-tag { font-size: 11px; padding: 1px 5px; border-radius: 4px; background: rgba(255,255,255,0.2); color: #fff; margin-left: 4px; font-weight: normal; }
 
     .page-nav-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; background: #f8fafc; padding: 10px 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; }
     .page-nav-btn { background: #3b82f6; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13.5px; font-weight: 700; cursor: pointer; }
     .page-nav-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
     .page-indicator { font-size: 14px; font-weight: 800; color: #475569; }
 
-    .drama-banner {
+    .drama-control-box {
       margin-top: 14px;
       background: #eff6ff;
       border: 1.5px solid #bfdbfe;
-      padding: 10px 14px;
+      padding: 12px 14px;
       border-radius: 12px;
-      font-size: 13.5px;
+    }
+    .drama-control-box label {
       color: #1e40af;
-      font-weight: 600;
-      text-align: center;
+      font-size: 13.5px;
+      margin-bottom: 6px;
     }
 
     .controls { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
@@ -222,7 +272,18 @@
       <input type="password" id="apiKey" placeholder="API 키를 입력하세요" oninput="saveApiKeyManually()">
     </div>
 
-    <!-- 🎭 동화 장르 선택 드롭다운 추가 -->
+    <!-- 📸 어린이 얼굴 사진 업로드 영역 -->
+    <div class="photo-upload-box">
+      <label style="color: #92400e; margin-bottom: 4px;">🧒 주인공 얼굴 사진 넣기 (선택)</label>
+      <p style="margin: 0 0 8px 0; font-size: 12px; color: #b45309;">아이 사진을 넣으면 동화 속 캐릭터로 똑닮게 그려줘요!</p>
+      <input type="file" id="childPhotoInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+      <div class="photo-preview-wrapper">
+        <img id="photoPreview" class="photo-preview-img" alt="아이 사진">
+        <button type="button" class="photo-btn" onclick="document.getElementById('childPhotoInput').click()">📷 사진 선택하기</button>
+        <button type="button" id="photoClearBtn" class="photo-clear-btn" onclick="clearChildPhoto()">지우기</button>
+      </div>
+    </div>
+
     <div class="input-group">
       <label for="storyGenre">🎨 동화 장르 / 이야기 스타일</label>
       <select id="storyGenre">
@@ -236,16 +297,16 @@
     </div>
     
     <div class="input-group">
-      <label>🐰 등장인물 / 주인공</label>
-      <input type="text" id="character" value="용감한 양치기 소년 다윗과 거인 골리앗">
+      <label>🐰 등장인물 / 주인공 이름</label>
+      <input type="text" id="character" value="용감한 어린이 수아와 마법 숲의 요정">
     </div>
     <div class="input-group">
       <label>🏰 배경</label>
-      <input type="text" id="background" value="고대 엘라 골짜기 전장">
+      <input type="text" id="background" value="구름 위에 떠 있는 무지개 마을">
     </div>
     <div class="input-group">
       <label>💡 교훈 / 주제</label>
-      <input type="text" id="lesson" value="겉모습보다 강한 용기와 믿음의 승리">
+      <input type="text" id="lesson" value="실수를 두려워하지 않고 다시 도전하는 용기">
     </div>
     
     <div class="input-group">
@@ -262,7 +323,6 @@
     <div id="status-log"></div>
   </div>
 
-  <!-- 2. 서재 탭 -->
   <div id="library-view" style="display: none;">
     <div class="library-header">
       <span style="font-weight: 700; color: #475569; font-size: 15px;">보관된 동화 목록</span>
@@ -273,10 +333,8 @@
     </div>
   </div>
 
-  <!-- 3. 📖 오디오 드라마 뷰어 -->
   <div id="book-container">
     <div class="story-title" id="story-main-title"></div>
-    
     <div class="book-page-wrapper" id="story-pages-wrapper"></div>
 
     <div class="page-nav-bar">
@@ -285,13 +343,15 @@
       <button class="page-nav-btn" id="nextPageBtn" onclick="goToNextPage()">다음 페이지 ▶</button>
     </div>
 
-    <div class="drama-banner">
-      🎙️ <b>배역 맞춤 다역 낭독 모드 활성화</b><br>
-      <span style="font-size: 12px; color: #3b82f6;">해설, 주인공, 거인/악당, 조연이 각자 다른 목소리로 연기합니다.</span>
+    <div class="drama-control-box">
+      <label for="actingStyle">🎙️ 낭독 연기 스타일</label>
+      <select id="actingStyle">
+        <option value="dynamic_theater" selected>🔥 활기찬 다이내믹 극장 모드 (생생한 감정 연기 & 빠른 템포)</option>
+        <option value="bedtime_calm">🌙 잔잔한 베드타임 모드 (편안하고 포근한 수면 톤)</option>
+      </select>
     </div>
   </div>
   
-  <!-- 4. 컨트롤 패널 -->
   <div class="controls" id="controlPanel" style="display: none;">
     <button class="read-btn" id="readBtn" onclick="startContinuousReading()">📢 다역 입체 낭독 시작</button>
     <button class="loop-btn" id="loopBtn" onclick="toggleRepeatMode()">🔁 반복 재생: OFF</button>
@@ -313,6 +373,10 @@
   let currentLibraryIndex = 0;
   let currentPageIndex = 0;
 
+  // 🧒 아이 사진 Base64 저장 변수
+  let childPhotoBase64 = null;
+  let childPhotoMime = "image/jpeg";
+
   let availableVoices = [];
   function initVoices() {
     availableVoices = window.speechSynthesis.getVoices();
@@ -323,6 +387,47 @@
   initVoices();
 
   const API_STORAGE_KEY = "gemini_fairytale_api_key";
+
+  // --- 아이 사진 업로드 및 리사이즈 처리 ---
+  function handlePhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    childPhotoMime = file.type || "image/jpeg";
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      // 이미지 용량 최적화 (Canvas 리사이징)
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 512;
+        let w = img.width, h = img.height;
+        if (w > h && w > maxDim) { h *= maxDim / w; w = maxDim; }
+        else if (h > maxDim) { w *= maxDim / h; h = maxDim; }
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+
+        const dataUrl = canvas.toDataURL(childPhotoMime, 0.85);
+        childPhotoBase64 = dataUrl.split(',')[1];
+
+        // UI 미리보기 반영
+        const preview = document.getElementById('photoPreview');
+        preview.src = dataUrl;
+        preview.style.display = 'block';
+        document.getElementById('photoClearBtn').style.display = 'inline-block';
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearChildPhoto() {
+    childPhotoBase64 = null;
+    document.getElementById('childPhotoInput').value = '';
+    document.getElementById('photoPreview').style.display = 'none';
+    document.getElementById('photoClearBtn').style.display = 'none';
+  }
 
   function saveApiKeyManually() {
     const key = document.getElementById('apiKey').value.trim();
@@ -388,7 +493,6 @@
     "10": { pages: 10 }
   };
 
-  // 장르별 특화 프롬프트 가이드
   const genreGuides = {
     "fantasy": {
       storyGuide: "신비롭고 몽환적인 마법, 요정, 별빛, 환상적인 세계관을 중심으로 환상동화 스타일로 연출해줘.",
@@ -416,7 +520,6 @@
     }
   };
 
-  // 1. 장르 맞춤 다역 대본 및 삽화 생성
   async function generateStoryAndImages() {
     const apiKey = document.getElementById('apiKey').value.trim();
     const genreKey = document.getElementById('storyGenre').value;
@@ -444,17 +547,17 @@
     btn.disabled = true;
     controlPanel.style.display = 'none';
     bookContainer.style.display = 'none';
-    statusLog.innerText = `✨ 1/${config.pages + 1}. 선택하신 장르에 맞춰 입체 대본을 작성 중입니다...`;
+    statusLog.innerText = `✨ 1/${config.pages + 1}. 맞춤형 입체 대본을 작성 중입니다...`;
     pagesWrapper.innerHTML = '';
     stopVoice();
 
     const promptText = `
-너는 입체 오디오 드라마 동화 전문 작가야.
-아래 설정을 바탕으로 총 ${config.pages}개 장면의 동화책 JSON 데이터를 만들어줘.
+너는 유명 성우들이 연기할 역동적이고 재미있는 '어린이 오디오 드라마' 극작가야.
+신나는 부분은 와글와글 신나게, 긴장되는 부분은 손에 땀을 쥐게 생동감 넘치게 써줘!
 
-[장르 연출 가이드]
+[장르 연출]
 - 장르: ${document.getElementById('storyGenre').selectedOptions[0].text}
-- 연출 스타일: ${selectedGenre.storyGuide}
+- 스타일: ${selectedGenre.storyGuide}
 
 [이야기 설정]
 - 등장인물/주인공: ${char}
@@ -462,15 +565,12 @@
 - 주제/교훈: ${lesson}
 
 [작성 규칙]
-1. 단순 설명문이 아닌, 등장인물들의 생생한 대화와 해설이 어우러진 대본 형태로 작성해줘.
-2. 각 페이지마다 dialogue_list 배열을 만들어 문장 단위로 역할(role)을 명시해줘:
-   - role 종류: 
-     * "narrator" (차분하고 다정한 해설)
-     * "hero" 또는 "child" (맑고 씩씩한 주인공/어린이)
-     * "villain" 또는 "monster" (굵고 거친 악당/골리앗/괴물/거인)
-     * "elder" (지혜롭고 점잖은 왕/할아버지/어른)
-3. full_text에는 페이지 전체 본문 텍스트를 담아줘.
-4. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반드시 반영한 영문 프롬프트를 작성해줘.
+1. 재미있고 통통 튀는 대사와 해설이 어우러진 대본 형태로 작성해줘.
+2. 각 페이지의 dialogue_list 배열에 문장 단위로 role과 emotion을 반드시 부여해줘:
+   - role: "narrator"(해설), "hero"(주인공/어린이), "villain"(악당/거인), "elder"(어른/왕), "friend"(조연/동물친구)
+   - emotion: "excited", "happy", "urgent", "angry", "curious", "whisper", "calm"
+3. full_text에는 전체 본문을 적어줘.
+4. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘.
 
 [출력 규격: 순수 JSON만 출력]
 {
@@ -478,10 +578,10 @@
   "pages": [
     {
       "page_num": 1,
-      "full_text": "해설과 대사가 어우러진 전체 본문",
+      "full_text": "전체 본문",
       "dialogue_list": [
-        { "role": "narrator", "text": "문장..." },
-        { "role": "hero", "text": "대사..." }
+        { "role": "narrator", "emotion": "excited", "text": "문장..." },
+        { "role": "hero", "emotion": "happy", "text": "대사..." }
       ],
       "image_prompt": "1페이지 영문 프롬프트, ${selectedGenre.artStyle}"
     }
@@ -518,7 +618,8 @@
 
         let imgBase64 = "";
         try {
-          imgBase64 = await generateGeminiImage(apiKey, page.image_prompt);
+          // 🧒 아이 사진이 있으면 사진 기반 캐릭터화 호출
+          imgBase64 = await generateGeminiImage(apiKey, page.image_prompt, childPhotoBase64);
         } catch (imgErr) {
           console.error(`Page ${i+1} Image Error:`, imgErr);
         }
@@ -526,7 +627,7 @@
         currentStoryBookObject.pages.push({
           page_num: page.page_num,
           full_text: page.full_text || page.text,
-          dialogue_list: page.dialogue_list || [{ role: 'narrator', text: page.full_text || page.text }],
+          dialogue_list: page.dialogue_list || [{ role: 'narrator', emotion: 'calm', text: page.full_text || page.text }],
           imageBase64: imgBase64
         });
       }
@@ -534,7 +635,7 @@
       renderBookPages(currentStoryBookObject);
       showPage(0);
 
-      statusLog.innerText = '🎉 동화책이 완성되었어요! [다역 입체 낭독 시작]을 눌러보세요.';
+      statusLog.innerText = '🎉 나만의 맞춤 동화책이 완성되었어요! [다역 입체 낭독 시작]을 눌러보세요.';
       controlPanel.style.display = 'flex';
 
     } catch (err) {
@@ -544,18 +645,38 @@
     }
   }
 
-  async function generateGeminiImage(apiKey, prompt) {
+  // 🧒 Gemini 2.5 Flash Image - 아이 사진 기반 캐릭터 일관성 생성
+  async function generateGeminiImage(apiKey, prompt, inputImageBase64 = null) {
+    const parts = [];
+
+    if (inputImageBase64) {
+      // 1. 첨부된 아이 얼굴 사진 데이터 추가
+      parts.push({
+        inlineData: {
+          mimeType: childPhotoMime,
+          data: inputImageBase64
+        }
+      });
+      // 2. 사진 속 아이의 얼굴 특징을 캐릭터로 일관되게 반영하도록 프롬프트 결합
+      parts.push({
+        text: `Create a children's book illustration where the main character has the exact facial appearance, hairstyle, and likeness of the child in the provided image. Scene description: ${prompt}`
+      });
+    } else {
+      parts.push({
+        text: `Children's storybook illustration: ${prompt}`
+      });
+    }
+
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: `Children's storybook illustration: ${prompt}` }] }]
-      })
+      body: JSON.stringify({ contents: [{ parts: parts }] })
     });
+
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
-    const parts = data.candidates?.[0]?.content?.parts || [];
-    for (const part of parts) {
+    const resParts = data.candidates?.[0]?.content?.parts || [];
+    for (const part of resParts) {
       if (part.inlineData && part.inlineData.data) return part.inlineData.data;
     }
     throw new Error('이미지 없음');
@@ -576,10 +697,24 @@
 
       const formattedText = p.dialogue_list 
         ? p.dialogue_list.map(d => {
-            if (d.role === 'hero' || d.role === 'child') return `<span class="dialogue-char">🧒</span> "${d.text}"<br>`;
-            if (d.role === 'villain' || d.role === 'monster') return `<span class="dialogue-char">👹</span> "${d.text}"<br>`;
-            if (d.role === 'elder') return `<span class="dialogue-char">🧙‍♂️</span> "${d.text}"<br>`;
-            return `${d.text}<br>`;
+            let icon = '📖';
+            let roleClass = '';
+            if (d.role === 'hero' || d.role === 'child') { icon = '🧒'; roleClass = 'dialogue-hero'; }
+            else if (d.role === 'villain' || d.role === 'monster') { icon = '👹'; roleClass = 'dialogue-villain'; }
+            else if (d.role === 'elder') { icon = '🧙‍♂️'; roleClass = 'dialogue-elder'; }
+            else if (d.role === 'friend') { icon = '🐾'; roleClass = 'dialogue-hero'; }
+
+            let emotionBadge = '';
+            if (d.emotion === 'excited') emotionBadge = '<span class="emotion-tag">✨ 신남</span>';
+            else if (d.emotion === 'urgent') emotionBadge = '<span class="emotion-tag">🔥 긴박</span>';
+            else if (d.emotion === 'angry') emotionBadge = '<span class="emotion-tag">💥 호통</span>';
+            else if (d.emotion === 'whisper') emotionBadge = '<span class="emotion-tag">🤫 속삭임</span>';
+
+            if (d.role === 'narrator') {
+              return `${d.text}<br>`;
+            } else {
+              return `<span class="dialogue-char ${roleClass}">${icon}</span> "${d.text}" ${emotionBadge}<br>`;
+            }
           }).join('')
         : p.full_text;
 
@@ -620,14 +755,13 @@
   function goToPrevPage() { showPage(currentPageIndex - 1); }
   function goToNextPage() { showPage(currentPageIndex + 1); }
 
-  // 2. 실시간 다역 낭독 엔진
   async function startContinuousReading(onCompleteCallback = null) {
     if (!currentStoryBookObject) return;
     stopVoice();
     isPlaying = true;
 
     showPage(0);
-    await speakWithRole('narrator', `제목: ${currentStoryBookObject.title}`);
+    await speakDynamicLine('narrator', 'excited', `제목: ${currentStoryBookObject.title}`);
 
     for (let i = 0; i < currentStoryBookObject.pages.length; i++) {
       if (!isPlaying) break;
@@ -638,10 +772,12 @@
       if (pageData.dialogue_list && pageData.dialogue_list.length > 0) {
         for (const line of pageData.dialogue_list) {
           if (!isPlaying) break;
-          await speakWithRole(line.role || 'narrator', line.text);
+          await speakDynamicLine(line.role || 'narrator', line.emotion || 'calm', line.text);
+          const delay = line.emotion === 'urgent' ? 60 : 120;
+          await new Promise(r => setTimeout(r, delay));
         }
       } else {
-        await speakWithRole('narrator', pageData.full_text);
+        await speakDynamicLine('narrator', 'calm', pageData.full_text);
       }
     }
 
@@ -660,7 +796,7 @@
     }
   }
 
-  function speakWithRole(role, rawText) {
+  function speakDynamicLine(role, emotion, rawText) {
     return new Promise((resolve) => {
       const cleanText = rawText.replace(/[*#"]/g, '').trim();
       if (!cleanText) return resolve();
@@ -668,33 +804,53 @@
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = 'ko-KR';
 
+      const styleMode = document.getElementById('actingStyle').value;
+
       if (availableVoices.length === 0) initVoices();
       const koVoices = availableVoices.filter(v => v.lang.startsWith('ko'));
       const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남성') || v.name.includes('Minho') || v.name.includes('Standard-C'));
       const femaleVoice = koVoices.find(v => v.name.includes('Female') || v.name.includes('여성') || v.name.includes('Yuna') || v.name.includes('Sora') || v.name.includes('Google'));
 
       const r = (role || '').toLowerCase();
+      const em = (emotion || '').toLowerCase();
 
-      if (r.includes('villain') || r.includes('monster') || r.includes('giant') || r.includes('goliath')) {
-        utterance.rate = 0.82;
-        utterance.pitch = 0.65;
-        if (maleVoice) utterance.voice = maleVoice;
-      } 
-      else if (r.includes('hero') || r.includes('child') || r.includes('david')) {
-        utterance.rate = 0.98;
-        utterance.pitch = 1.25;
-        if (femaleVoice) utterance.voice = femaleVoice;
-      } 
-      else if (r.includes('elder') || r.includes('king') || r.includes('grandpa')) {
-        utterance.rate = 0.84;
-        utterance.pitch = 0.82;
-        if (maleVoice) utterance.voice = maleVoice;
-      } 
-      else {
-        utterance.rate = 0.88;
-        utterance.pitch = 1.02;
-        if (femaleVoice) utterance.voice = femaleVoice;
+      let rate = 1.0;
+      let pitch = 1.0;
+
+      if (styleMode === 'dynamic_theater') {
+        if (r.includes('hero') || r.includes('child') || r.includes('friend')) {
+          if (femaleVoice) utterance.voice = femaleVoice;
+          if (em === 'excited' || em === 'happy') { rate = 1.18; pitch = 1.22; }
+          else if (em === 'urgent') { rate = 1.25; pitch = 1.15; }
+          else if (em === 'whisper') { rate = 0.88; pitch = 1.05; }
+          else { rate = 1.10; pitch = 1.15; }
+        } 
+        else if (r.includes('villain') || r.includes('monster') || r.includes('giant')) {
+          if (maleVoice) utterance.voice = maleVoice;
+          if (em === 'angry') { rate = 1.05; pitch = 0.78; }
+          else { rate = 0.95; pitch = 0.82; }
+        } 
+        else if (r.includes('elder') || r.includes('king')) {
+          if (maleVoice) utterance.voice = maleVoice;
+          rate = 0.95; pitch = 0.90;
+        } 
+        else {
+          if (femaleVoice) utterance.voice = femaleVoice;
+          if (em === 'excited' || em === 'happy') { rate = 1.12; pitch = 1.10; }
+          else if (em === 'urgent') { rate = 1.18; pitch = 1.08; }
+          else { rate = 1.05; pitch = 1.05; }
+        }
+      } else {
+        rate = 0.88; pitch = 1.0;
+        if (r.includes('villain') || r.includes('elder')) {
+          if (maleVoice) utterance.voice = maleVoice;
+        } else {
+          if (femaleVoice) utterance.voice = femaleVoice;
+        }
       }
+
+      utterance.rate = rate;
+      utterance.pitch = pitch;
 
       utterance.onend = () => resolve();
       utterance.onerror = () => resolve();

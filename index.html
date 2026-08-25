@@ -100,7 +100,6 @@
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12); 
     }
     
-    /* 📸 사진 업로드 전용 UI */
     .photo-upload-box {
       background: #fffbeb;
       border: 2px dashed #fcd34d;
@@ -145,9 +144,10 @@
       display: none;
     }
 
+    /* 📱 모바일 터치 최적화 버튼 */
     button.primary-btn { 
       width: 100%; 
-      padding: 15px; 
+      padding: 16px; 
       background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); 
       color: white; 
       border: none; 
@@ -157,20 +157,14 @@
       cursor: pointer; 
       margin-top: 8px; 
       box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3);
-      transition: transform 0.1s;
+      touch-action: manipulation;
     }
-    button.primary-btn:hover { transform: translateY(-1px); }
-    button.primary-btn:disabled { 
-      background: #cbd5e1 !important; 
-      color: #94a3b8 !important; 
-      box-shadow: none !important; 
-      cursor: not-allowed !important;
-      background-image: none !important;
+    button.primary-btn:active {
+      transform: scale(0.98);
     }
     
     #status-log { margin-top: 14px; font-size: 14px; color: #4f46e5; text-align: center; font-weight: 700; }
     
-    /* 📖 동화책 뷰어 */
     #book-container { margin-top: 20px; display: none; }
     .story-title { font-size: 20px; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 14px; }
     
@@ -258,7 +252,6 @@
     <button class="tab-btn" id="tabLibraryBtn" onclick="switchTab('library')">📚 내 서재 보관함</button>
   </div>
 
-  <!-- 1. 제작 탭 -->
   <div id="create-view">
     <div class="api-key-box">
       <div class="api-key-header">
@@ -272,10 +265,10 @@
       <input type="password" id="apiKey" placeholder="API 키를 입력하세요" oninput="saveApiKeyManually()">
     </div>
 
-    <!-- 📸 어린이 얼굴 사진 업로드 영역 -->
+    <!-- 📸 어린이 얼굴 사진 업로드 -->
     <div class="photo-upload-box">
       <label style="color: #92400e; margin-bottom: 4px;">🧒 주인공 얼굴 사진 넣기 (선택)</label>
-      <p style="margin: 0 0 8px 0; font-size: 12px; color: #b45309;">아이 사진을 넣으면 동화 속 캐릭터로 똑닮게 그려줘요!</p>
+      <p style="margin: 0 0 8px 0; font-size: 12px; color: #b45309;">아이 사진을 넣으면 동화 속 캐릭터로 쏙 들어갑니다!</p>
       <input type="file" id="childPhotoInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
       <div class="photo-preview-wrapper">
         <img id="photoPreview" class="photo-preview-img" alt="아이 사진">
@@ -284,6 +277,7 @@
       </div>
     </div>
 
+    <!-- 🎭 장르 선택 (기타/자유 장르 추가) -->
     <div class="input-group">
       <label for="storyGenre">🎨 동화 장르 / 이야기 스타일</label>
       <select id="storyGenre">
@@ -293,20 +287,21 @@
         <option value="scifi">🚀 우주 & 미래 SF 과학 탐험 (로봇, 별자리, 시간여행)</option>
         <option value="animal">🐾 따뜻한 동물 친구들 & 일상 교훈 (숲속 우정과 배려)</option>
         <option value="comic">😂 유쾌하고 웃긴 코믹 모험 (엉뚱하고 재미있는 소동)</option>
+        <option value="custom">🌈 기타 / 자유 장르 (주제에 맞춘 창의적 자유 연출)</option>
       </select>
     </div>
     
     <div class="input-group">
       <label>🐰 등장인물 / 주인공 이름</label>
-      <input type="text" id="character" value="용감한 어린이 수아와 마법 숲의 요정">
+      <input type="text" id="character" value="용감한 양치기 소년 다윗과 거인 골리앗">
     </div>
     <div class="input-group">
       <label>🏰 배경</label>
-      <input type="text" id="background" value="구름 위에 떠 있는 무지개 마을">
+      <input type="text" id="background" value="고대 엘라 골짜기 전장">
     </div>
     <div class="input-group">
       <label>💡 교훈 / 주제</label>
-      <input type="text" id="lesson" value="실수를 두려워하지 않고 다시 도전하는 용기">
+      <input type="text" id="lesson" value="겉모습보다 강한 용기와 믿음의 승리">
     </div>
     
     <div class="input-group">
@@ -319,7 +314,8 @@
       </select>
     </div>
 
-    <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎭 다역 연기 동화책 만들기</button>
+    <!-- 💥 disabled 속성 완전 제거로 모바일 터치 차단 방지 -->
+    <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎭 마법의 동화책 & 삽화 만들기</button>
     <div id="status-log"></div>
   </div>
 
@@ -373,7 +369,6 @@
   let currentLibraryIndex = 0;
   let currentPageIndex = 0;
 
-  // 🧒 아이 사진 Base64 저장 변수
   let childPhotoBase64 = null;
   let childPhotoMime = "image/jpeg";
 
@@ -388,7 +383,6 @@
 
   const API_STORAGE_KEY = "gemini_fairytale_api_key";
 
-  // --- 아이 사진 업로드 및 리사이즈 처리 ---
   function handlePhotoUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -396,7 +390,6 @@
     childPhotoMime = file.type || "image/jpeg";
     const reader = new FileReader();
     reader.onload = (e) => {
-      // 이미지 용량 최적화 (Canvas 리사이징)
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
@@ -411,7 +404,6 @@
         const dataUrl = canvas.toDataURL(childPhotoMime, 0.85);
         childPhotoBase64 = dataUrl.split(',')[1];
 
-        // UI 미리보기 반영
         const preview = document.getElementById('photoPreview');
         preview.src = dataUrl;
         preview.style.display = 'block';
@@ -517,11 +509,23 @@
     "comic": {
       storyGuide: "엉뚱하고 기발한 사건, 유쾌한 소동, 아이들이 까르르 웃을 수 있는 재치 넘치는 대화로 연출해줘.",
       artStyle: "fun lively children's comic storybook illustration, expressive characters, bright cheerful vibrant colors"
+    },
+    "custom": {
+      storyGuide: "입력된 주인공과 배경, 주제의 개성을 극대화하여 가장 매력적이고 독창적인 맞춤형 스토리로 자유롭게 연출해줘.",
+      artStyle: "creative charming children's storybook illustration, expressive and heartwarming watercolor art style, vibrant pleasant colors"
     }
   };
 
   async function generateStoryAndImages() {
     const apiKey = document.getElementById('apiKey').value.trim();
+    
+    // 모바일 안내 팝업
+    if (!apiKey || apiKey.length < 5) {
+      alert('🔑 Google AI Studio API Key를 먼저 입력해 주세요.');
+      document.getElementById('apiKey').focus();
+      return;
+    }
+
     const genreKey = document.getElementById('storyGenre').value;
     const char = document.getElementById('character').value.trim();
     const bg = document.getElementById('background').value.trim();
@@ -533,16 +537,10 @@
     const pagesWrapper = document.getElementById('story-pages-wrapper');
     const controlPanel = document.getElementById('controlPanel');
 
-    if (!apiKey) {
-      alert('API 키를 입력해 주세요.');
-      document.getElementById('apiKey').focus();
-      return;
-    }
-
     saveApiKeyManually();
 
     const config = lengthConfig[lengthVal];
-    const selectedGenre = genreGuides[genreKey];
+    const selectedGenre = genreGuides[genreKey] || genreGuides["custom"];
 
     btn.disabled = true;
     controlPanel.style.display = 'none';
@@ -618,7 +616,6 @@
 
         let imgBase64 = "";
         try {
-          // 🧒 아이 사진이 있으면 사진 기반 캐릭터화 호출
           imgBase64 = await generateGeminiImage(apiKey, page.image_prompt, childPhotoBase64);
         } catch (imgErr) {
           console.error(`Page ${i+1} Image Error:`, imgErr);
@@ -645,19 +642,16 @@
     }
   }
 
-  // 🧒 Gemini 2.5 Flash Image - 아이 사진 기반 캐릭터 일관성 생성
   async function generateGeminiImage(apiKey, prompt, inputImageBase64 = null) {
     const parts = [];
 
     if (inputImageBase64) {
-      // 1. 첨부된 아이 얼굴 사진 데이터 추가
       parts.push({
         inlineData: {
           mimeType: childPhotoMime,
           data: inputImageBase64
         }
       });
-      // 2. 사진 속 아이의 얼굴 특징을 캐릭터로 일관되게 반영하도록 프롬프트 결합
       parts.push({
         text: `Create a children's book illustration where the main character has the exact facial appearance, hairstyle, and likeness of the child in the provided image. Scene description: ${prompt}`
       });

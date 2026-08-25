@@ -4,29 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>나만의 동화책 제작 & 서재</title>
+  <!-- PDF 변환 라이브러리 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    /* 이전 스타일과 동일 */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 16px 12px; background: linear-gradient(135deg, #fff9e6 0%, #e0f2fe 50%, #fce7f3 100%); background-attachment: fixed; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; }
-    .card { width: 100%; max-width: 640px; background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(12px); padding: 24px 18px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 2px solid #fef3c7; margin: 0 auto; }
-    h2 { margin: 0 0 18px 0; font-size: 22px; text-align: center; font-weight: 800; }
-    .tab-nav { display: flex; gap: 6px; margin-bottom: 20px; background: #f1f5f9; padding: 5px; border-radius: 14px; }
-    .tab-btn { flex: 1; padding: 11px; font-size: 14.5px; font-weight: 700; color: #64748b; cursor: pointer; border-radius: 10px; border:none; background:transparent;}
-    .tab-btn.active { background: #ffffff; color: #6366f1; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
-    .api-key-box { background: #f8fafc; border: 1.5px dashed #cbd5e1; padding: 14px; border-radius: 14px; margin-bottom: 18px; }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; 
+      margin: 0;
+      padding: 16px 12px;
+      background: linear-gradient(135deg, #fff9e6 0%, #e0f2fe 50%, #fce7f3 100%); 
+      background-attachment: fixed;
+      color: #334155; 
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    
+    .card { 
+      width: 100%;
+      max-width: 640px;
+      background: rgba(255, 255, 255, 0.96); 
+      backdrop-filter: blur(12px);
+      padding: 24px 18px; 
+      border-radius: 24px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+      border: 2px solid #fef3c7;
+      margin: 0 auto;
+    }
+
+    h2 { 
+      margin: 0 0 18px 0; 
+      color: #1e293b; 
+      font-size: 22px; 
+      text-align: center; 
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    
+    .tab-nav { 
+      display: flex; 
+      gap: 6px; 
+      margin-bottom: 20px; 
+      background: #f1f5f9;
+      padding: 5px;
+      border-radius: 14px;
+    }
+    .tab-btn { 
+      flex: 1; 
+      padding: 11px; 
+      background: transparent; 
+      border: none; 
+      font-size: 14.5px; 
+      font-weight: 700; 
+      color: #64748b; 
+      cursor: pointer; 
+      border-radius: 10px; 
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active { 
+      background: #ffffff; 
+      color: #6366f1; 
+      box-shadow: 0 3px 10px rgba(0,0,0,0.06); 
+    }
+
+    .api-key-box { 
+      background: #f8fafc; 
+      border: 1.5px dashed #cbd5e1; 
+      padding: 14px; 
+      border-radius: 14px; 
+      margin-bottom: 18px; 
+    }
     .api-key-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .api-key-header label { color: #4f46e5; font-weight: 700; font-size: 13.5px; }
     .api-key-actions { display: flex; gap: 6px; align-items: center; }
     .api-status { font-size: 12px; color: #10b981; font-weight: bold; display: none; }
     .api-btn-small { background: #6366f1; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; cursor: pointer; font-weight: 600; }
     .api-btn-clear { background: none; border: none; color: #ef4444; font-size: 11.5px; cursor: pointer; text-decoration: underline; }
+    
     .input-group { margin-bottom: 15px; }
-    label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 14px; }
-    input, select { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 12px; font-size: 15px; background: #ffffff; }
-    input:focus, select:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12); }
-    button.primary-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); color: white; border: none; border-radius: 14px; font-size: 16.5px; font-weight: 800; cursor: pointer; margin-top: 8px; box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3); }
-    /* 💥 모바일 버튼 비활성화 시 스타일 정의 (필수) */
+    label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 14px; color: #334155; }
+    input, select { 
+      width: 100%; 
+      padding: 12px 14px; 
+      border: 1.5px solid #e2e8f0; 
+      border-radius: 12px; 
+      font-size: 15px; 
+      background: #ffffff; 
+      transition: all 0.2s;
+    }
+    input:focus, select:focus { 
+      outline: none; 
+      border-color: #6366f1; 
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12); 
+    }
+    
+    button.primary-btn { 
+      width: 100%; 
+      padding: 15px; 
+      background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); 
+      color: white; 
+      border: none; 
+      border-radius: 14px; 
+      font-size: 16.5px; 
+      font-weight: 800; 
+      cursor: pointer; 
+      margin-top: 8px; 
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3);
+      transition: transform 0.1s;
+    }
+    button.primary-btn:hover { transform: translateY(-1px); }
     button.primary-btn:disabled { 
       background: #cbd5e1 !important; 
       color: #94a3b8 !important; 
@@ -34,37 +122,78 @@
       cursor: not-allowed !important;
       background-image: none !important;
     }
+    
     #status-log { margin-top: 14px; font-size: 14px; color: #4f46e5; text-align: center; font-weight: 700; }
-    /* 나머지 스타일 동일... */
+    
+    /* 📖 동화책 뷰어 */
     #book-container { margin-top: 20px; display: none; }
-    .story-title { font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 14px; }
+    .story-title { font-size: 20px; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 14px; }
+    
     .book-page-wrapper { width: 100%; position: relative; }
     .page-item { display: none; position: relative; width: 100%; aspect-ratio: 1/1; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.12); animation: fadeIn 0.3s ease-in-out; background: #e2e8f0; border: 3px solid #ffffff; }
     .page-item.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
     .page-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .page-loading-text { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 15px; font-weight: 700; }
-    .page-overlay-box { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%); padding: 32px 16px 16px 16px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-    .page-text { font-size: 15px; line-height: 1.75; color: #ffffff; text-align: left; word-break: keep-all; margin: 0; font-weight: 500; }
+    .page-loading-text { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 15px; color: #64748b; font-weight: 700; }
+
+    .page-overlay-box { 
+      position: absolute; 
+      bottom: 0; 
+      left: 0; 
+      width: 100%; 
+      background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%); 
+      padding: 32px 16px 16px 16px; 
+      backdrop-filter: blur(4px); 
+      -webkit-backdrop-filter: blur(4px); 
+    }
+    .page-text { font-size: 15px; line-height: 1.75; color: #ffffff; text-align: left; word-break: keep-all; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.7); font-weight: 500; }
     .page-num-badge { display: inline-block; background: rgba(251, 191, 36, 0.95); color: #78350f; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+
     .page-nav-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; background: #f8fafc; padding: 10px 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; }
     .page-nav-btn { background: #3b82f6; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13.5px; font-weight: 700; cursor: pointer; }
-    .page-nav-btn:disabled { background: #cbd5e1; }
+    .page-nav-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
     .page-indicator { font-size: 14px; font-weight: 800; color: #475569; }
-    .controls { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
-    .controls button { flex: 1 1 calc(50% - 4px); padding: 12px 6px; background: #e2e8f0; border: none; border-radius: 10px; font-size: 13.5px; font-weight: 700; color: #334155; }
+
+    /* 완성 후 목소리 선택 바 */
+    .voice-control-box {
+      margin-top: 14px;
+      background: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      padding: 12px;
+      border-radius: 12px;
+    }
+    .voice-control-box label {
+      color: #166534;
+      font-size: 13.5px;
+      margin-bottom: 6px;
+    }
+
+    /* 제어 버튼 바 */
+    .controls { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .controls button { flex: 1 1 calc(50% - 4px); padding: 12px 6px; background: #e2e8f0; border: none; border-radius: 10px; font-size: 13.5px; cursor: pointer; font-weight: 700; color: #334155; }
     .controls button.read-btn { background: #10b981; color: white; flex: 1 1 100%; font-size: 15.5px; padding: 13px; }
+    
+    .controls button.loop-btn { background: #f1f5f9; color: #475569; border: 1.5px solid #cbd5e1; }
     .controls button.loop-btn.active { background: #8b5cf6; color: white; border-color: #7c3aed; font-weight: 800; }
+    
     .controls button.save-btn { background: #6366f1; color: white; }
     .controls button.pdf-btn { background: #f59e0b; color: white; }
     .controls button.stop { background: #fee2e2; color: #991b1b; }
+
+    /* 서재 목록 스타일 */
     .library-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .library-play-all { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
     .library-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; margin-bottom: 10px; }
-    .library-info h4 { margin: 0 0 3px 0; font-size: 15px; font-weight: 700; }
+    .library-info { flex: 1; text-align: left; }
+    .library-info h4 { margin: 0 0 3px 0; color: #1e293b; font-size: 15px; font-weight: 700; }
     .library-info p { margin: 0; font-size: 11.5px; color: #64748b; }
     .library-actions { display: flex; gap: 6px; }
-    .library-actions button { padding: 6px 10px; font-size: 12px; border-radius: 6px; font-weight: 700; }
+    .library-actions button { padding: 6px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 700; }
     .btn-load { background: #6366f1; color: white; }
     .btn-delete { background: #ef4444; color: white; }
   </style>
@@ -79,31 +208,31 @@
     <button class="tab-btn" id="tabLibraryBtn" onclick="switchTab('library')">📚 내 서재 보관함</button>
   </div>
 
+  <!-- 1. 제작 탭 (생성 시에는 스토리 설정에만 집중) -->
   <div id="create-view">
     <div class="api-key-box">
       <div class="api-key-header">
-        <label for="apiKey">🔑 Google AI Studio API Key (필수)</label>
+        <label for="apiKey">🔑 Google AI Studio API Key</label>
         <div class="api-key-actions">
           <span class="api-status" id="apiStatus">💾 저장됨</span>
           <button class="api-btn-small" onclick="saveApiKeyManually()">키 저장</button>
           <button class="api-btn-clear" onclick="clearSavedApiKey()">삭제</button>
         </div>
       </div>
-      <!-- 💥 oninput 이벤트 추가 및 ID 명확화 -->
-      <input type="password" id="apiKey" placeholder="AI Studio API 키를 입력하세요" oninput="saveApiKeyManually()">
+      <input type="password" id="apiKey" placeholder="API 키를 입력하세요" oninput="saveApiKeyManually()">
     </div>
     
     <div class="input-group">
       <label>🐰 주인공</label>
-      <input type="text" id="character" value="다윗과 골리앗">
+      <input type="text" id="character" value="호기심 많은 아기 고양이 나비">
     </div>
     <div class="input-group">
       <label>🏰 배경</label>
-      <input type="text" id="background" value="고대 이스라엘">
+      <input type="text" id="background" value="구름 위에 떠 있는 무지개 마을">
     </div>
     <div class="input-group">
       <label>💡 교훈 / 주제</label>
-      <input type="text" id="lesson" value="다윗의 믿음">
+      <input type="text" id="lesson" value="실수를 두려워하지 않고 다시 도전하는 용기">
     </div>
     
     <div class="input-group">
@@ -116,21 +245,11 @@
       </select>
     </div>
 
-    <div class="input-group">
-      <label for="voiceStyle">🎙 낭독 목소리 선택</label>
-      <select id="voiceStyle">
-        <option value="warm_mom" selected>🌸 다정한 이야기 엄마 / 이모 (따뜻하고 편안한 톤)</option>
-        <option value="cheerful_kid">🧒 발랄한 어린이 친구 (밝고 쾌활한 모험 톤)</option>
-        <option value="wise_grandpa">🧙‍♂️ 지혜로운 마법사 할아버지 (차분하고 묵직한 저음)</option>
-        <option value="pro_actor">🎭 감정 풍부한 전문 성우 (생동감 넘치는 표준 톤)</option>
-      </select>
-    </div>
-
-    <!-- 💥 초기 비활성화 상태로 시작 -->
-    <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()" disabled>🎨 마법의 동화책 & 삽화 만들기</button>
+    <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎨 마법의 동화책 & 삽화 만들기</button>
     <div id="status-log"></div>
   </div>
 
+  <!-- 2. 서재 탭 -->
   <div id="library-view" style="display: none;">
     <div class="library-header">
       <span style="font-weight: 700; color: #475569; font-size: 15px;">보관된 동화 목록</span>
@@ -141,18 +260,33 @@
     </div>
   </div>
 
+  <!-- 3. 📖 그림 위 텍스트 동화책 뷰어 -->
   <div id="book-container">
     <div class="story-title" id="story-main-title"></div>
+    
     <div class="book-page-wrapper" id="story-pages-wrapper"></div>
+
     <div class="page-nav-bar">
-      <button class="page-nav-btn" id="prevPageBtn" onclick="goToPrevPage()">◀ 이전</button>
+      <button class="page-nav-btn" id="prevPageBtn" onclick="goToPrevPage()">◀ 이전 페이지</button>
       <span class="page-indicator" id="pageIndicator">1 / 1</span>
-      <button class="page-nav-btn" id="nextPageBtn" onclick="goToNextPage()">다음 ▶</button>
+      <button class="page-nav-btn" id="nextPageBtn" onclick="goToNextPage()">다음 페이지 ▶</button>
+    </div>
+
+    <!-- 🎙 동화 완성 후 실시간으로 목소리를 변경하는 선택창 -->
+    <div class="voice-control-box">
+      <label for="postVoiceStyle">🎙 낭독 목소리 선택 (실시간 변경 가능)</label>
+      <select id="postVoiceStyle">
+        <option value="warm_mom" selected>🌸 다정한 이야기 엄마 / 이모 (따뜻하고 깨끗한 톤)</option>
+        <option value="cheerful_kid">🧒 발랄한 어린이 친구 (밝고 쾌활한 톤)</option>
+        <option value="wise_grandpa">🧙‍♂️ 지혜로운 마법사 할아버지 (차분한 저음 톤)</option>
+        <option value="pro_actor">🎭 감정 풍부한 동화 구연 성우 (표준 구연동화 톤)</option>
+      </select>
     </div>
   </div>
   
+  <!-- 4. 컨트롤 패널 -->
   <div class="controls" id="controlPanel" style="display: none;">
-    <button class="read-btn" id="readBtn" onclick="startContinuousReading()">📢 연속 낭독하기</button>
+    <button class="read-btn" id="readBtn" onclick="startContinuousReading()">📢 동화 연속 낭독하기</button>
     <button class="loop-btn" id="loopBtn" onclick="toggleRepeatMode()">🔁 반복 재생: OFF</button>
     <button onclick="pauseVoice()">⏸ 일시정지</button>
     <button onclick="resumeVoice()">▶ 이어듣기</button>
@@ -172,7 +306,7 @@
   let currentLibraryIndex = 0;
   let currentPageIndex = 0;
 
-  // 브라우저 음성 목록
+  // 브라우저 음성 목록 초기화
   let availableVoices = [];
   function initVoices() {
     availableVoices = window.speechSynthesis.getVoices();
@@ -182,20 +316,9 @@
   }
   initVoices();
 
-  // API 키 이중 저장소 (localStorage + IndexedDB)
   const API_STORAGE_KEY = "gemini_fairytale_api_key";
 
-  // 💥 키가 입력될 때마다 버튼 상태를 체크하는 함수 추가
-  function handleKeyTyping() {
-    const keyInput = document.getElementById('apiKey').value.trim();
-    const btn = document.getElementById('generateBtn');
-    
-    if (keyInput.length > 5) { // 최소 글자 수 제한 (안전장치)
-      btn.disabled = false;
-    } else {
-      btn.disabled = true;
-    }
-  }
+  function handleKeyTyping() { saveApiKeyManually(); }
 
   function saveApiKeyManually() {
     const key = document.getElementById('apiKey').value.trim();
@@ -207,13 +330,9 @@
         tx.objectStore("settings").put({ key: "apiKey", value: key });
       } catch(e) {}
     }
-    
-    // 키 저장 완료 메시지 표시
     const status = document.getElementById('apiStatus');
     status.style.display = 'inline';
     setTimeout(() => { status.style.display = 'none'; }, 2000);
-    
-    handleKeyTyping(); // 저장 후 버튼 상태 즉시 업데이트
   }
 
   function clearSavedApiKey() {
@@ -225,11 +344,9 @@
       } catch(e) {}
     }
     document.getElementById('apiKey').value = '';
-    handleKeyTyping(); // 삭제 후 버튼 즉시 비활성화
     alert('저장된 API 키가 삭제되었습니다.');
   }
 
-  // DB 초기화 및 복원 로직
   const dbRequest = indexedDB.open("FairytaleAppDB", 2);
   dbRequest.onupgradeneeded = (e) => {
     db = e.target.result;
@@ -244,21 +361,17 @@
     db = e.target.result;
     loadLibraryList();
 
-    // 키 복원 시도
     let loadedKey = "";
     try { loadedKey = localStorage.getItem(API_STORAGE_KEY); } catch(e) {}
 
     if (loadedKey) {
       document.getElementById('apiKey').value = loadedKey;
-      handleKeyTyping(); // 복원된 키가 있으면 버튼 활성화
     } else {
       const tx = db.transaction("settings", "readonly");
-      const store = tx.objectStore("settings");
-      const getReq = store.get("apiKey");
-      getReq.onsuccess = () => {
-        if (getReq.result) {
-          document.getElementById('apiKey').value = getReq.result.value;
-          handleKeyTyping(); // DB에서 복원된 키가 있으면 버튼 활성화
+      const req = tx.objectStore("settings").get("apiKey");
+      req.onsuccess = () => {
+        if (req.result && req.result.value) {
+          document.getElementById('apiKey').value = req.result.value;
         }
       };
     }
@@ -273,14 +386,6 @@
 
   async function generateStoryAndImages() {
     const apiKey = document.getElementById('apiKey').value.trim();
-    
-    // 💥 [해결] 혹시 disabled 처리가 안 되었어도 실행 시 최종 체크
-    if (apiKey.length < 5) {
-      alert('Google AI Studio API Key를 먼저 입력해 주세요.');
-      document.getElementById('apiKey').focus();
-      return;
-    }
-
     const char = document.getElementById('character').value.trim();
     const bg = document.getElementById('background').value.trim();
     const lesson = document.getElementById('lesson').value.trim();
@@ -291,16 +396,22 @@
     const pagesWrapper = document.getElementById('story-pages-wrapper');
     const controlPanel = document.getElementById('controlPanel');
 
-    saveApiKeyManually(); // 생성 시작 시 최종 저장
+    if (!apiKey) {
+      alert('API 키를 입력해 주세요.');
+      document.getElementById('apiKey').focus();
+      return;
+    }
 
+    saveApiKeyManually();
+
+    const config = lengthConfig[lengthVal];
     btn.disabled = true;
     controlPanel.style.display = 'none';
     bookContainer.style.display = 'none';
-    statusLog.innerText = `✨ 1/${lengthConfig[lengthVal].pages + 1}. 마법 같은 스토리를 짓고 있어요...`;
+    statusLog.innerText = `✨ 1/${config.pages + 1}. 마법 같은 스토리를 짓고 있어요...`;
     pagesWrapper.innerHTML = '';
     stopVoice();
 
-    const config = lengthConfig[lengthVal];
     const promptText = `
 너는 유아/아동용 그림동화 전문 작가야.
 아래 설정을 바탕으로 총 ${config.pages}개 장면에 걸친 ${lengthVal}분 분량의 동화책 JSON 데이터를 만들어줘.
@@ -371,7 +482,7 @@
       renderBookPages(currentStoryBookObject);
       showPage(0);
 
-      statusLog.innerText = '✅ 예쁜 동화책이 완성되었어요! 책장을 넘기거나 낭독을 시작해 보세요.';
+      statusLog.innerText = '🎉 동화책이 완성되었어요! 아래에서 목소리를 선택하고 낭독을 시작해 보세요.';
       controlPanel.style.display = 'flex';
 
     } catch (err) {
@@ -448,6 +559,7 @@
   function goToPrevPage() { showPage(currentPageIndex - 1); }
   function goToNextPage() { showPage(currentPageIndex + 1); }
 
+  // 🎙 깨짐 없는 자연스러운 고음질 음성 엔진
   async function startContinuousReading(onCompleteCallback = null) {
     if (!currentStoryBookObject) return;
     stopVoice();
@@ -484,39 +596,40 @@
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = 'ko-KR';
 
-      const voiceStyle = document.getElementById('voiceStyle').value;
+      // 동화 완성 영역에 있는 목소리 드롭다운 값 참조
+      const voiceStyle = document.getElementById('postVoiceStyle').value;
       
+      // 💡 모바일 음성 깨짐 방지: 극단적인 변조 없이 가장 자연스러운 음높이/속도 밸런스 적용
       switch (voiceStyle) {
-        case 'cheerful_kid':
-          utterance.rate = 1.05;
-          utterance.pitch = 1.35;
-          break;
-        case 'wise_grandpa':
-          utterance.rate = 0.78;
-          utterance.pitch = 0.65;
-          break;
-        case 'pro_actor':
-          utterance.rate = 0.92;
+        case 'cheerful_kid': // 발랄한 어린이
+          utterance.rate = 0.98;
           utterance.pitch = 1.15;
           break;
-        case 'warm_mom':
+        case 'wise_grandpa': // 할아버지 / 차분한 저음
+          utterance.rate = 0.85;
+          utterance.pitch = 0.85;
+          break;
+        case 'pro_actor': // 전문 성우
+          utterance.rate = 0.92;
+          utterance.pitch = 1.05;
+          break;
+        case 'warm_mom': // 다정한 엄마 (기본)
         default:
-          utterance.rate = 0.86;
-          utterance.pitch = 1.08;
+          utterance.rate = 0.88;
+          utterance.pitch = 1.02;
           break;
       }
 
+      // 기기에 설치된 한국어 고음질 엔진 매핑
       if (availableVoices.length === 0) initVoices();
       const koVoices = availableVoices.filter(v => v.lang.startsWith('ko'));
       if (koVoices.length > 0) {
         if (voiceStyle === 'wise_grandpa') {
-          const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남성') || v.name.includes('Minho'));
-          if (maleVoice) utterance.voice = maleVoice;
-          else utterance.voice = koVoices[0];
+          const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남성') || v.name.includes('Minho') || v.name.includes('Google ko-KR-Standard-C'));
+          utterance.voice = maleVoice || koVoices[0];
         } else {
           const femaleVoice = koVoices.find(v => v.name.includes('Female') || v.name.includes('여성') || v.name.includes('Yuna') || v.name.includes('Sora') || v.name.includes('Google'));
-          if (femaleVoice) utterance.voice = femaleVoice;
-          else utterance.voice = koVoices[0];
+          utterance.voice = femaleVoice || koVoices[0];
         }
       }
 
@@ -679,7 +792,6 @@
     isPlaying = false;
     isLibraryPlayingMode = false;
     window.speechSynthesis.cancel();
-    document.querySelectorAll('.page-item').forEach(el => el.classList.remove('reading-now'));
   }
 </script>
 

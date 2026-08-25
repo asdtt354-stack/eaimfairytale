@@ -146,37 +146,38 @@
       bottom: 0; 
       left: 0; 
       width: 100%; 
-      background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%); 
-      padding: 32px 16px 16px 16px; 
+      background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 75%, rgba(0,0,0,0) 100%); 
+      padding: 34px 16px 16px 16px; 
       backdrop-filter: blur(4px); 
       -webkit-backdrop-filter: blur(4px); 
+      max-height: 55%;
+      overflow-y: auto;
     }
-    .page-text { font-size: 15px; line-height: 1.75; color: #ffffff; text-align: left; word-break: keep-all; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.7); font-weight: 500; }
+    .page-text { font-size: 14.5px; line-height: 1.7; color: #ffffff; text-align: left; word-break: keep-all; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.7); font-weight: 500; }
     .page-num-badge { display: inline-block; background: rgba(251, 191, 36, 0.95); color: #78350f; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+
+    .dialogue-char { color: #93c5fd; font-weight: 700; }
 
     .page-nav-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; background: #f8fafc; padding: 10px 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; }
     .page-nav-btn { background: #3b82f6; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13.5px; font-weight: 700; cursor: pointer; }
     .page-nav-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
     .page-indicator { font-size: 14px; font-weight: 800; color: #475569; }
 
-    /* 완성 후 목소리 선택 바 */
-    .voice-control-box {
+    .drama-banner {
       margin-top: 14px;
-      background: #f0fdf4;
-      border: 1.5px solid #bbf7d0;
-      padding: 12px;
+      background: #eff6ff;
+      border: 1.5px solid #bfdbfe;
+      padding: 10px 14px;
       border-radius: 12px;
-    }
-    .voice-control-box label {
-      color: #166534;
       font-size: 13.5px;
-      margin-bottom: 6px;
+      color: #1e40af;
+      font-weight: 600;
+      text-align: center;
     }
 
-    /* 제어 버튼 바 */
     .controls { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
     .controls button { flex: 1 1 calc(50% - 4px); padding: 12px 6px; background: #e2e8f0; border: none; border-radius: 10px; font-size: 13.5px; cursor: pointer; font-weight: 700; color: #334155; }
-    .controls button.read-btn { background: #10b981; color: white; flex: 1 1 100%; font-size: 15.5px; padding: 13px; }
+    .controls button.read-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; flex: 1 1 100%; font-size: 15.5px; padding: 13px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25); }
     
     .controls button.loop-btn { background: #f1f5f9; color: #475569; border: 1.5px solid #cbd5e1; }
     .controls button.loop-btn.active { background: #8b5cf6; color: white; border-color: #7c3aed; font-weight: 800; }
@@ -185,7 +186,6 @@
     .controls button.pdf-btn { background: #f59e0b; color: white; }
     .controls button.stop { background: #fee2e2; color: #991b1b; }
 
-    /* 서재 목록 스타일 */
     .library-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .library-play-all { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
     .library-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; margin-bottom: 10px; }
@@ -201,14 +201,14 @@
 <body>
 
 <div class="card">
-  <h2>📖 동화마을 이야기 공작소</h2>
+  <h2>📖 동화마을 오디오 드라마 공작소</h2>
 
   <div class="tab-nav">
     <button class="tab-btn active" id="tabCreateBtn" onclick="switchTab('create')">✨ 새 동화 만들기</button>
     <button class="tab-btn" id="tabLibraryBtn" onclick="switchTab('library')">📚 내 서재 보관함</button>
   </div>
 
-  <!-- 1. 제작 탭 (생성 시에는 스토리 설정에만 집중) -->
+  <!-- 1. 제작 탭 -->
   <div id="create-view">
     <div class="api-key-box">
       <div class="api-key-header">
@@ -221,31 +221,44 @@
       </div>
       <input type="password" id="apiKey" placeholder="API 키를 입력하세요" oninput="saveApiKeyManually()">
     </div>
+
+    <!-- 🎭 동화 장르 선택 드롭다운 추가 -->
+    <div class="input-group">
+      <label for="storyGenre">🎨 동화 장르 / 이야기 스타일</label>
+      <select id="storyGenre">
+        <option value="fantasy" selected>✨ 환상 판타지 / 요정 이야기 (마법, 신비로운 모험)</option>
+        <option value="heroic">⚔️ 영웅 & 신화 / 성경 / 역사 모험 (용기와 믿음의 대결)</option>
+        <option value="mystery">🔍 흥미진진 추리 & 비밀 탐험 (지혜로운 수수께끼 풀기)</option>
+        <option value="scifi">🚀 우주 & 미래 SF 과학 탐험 (로봇, 별자리, 시간여행)</option>
+        <option value="animal">🐾 따뜻한 동물 친구들 & 일상 교훈 (숲속 우정과 배려)</option>
+        <option value="comic">😂 유쾌하고 웃긴 코믹 모험 (엉뚱하고 재미있는 소동)</option>
+      </select>
+    </div>
     
     <div class="input-group">
-      <label>🐰 주인공</label>
-      <input type="text" id="character" value="호기심 많은 아기 고양이 나비">
+      <label>🐰 등장인물 / 주인공</label>
+      <input type="text" id="character" value="용감한 양치기 소년 다윗과 거인 골리앗">
     </div>
     <div class="input-group">
       <label>🏰 배경</label>
-      <input type="text" id="background" value="구름 위에 떠 있는 무지개 마을">
+      <input type="text" id="background" value="고대 엘라 골짜기 전장">
     </div>
     <div class="input-group">
       <label>💡 교훈 / 주제</label>
-      <input type="text" id="lesson" value="실수를 두려워하지 않고 다시 도전하는 용기">
+      <input type="text" id="lesson" value="겉모습보다 강한 용기와 믿음의 승리">
     </div>
     
     <div class="input-group">
       <label for="storyLength">⏱ 이야기 분량</label>
       <select id="storyLength">
-        <option value="2">2분 (약 4페이지)</option>
-        <option value="3" selected>3분 (약 6페이지)</option>
-        <option value="5">5분 (약 8페이지)</option>
-        <option value="10">10분 (약 10페이지)</option>
+        <option value="2">2분 (약 4페이지 - 속도감 있는 역할극)</option>
+        <option value="3" selected>3분 (약 6페이지 - 대화가 풍성한 오디오 드라마)</option>
+        <option value="5">5분 (약 8페이지 - 깊이 있는 모험 서사극)</option>
+        <option value="10">10분 (약 10페이지 - 장편 입체 낭독극)</option>
       </select>
     </div>
 
-    <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎨 마법의 동화책 & 삽화 만들기</button>
+    <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎭 다역 연기 동화책 만들기</button>
     <div id="status-log"></div>
   </div>
 
@@ -260,7 +273,7 @@
     </div>
   </div>
 
-  <!-- 3. 📖 그림 위 텍스트 동화책 뷰어 -->
+  <!-- 3. 📖 오디오 드라마 뷰어 -->
   <div id="book-container">
     <div class="story-title" id="story-main-title"></div>
     
@@ -272,21 +285,15 @@
       <button class="page-nav-btn" id="nextPageBtn" onclick="goToNextPage()">다음 페이지 ▶</button>
     </div>
 
-    <!-- 🎙 동화 완성 후 실시간으로 목소리를 변경하는 선택창 -->
-    <div class="voice-control-box">
-      <label for="postVoiceStyle">🎙 낭독 목소리 선택 (실시간 변경 가능)</label>
-      <select id="postVoiceStyle">
-        <option value="warm_mom" selected>🌸 다정한 이야기 엄마 / 이모 (따뜻하고 깨끗한 톤)</option>
-        <option value="cheerful_kid">🧒 발랄한 어린이 친구 (밝고 쾌활한 톤)</option>
-        <option value="wise_grandpa">🧙‍♂️ 지혜로운 마법사 할아버지 (차분한 저음 톤)</option>
-        <option value="pro_actor">🎭 감정 풍부한 동화 구연 성우 (표준 구연동화 톤)</option>
-      </select>
+    <div class="drama-banner">
+      🎙️ <b>배역 맞춤 다역 낭독 모드 활성화</b><br>
+      <span style="font-size: 12px; color: #3b82f6;">해설, 주인공, 거인/악당, 조연이 각자 다른 목소리로 연기합니다.</span>
     </div>
   </div>
   
   <!-- 4. 컨트롤 패널 -->
   <div class="controls" id="controlPanel" style="display: none;">
-    <button class="read-btn" id="readBtn" onclick="startContinuousReading()">📢 동화 연속 낭독하기</button>
+    <button class="read-btn" id="readBtn" onclick="startContinuousReading()">📢 다역 입체 낭독 시작</button>
     <button class="loop-btn" id="loopBtn" onclick="toggleRepeatMode()">🔁 반복 재생: OFF</button>
     <button onclick="pauseVoice()">⏸ 일시정지</button>
     <button onclick="resumeVoice()">▶ 이어듣기</button>
@@ -306,7 +313,6 @@
   let currentLibraryIndex = 0;
   let currentPageIndex = 0;
 
-  // 브라우저 음성 목록 초기화
   let availableVoices = [];
   function initVoices() {
     availableVoices = window.speechSynthesis.getVoices();
@@ -317,8 +323,6 @@
   initVoices();
 
   const API_STORAGE_KEY = "gemini_fairytale_api_key";
-
-  function handleKeyTyping() { saveApiKeyManually(); }
 
   function saveApiKeyManually() {
     const key = document.getElementById('apiKey').value.trim();
@@ -378,14 +382,44 @@
   };
 
   const lengthConfig = {
-    "2": { pages: 4, charCountPerPage: "150~180자 (4~5문장)" },
-    "3": { pages: 6, charCountPerPage: "160~200자 (5~6문장)" },
-    "5": { pages: 8, charCountPerPage: "200~250자 (6~7문장)" },
-    "10": { pages: 10, charCountPerPage: "280~320자 (8~10문장)" }
+    "2": { pages: 4 },
+    "3": { pages: 6 },
+    "5": { pages: 8 },
+    "10": { pages: 10 }
   };
 
+  // 장르별 특화 프롬프트 가이드
+  const genreGuides = {
+    "fantasy": {
+      storyGuide: "신비롭고 몽환적인 마법, 요정, 별빛, 환상적인 세계관을 중심으로 환상동화 스타일로 연출해줘.",
+      artStyle: "magical soft watercolor fairy tale illustration, dreamlike fantasy lighting, glowing sparkles, pastel colors"
+    },
+    "heroic": {
+      storyGuide: "웅장하고 감동적인 대결, 불굴의 용기와 신념, 박진감 넘치는 영웅 서사극 스타일로 연출해줘.",
+      artStyle: "epic heroic children's storybook illustration, ancient biblical and historical atmosphere, dramatic lighting, warm colors"
+    },
+    "mystery": {
+      storyGuide: "호기심을 자극하는 단서, 수수께끼, 지혜를 발휘해 비밀을 풀어나가는 흥미진진한 탐정/추리 스타일로 연출해줘.",
+      artStyle: "charming mystery adventure book illustration, magnifying glass, secret paths, cozy warm lighting"
+    },
+    "scifi": {
+      storyGuide: "신비로운 우주, 별자리 탐험, 귀여운 로봇, 상상력 넘치는 미래 과학 기술을 중심으로 연출해줘.",
+      artStyle: "cute sci-fi space adventure illustration, glowing stars, futuristic cozy robots, galaxy nebula colors"
+    },
+    "animal": {
+      storyGuide: "숲속 귀여운 동물 친구들의 따뜻한 우정, 서로 돕는 배려와 사랑스러운 일상 성장 이야기로 연출해줘.",
+      artStyle: "cute fluffy animal characters, warm cozy forest background, soft watercolor picture book style"
+    },
+    "comic": {
+      storyGuide: "엉뚱하고 기발한 사건, 유쾌한 소동, 아이들이 까르르 웃을 수 있는 재치 넘치는 대화로 연출해줘.",
+      artStyle: "fun lively children's comic storybook illustration, expressive characters, bright cheerful vibrant colors"
+    }
+  };
+
+  // 1. 장르 맞춤 다역 대본 및 삽화 생성
   async function generateStoryAndImages() {
     const apiKey = document.getElementById('apiKey').value.trim();
+    const genreKey = document.getElementById('storyGenre').value;
     const char = document.getElementById('character').value.trim();
     const bg = document.getElementById('background').value.trim();
     const lesson = document.getElementById('lesson').value.trim();
@@ -405,34 +439,51 @@
     saveApiKeyManually();
 
     const config = lengthConfig[lengthVal];
+    const selectedGenre = genreGuides[genreKey];
+
     btn.disabled = true;
     controlPanel.style.display = 'none';
     bookContainer.style.display = 'none';
-    statusLog.innerText = `✨ 1/${config.pages + 1}. 마법 같은 스토리를 짓고 있어요...`;
+    statusLog.innerText = `✨ 1/${config.pages + 1}. 선택하신 장르에 맞춰 입체 대본을 작성 중입니다...`;
     pagesWrapper.innerHTML = '';
     stopVoice();
 
     const promptText = `
-너는 유아/아동용 그림동화 전문 작가야.
-아래 설정을 바탕으로 총 ${config.pages}개 장면에 걸친 ${lengthVal}분 분량의 동화책 JSON 데이터를 만들어줘.
+너는 입체 오디오 드라마 동화 전문 작가야.
+아래 설정을 바탕으로 총 ${config.pages}개 장면의 동화책 JSON 데이터를 만들어줘.
 
-- 주인공: ${char}
+[장르 연출 가이드]
+- 장르: ${document.getElementById('storyGenre').selectedOptions[0].text}
+- 연출 스타일: ${selectedGenre.storyGuide}
+
+[이야기 설정]
+- 등장인물/주인공: ${char}
 - 배경: ${bg}
 - 주제/교훈: ${lesson}
 
-[작성 가이드라인]
-1. 등장인물의 대화, 감정 표현, 구체적인 상황 묘사를 충분히 넣어줘.
-2. 각 페이지당 한국어 본문 길이는 반드시 **${config.charCountPerPage}** 내외로 작성해줘.
-3. 아동용 친근한 구어체('~했어요', '~했답니다') 사용.
+[작성 규칙]
+1. 단순 설명문이 아닌, 등장인물들의 생생한 대화와 해설이 어우러진 대본 형태로 작성해줘.
+2. 각 페이지마다 dialogue_list 배열을 만들어 문장 단위로 역할(role)을 명시해줘:
+   - role 종류: 
+     * "narrator" (차분하고 다정한 해설)
+     * "hero" 또는 "child" (맑고 씩씩한 주인공/어린이)
+     * "villain" 또는 "monster" (굵고 거친 악당/골리앗/괴물/거인)
+     * "elder" (지혜롭고 점잖은 왕/할아버지/어른)
+3. full_text에는 페이지 전체 본문 텍스트를 담아줘.
+4. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반드시 반영한 영문 프롬프트를 작성해줘.
 
-[반드시 준수할 출력 규격: 순수 JSON만 출력]
+[출력 규격: 순수 JSON만 출력]
 {
   "title": "동화책 제목",
   "pages": [
     {
       "page_num": 1,
-      "text": "1페이지 상세 본문...",
-      "image_prompt": "1페이지 장면에 어울리는 구체적인 영문 프롬프트, cute soft watercolor children's book illustration style, bright, pastel colors"
+      "full_text": "해설과 대사가 어우러진 전체 본문",
+      "dialogue_list": [
+        { "role": "narrator", "text": "문장..." },
+        { "role": "hero", "text": "대사..." }
+      ],
+      "image_prompt": "1페이지 영문 프롬프트, ${selectedGenre.artStyle}"
     }
   ]
 }
@@ -474,7 +525,8 @@
 
         currentStoryBookObject.pages.push({
           page_num: page.page_num,
-          text: page.text,
+          full_text: page.full_text || page.text,
+          dialogue_list: page.dialogue_list || [{ role: 'narrator', text: page.full_text || page.text }],
           imageBase64: imgBase64
         });
       }
@@ -482,7 +534,7 @@
       renderBookPages(currentStoryBookObject);
       showPage(0);
 
-      statusLog.innerText = '🎉 동화책이 완성되었어요! 아래에서 목소리를 선택하고 낭독을 시작해 보세요.';
+      statusLog.innerText = '🎉 동화책이 완성되었어요! [다역 입체 낭독 시작]을 눌러보세요.';
       controlPanel.style.display = 'flex';
 
     } catch (err) {
@@ -522,11 +574,20 @@
         ? `<img src="data:image/png;base64,${p.imageBase64}" class="page-img" alt="삽화 ${p.page_num}">` 
         : `<div class="page-loading-text">🎨 (삽화 준비 중)</div>`;
 
+      const formattedText = p.dialogue_list 
+        ? p.dialogue_list.map(d => {
+            if (d.role === 'hero' || d.role === 'child') return `<span class="dialogue-char">🧒</span> "${d.text}"<br>`;
+            if (d.role === 'villain' || d.role === 'monster') return `<span class="dialogue-char">👹</span> "${d.text}"<br>`;
+            if (d.role === 'elder') return `<span class="dialogue-char">🧙‍♂️</span> "${d.text}"<br>`;
+            return `${d.text}<br>`;
+          }).join('')
+        : p.full_text;
+
       pageDiv.innerHTML = `
         ${imgHtml}
         <div class="page-overlay-box">
           <div class="page-num-badge">${p.page_num}페이지</div>
-          <p class="page-text">${p.text}</p>
+          <p class="page-text">${formattedText}</p>
         </div>
       `;
       wrapper.appendChild(pageDiv);
@@ -559,20 +620,29 @@
   function goToPrevPage() { showPage(currentPageIndex - 1); }
   function goToNextPage() { showPage(currentPageIndex + 1); }
 
-  // 🎙 깨짐 없는 자연스러운 고음질 음성 엔진
+  // 2. 실시간 다역 낭독 엔진
   async function startContinuousReading(onCompleteCallback = null) {
     if (!currentStoryBookObject) return;
     stopVoice();
     isPlaying = true;
 
     showPage(0);
-    await readSingleSnippet(`제목: ${currentStoryBookObject.title}`);
+    await speakWithRole('narrator', `제목: ${currentStoryBookObject.title}`);
 
     for (let i = 0; i < currentStoryBookObject.pages.length; i++) {
       if (!isPlaying) break;
       showPage(i);
-      const pageText = currentStoryBookObject.pages[i].text;
-      await readSingleSnippet(pageText);
+      
+      const pageData = currentStoryBookObject.pages[i];
+
+      if (pageData.dialogue_list && pageData.dialogue_list.length > 0) {
+        for (const line of pageData.dialogue_list) {
+          if (!isPlaying) break;
+          await speakWithRole(line.role || 'narrator', line.text);
+        }
+      } else {
+        await speakWithRole('narrator', pageData.full_text);
+      }
     }
 
     if (isPlaying) {
@@ -590,47 +660,40 @@
     }
   }
 
-  function readSingleSnippet(text) {
+  function speakWithRole(role, rawText) {
     return new Promise((resolve) => {
-      const cleanText = text.replace(/[*#]/g, '');
+      const cleanText = rawText.replace(/[*#"]/g, '').trim();
+      if (!cleanText) return resolve();
+
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = 'ko-KR';
 
-      // 동화 완성 영역에 있는 목소리 드롭다운 값 참조
-      const voiceStyle = document.getElementById('postVoiceStyle').value;
-      
-      // 💡 모바일 음성 깨짐 방지: 극단적인 변조 없이 가장 자연스러운 음높이/속도 밸런스 적용
-      switch (voiceStyle) {
-        case 'cheerful_kid': // 발랄한 어린이
-          utterance.rate = 0.98;
-          utterance.pitch = 1.15;
-          break;
-        case 'wise_grandpa': // 할아버지 / 차분한 저음
-          utterance.rate = 0.85;
-          utterance.pitch = 0.85;
-          break;
-        case 'pro_actor': // 전문 성우
-          utterance.rate = 0.92;
-          utterance.pitch = 1.05;
-          break;
-        case 'warm_mom': // 다정한 엄마 (기본)
-        default:
-          utterance.rate = 0.88;
-          utterance.pitch = 1.02;
-          break;
-      }
-
-      // 기기에 설치된 한국어 고음질 엔진 매핑
       if (availableVoices.length === 0) initVoices();
       const koVoices = availableVoices.filter(v => v.lang.startsWith('ko'));
-      if (koVoices.length > 0) {
-        if (voiceStyle === 'wise_grandpa') {
-          const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남성') || v.name.includes('Minho') || v.name.includes('Google ko-KR-Standard-C'));
-          utterance.voice = maleVoice || koVoices[0];
-        } else {
-          const femaleVoice = koVoices.find(v => v.name.includes('Female') || v.name.includes('여성') || v.name.includes('Yuna') || v.name.includes('Sora') || v.name.includes('Google'));
-          utterance.voice = femaleVoice || koVoices[0];
-        }
+      const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남성') || v.name.includes('Minho') || v.name.includes('Standard-C'));
+      const femaleVoice = koVoices.find(v => v.name.includes('Female') || v.name.includes('여성') || v.name.includes('Yuna') || v.name.includes('Sora') || v.name.includes('Google'));
+
+      const r = (role || '').toLowerCase();
+
+      if (r.includes('villain') || r.includes('monster') || r.includes('giant') || r.includes('goliath')) {
+        utterance.rate = 0.82;
+        utterance.pitch = 0.65;
+        if (maleVoice) utterance.voice = maleVoice;
+      } 
+      else if (r.includes('hero') || r.includes('child') || r.includes('david')) {
+        utterance.rate = 0.98;
+        utterance.pitch = 1.25;
+        if (femaleVoice) utterance.voice = femaleVoice;
+      } 
+      else if (r.includes('elder') || r.includes('king') || r.includes('grandpa')) {
+        utterance.rate = 0.84;
+        utterance.pitch = 0.82;
+        if (maleVoice) utterance.voice = maleVoice;
+      } 
+      else {
+        utterance.rate = 0.88;
+        utterance.pitch = 1.02;
+        if (femaleVoice) utterance.voice = femaleVoice;
       }
 
       utterance.onend = () => resolve();
@@ -762,7 +825,7 @@
         ${imgTag}
         <div style="position: absolute; bottom: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.65); padding: 20px 16px; color: #fff;">
           <b style="color: #fbbf24;">[${p.page_num}페이지]</b>
-          <p style="font-size: 14px; line-height: 1.6; margin: 4px 0 0 0; color: #fff;">${p.text}</p>
+          <p style="font-size: 14px; line-height: 1.6; margin: 4px 0 0 0; color: #fff;">${p.full_text || p.text}</p>
         </div>
       `;
       printContainer.appendChild(pDiv);

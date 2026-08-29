@@ -34,74 +34,78 @@
       margin: 0 auto;
     }
 
-    /* 🎵 완벽하게 밀착되는 인라인 뮤니 로고 헤더 */
+    /* 🎵 [핵심] 캐릭터와 제목이 겹치는 맞춤 배너 헤더 */
     .muni-header {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
       text-align: center;
     }
 
-    .muni-title-row {
-      display: inline-flex;
+    .muni-banner-wrapper {
+      display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px; /* 글자와의 간격을 자연스럽게 조절 */
-    }
-
-    /* 💡 네모 테두리/잔상 제거 및 수직 정렬 최적화 */
-    .muni-inline-wrap {
-      width: 46px;
-      height: 46px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      flex-shrink: 0;
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
       position: relative;
-      top: 3px; /* 글자 높이와 맞게 살짝 아래로 내려 자연스럽게 어우러짐 */
+      padding: 8px 10px;
+      min-height: 95px;
     }
 
-    .muni-inline-img {
+    /* 큼직하게 뒤에 서 있는 뮤니 캐릭터 */
+    .muni-char-box {
+      width: 105px;
+      height: 105px;
+      position: relative;
+      z-index: 1; /* 글자 박스 뒤에 배치 */
+      margin-right: -32px; /* 💡 글자 상자와 32px 겹치도록 설정 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+      flex-shrink: 0;
+    }
+
+    .muni-char-img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      transform: scale(2.8);
-      transform-origin: center center;
-      background: transparent !important;
-      border: none !important;
-      filter: none !important; /* 네모 잔상을 유발하던 그림자 필터 완전 제거 */
-      animation: muniRhythm 2.5s ease-in-out infinite;
+      transform: scale(1.65); /* 캐릭터 자체를 시원하게 확대 */
+      transform-origin: center bottom;
+      animation: muniBounce 3s ease-in-out infinite;
     }
 
-    @keyframes muniRhythm {
-      0%, 100% { transform: scale(2.8) translateY(0) rotate(0deg); }
-      25% { transform: scale(2.8) translateY(-2px) rotate(-3deg); }
-      75% { transform: scale(2.8) translateY(-2px) rotate(3deg); }
+    @keyframes muniBounce {
+      0%, 100% { transform: scale(1.65) translateY(0); }
+      50% { transform: scale(1.65) translateY(-4px); }
+    }
+
+    /* 뮤니 앞쪽으로 살짝 겹치는 둥근 제목 뱃지 */
+    .muni-title-badge {
+      background: #ffe4e6; /* 시안의 은은한 살구빛 핑크 톤 */
+      border: 2px solid #fecdd3;
+      padding: 9px 18px 9px 24px;
+      border-radius: 18px;
+      position: relative;
+      z-index: 2; /* 캐릭터 몸통 위로 겹쳐짐 */
+      box-shadow: 0 4px 14px rgba(244, 114, 182, 0.18);
     }
 
     h2.muni-title { 
       margin: 0; 
       color: #1e293b; 
-      font-size: 23px; 
+      font-size: 21px; 
       font-weight: 800;
       letter-spacing: -0.5px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      line-height: 1.2;
+      white-space: nowrap;
     }
 
     .muni-subtitle {
       font-size: 13px;
       color: #8b5cf6;
       font-weight: 600;
-      margin-top: 6px;
+      margin-top: 4px;
     }
     
     .tab-nav { 
@@ -302,13 +306,15 @@
 <body>
 
 <div class="card">
-  <!-- 🎵 글자와 완벽하게 어우러지는 뮤니 타이틀 -->
+  <!-- 🎵 캐릭터와 글자가 겹쳐지는 프리미엄 로고 헤더 -->
   <div class="muni-header">
-    <div class="muni-title-row">
-      <div class="muni-inline-wrap">
-        <img src="muni.png" id="muniLogoImg" class="muni-inline-img" alt="뮤니" onerror="this.src='muni.jpg'">
+    <div class="muni-banner-wrapper">
+      <div class="muni-char-box">
+        <img src="muni.png" id="muniLogoImg" class="muni-char-img" alt="뮤니" onerror="this.src='muni.jpg'">
       </div>
-      <h2 class="muni-title">뮤니의 동화마을 이야기 ✨</h2>
+      <div class="muni-title-badge">
+        <h2 class="muni-title">뮤니의 동화마을 이야기 ✨</h2>
+      </div>
     </div>
     <div class="muni-subtitle">음악과 함께하는 나만의 입체 오디오 동화 공작소</div>
   </div>

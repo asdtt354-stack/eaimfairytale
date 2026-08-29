@@ -34,7 +34,7 @@
       margin: 0 auto;
     }
 
-    /* 🎵 뮤니 캐릭터 헤더 */
+    /* 🎵 뮤니 캐릭터 헤더 (투명 PNG 최적화) */
     .muni-header {
       display: flex;
       flex-direction: column;
@@ -45,25 +45,26 @@
     }
 
     .muni-avatar-wrap {
-      width: 110px;
-      height: 110px;
-      background: #000000; /* 뮤니 원본 배경색 */
+      width: 115px;
+      height: 115px;
+      background: radial-gradient(circle, #ffffff 60%, #fff1f2 100%); /* 화사하고 부드러운 화이트/핑크 배경 */
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 24px rgba(236, 72, 153, 0.35);
+      box-shadow: 0 8px 24px rgba(236, 72, 153, 0.22);
       border: 3.5px solid #fbcfe8;
       margin-bottom: 12px;
       overflow: hidden;
       animation: floatMotion 3s ease-in-out infinite;
+      padding: 6px;
     }
 
     .muni-avatar-img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      transform: scale(1.15); /* 원본 캐릭터가 꽉 차게 조절 */
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.06)); /* 투명 외곽선에 부드러운 입체감 */
     }
 
     @keyframes floatMotion {
@@ -287,11 +288,11 @@
 <body>
 
 <div class="card">
-  <!-- 🎵 업로드된 muni.jpg와 연동되는 상단 헤더 -->
+  <!-- 🎵 투명 배경 최적화 뮤니 헤더 -->
   <div class="muni-header">
     <div class="muni-avatar-wrap">
-      <!-- 💡 GitHub에 올린 muni.jpg를 불러옵니다 -->
-      <img src="muni.jpg" id="muniLogoImg" class="muni-avatar-img" alt="뮤니" onerror="this.src='muni.png'">
+      <!-- 💡 muni.png (투명 PNG) 파일 우선 로드 -->
+      <img src="muni.png" id="muniLogoImg" class="muni-avatar-img" alt="뮤니" onerror="this.src='muni.jpg'">
     </div>
     <h2 class="muni-title">🎧 뮤니의 동화마을 이야기 ✨</h2>
     <div class="muni-subtitle">음악과 함께하는 나만의 입체 오디오 동화 공작소</div>

@@ -69,19 +69,20 @@
       box-shadow: 0 3px 10px rgba(0,0,0,0.06); 
     }
 
-    .api-key-box { 
+    /* 사용자 식별 및 API 키 상자 */
+    .user-profile-box { 
       background: #f8fafc; 
       border: 1.5px dashed #cbd5e1; 
       padding: 14px; 
       border-radius: 14px; 
       margin-bottom: 18px; 
     }
-    .api-key-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .api-key-header label { color: #4f46e5; font-weight: 700; font-size: 13.5px; }
-    .api-key-actions { display: flex; gap: 6px; align-items: center; }
-    .api-status { font-size: 12px; color: #10b981; font-weight: bold; display: none; }
-    .api-btn-small { background: #6366f1; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; cursor: pointer; font-weight: 600; }
-    .api-btn-clear { background: none; border: none; color: #ef4444; font-size: 11.5px; cursor: pointer; text-decoration: underline; }
+    .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .user-header label { color: #4f46e5; font-weight: 700; font-size: 13.5px; }
+    .user-actions { display: flex; gap: 6px; align-items: center; }
+    .user-status { font-size: 12px; color: #10b981; font-weight: bold; display: none; }
+    .btn-small { background: #6366f1; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; cursor: pointer; font-weight: 600; }
+    .btn-clear { background: none; border: none; color: #ef4444; font-size: 11.5px; cursor: pointer; text-decoration: underline; }
     
     .input-group { margin-bottom: 15px; }
     label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 14px; color: #334155; }
@@ -144,7 +145,6 @@
       display: none;
     }
 
-    /* 📱 모바일 터치 최적화 버튼 */
     button.primary-btn { 
       width: 100%; 
       padding: 16px; 
@@ -159,9 +159,7 @@
       box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3);
       touch-action: manipulation;
     }
-    button.primary-btn:active {
-      transform: scale(0.98);
-    }
+    button.primary-btn:active { transform: scale(0.98); }
     
     #status-log { margin-top: 14px; font-size: 14px; color: #4f46e5; text-align: center; font-weight: 700; }
     
@@ -213,11 +211,7 @@
       padding: 12px 14px;
       border-radius: 12px;
     }
-    .drama-control-box label {
-      color: #1e40af;
-      font-size: 13.5px;
-      margin-bottom: 6px;
-    }
+    .drama-control-box label { color: #1e40af; font-size: 13.5px; margin-bottom: 6px; }
 
     .controls { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
     .controls button { flex: 1 1 calc(50% - 4px); padding: 12px 6px; background: #e2e8f0; border: none; border-radius: 10px; font-size: 13.5px; cursor: pointer; font-weight: 700; color: #334155; }
@@ -245,24 +239,27 @@
 <body>
 
 <div class="card">
-  <h2>📖 동화마을 오디오 드라마 공작소</h2>
+  <h2>📖 동화마을 이야기 공작소</h2>
 
   <div class="tab-nav">
     <button class="tab-btn active" id="tabCreateBtn" onclick="switchTab('create')">✨ 새 동화 만들기</button>
     <button class="tab-btn" id="tabLibraryBtn" onclick="switchTab('library')">📚 내 서재 보관함</button>
   </div>
 
+  <!-- 1. 제작 탭 -->
   <div id="create-view">
-    <div class="api-key-box">
-      <div class="api-key-header">
-        <label for="apiKey">🔑 Google AI Studio API Key</label>
-        <div class="api-key-actions">
-          <span class="api-status" id="apiStatus">💾 저장됨</span>
-          <button class="api-btn-small" onclick="saveApiKeyManually()">키 저장</button>
-          <button class="api-btn-clear" onclick="clearSavedApiKey()">삭제</button>
+    <!-- 👤 사용자별 독립 계정 및 API 키 설정 -->
+    <div class="user-profile-box">
+      <div class="user-header">
+        <label for="apiKey">🔑 나의 API Key & 작가 닉네임</label>
+        <div class="user-actions">
+          <span class="user-status" id="apiStatus">💾 저장됨</span>
+          <button class="btn-small" onclick="saveUserSession()">설정 저장</button>
+          <button class="btn-clear" onclick="clearUserSession()">초기화</button>
         </div>
       </div>
-      <input type="password" id="apiKey" placeholder="API 키를 입력하세요" oninput="saveApiKeyManually()">
+      <input type="password" id="apiKey" placeholder="Google AI Studio API 키를 입력하세요" oninput="saveUserSession()" style="margin-bottom: 8px;">
+      <input type="text" id="authorName" placeholder="작가 이름 / 닉네임 (예: 민우 작가, 3학년 2반)" oninput="saveUserSession()">
     </div>
 
     <!-- 📸 어린이 얼굴 사진 업로드 -->
@@ -277,7 +274,7 @@
       </div>
     </div>
 
-    <!-- 🎭 장르 선택 (기타/자유 장르 추가) -->
+    <!-- 🎭 장르 선택 -->
     <div class="input-group">
       <label for="storyGenre">🎨 동화 장르 / 이야기 스타일</label>
       <select id="storyGenre">
@@ -314,21 +311,22 @@
       </select>
     </div>
 
-    <!-- 💥 disabled 속성 완전 제거로 모바일 터치 차단 방지 -->
     <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎭 마법의 동화책 & 삽화 만들기</button>
     <div id="status-log"></div>
   </div>
 
+  <!-- 2. 서재 탭 (사용자별 맞춤 서재) -->
   <div id="library-view" style="display: none;">
     <div class="library-header">
-      <span style="font-weight: 700; color: #475569; font-size: 15px;">보관된 동화 목록</span>
-      <button class="library-play-all" onclick="playAllBooksSequentially()">▶ 서재 전체 연속 재생</button>
+      <span id="libraryTitleLabel" style="font-weight: 700; color: #475569; font-size: 15px;">📚 나의 동화책 보관함</span>
+      <button class="library-play-all" onclick="playAllBooksSequentially()">▶ 내 서재 연속 재생</button>
     </div>
     <div id="library-list">
       <p style="text-align: center; color: #94a3b8; padding: 20px;">저장된 동화책이 없습니다.</p>
     </div>
   </div>
 
+  <!-- 3. 동화책 뷰어 -->
   <div id="book-container">
     <div class="story-title" id="story-main-title"></div>
     <div class="book-page-wrapper" id="story-pages-wrapper"></div>
@@ -348,13 +346,14 @@
     </div>
   </div>
   
+  <!-- 4. 컨트롤 패널 -->
   <div class="controls" id="controlPanel" style="display: none;">
     <button class="read-btn" id="readBtn" onclick="startContinuousReading()">📢 다역 입체 낭독 시작</button>
     <button class="loop-btn" id="loopBtn" onclick="toggleRepeatMode()">🔁 반복 재생: OFF</button>
     <button onclick="pauseVoice()">⏸ 일시정지</button>
     <button onclick="resumeVoice()">▶ 이어듣기</button>
     <button class="stop" onclick="stopVoice()">⏹ 정지</button>
-    <button class="save-btn" onclick="saveCurrentStoryToDB()">💾 서재 저장</button>
+    <button class="save-btn" onclick="saveCurrentStoryToDB()">💾 내 서재에 저장</button>
     <button class="pdf-btn" onclick="exportToPDF()">📄 PDF 다운로드</button>
   </div>
 </div>
@@ -365,7 +364,7 @@
   let isPlaying = false;
   let isRepeatMode = false;
   let isLibraryPlayingMode = false;
-  let allLibraryBooks = [];
+  let myLibraryBooks = [];
   let currentLibraryIndex = 0;
   let currentPageIndex = 0;
 
@@ -381,7 +380,69 @@
   }
   initVoices();
 
-  const API_STORAGE_KEY = "gemini_fairytale_api_key";
+  // --- 💡 [핵심] 사용자 고유 식별자(User Key) 생성 함수 ---
+  function getUniqueUserIdentifier() {
+    const key = document.getElementById('apiKey').value.trim();
+    const author = document.getElementById('authorName').value.trim();
+    
+    // API 키의 뒤 8자리 또는 닉네임을 조합하여 고유한 사용자 ID 생성
+    if (key.length >= 8) {
+      return (author ? author + "_" : "user_") + key.slice(-8);
+    }
+    return author ? author : "default_guest";
+  }
+
+  // 로컬 세션 저장
+  function saveUserSession() {
+    const key = document.getElementById('apiKey').value.trim();
+    const author = document.getElementById('authorName').value.trim();
+    
+    try {
+      localStorage.setItem("gemini_fairytale_api_key", key);
+      localStorage.setItem("gemini_fairytale_author", author);
+    } catch(e) {}
+
+    const status = document.getElementById('apiStatus');
+    status.style.display = 'inline';
+    setTimeout(() => { status.style.display = 'none'; }, 1500);
+
+    // 사용자 정보가 바뀌면 해당 사용자의 서재 목록으로 새로고침
+    loadLibraryList();
+  }
+
+  function clearUserSession() {
+    try {
+      localStorage.removeItem("gemini_fairytale_api_key");
+      localStorage.removeItem("gemini_fairytale_author");
+    } catch(e) {}
+    document.getElementById('apiKey').value = '';
+    document.getElementById('authorName').value = '';
+    loadLibraryList();
+    alert('사용자 정보가 초기화되었습니다.');
+  }
+
+  // --- IndexedDB 초기화 ---
+  const dbRequest = indexedDB.open("FairytaleAppDB_MultiUser", 3);
+  dbRequest.onupgradeneeded = (e) => {
+    db = e.target.result;
+    if (!db.objectStoreNames.contains("books")) {
+      const store = db.createObjectStore("books", { keyPath: "id", autoIncrement: true });
+      store.createIndex("userId", "userId", { unique: false });
+    }
+  };
+  dbRequest.onsuccess = (e) => {
+    db = e.target.result;
+    
+    // 이전 저장 세션 복원
+    try {
+      const savedKey = localStorage.getItem("gemini_fairytale_api_key");
+      const savedAuthor = localStorage.getItem("gemini_fairytale_author");
+      if (savedKey) document.getElementById('apiKey').value = savedKey;
+      if (savedAuthor) document.getElementById('authorName').value = savedAuthor;
+    } catch(e) {}
+
+    loadLibraryList();
+  };
 
   function handlePhotoUpload(event) {
     const file = event.target.files[0];
@@ -420,63 +481,6 @@
     document.getElementById('photoPreview').style.display = 'none';
     document.getElementById('photoClearBtn').style.display = 'none';
   }
-
-  function saveApiKeyManually() {
-    const key = document.getElementById('apiKey').value.trim();
-    if (!key) return;
-    try { localStorage.setItem(API_STORAGE_KEY, key); } catch(e) {}
-    if (db) {
-      try {
-        const tx = db.transaction("settings", "readwrite");
-        tx.objectStore("settings").put({ key: "apiKey", value: key });
-      } catch(e) {}
-    }
-    const status = document.getElementById('apiStatus');
-    status.style.display = 'inline';
-    setTimeout(() => { status.style.display = 'none'; }, 2000);
-  }
-
-  function clearSavedApiKey() {
-    try { localStorage.removeItem(API_STORAGE_KEY); } catch(e) {}
-    if (db) {
-      try {
-        const tx = db.transaction("settings", "readwrite");
-        tx.objectStore("settings").delete("apiKey");
-      } catch(e) {}
-    }
-    document.getElementById('apiKey').value = '';
-    alert('저장된 API 키가 삭제되었습니다.');
-  }
-
-  const dbRequest = indexedDB.open("FairytaleAppDB", 2);
-  dbRequest.onupgradeneeded = (e) => {
-    db = e.target.result;
-    if (!db.objectStoreNames.contains("books")) {
-      db.createObjectStore("books", { keyPath: "id", autoIncrement: true });
-    }
-    if (!db.objectStoreNames.contains("settings")) {
-      db.createObjectStore("settings", { keyPath: "key" });
-    }
-  };
-  dbRequest.onsuccess = (e) => {
-    db = e.target.result;
-    loadLibraryList();
-
-    let loadedKey = "";
-    try { loadedKey = localStorage.getItem(API_STORAGE_KEY); } catch(e) {}
-
-    if (loadedKey) {
-      document.getElementById('apiKey').value = loadedKey;
-    } else {
-      const tx = db.transaction("settings", "readonly");
-      const req = tx.objectStore("settings").get("apiKey");
-      req.onsuccess = () => {
-        if (req.result && req.result.value) {
-          document.getElementById('apiKey').value = req.result.value;
-        }
-      };
-    }
-  };
 
   const lengthConfig = {
     "2": { pages: 4 },
@@ -519,7 +523,6 @@
   async function generateStoryAndImages() {
     const apiKey = document.getElementById('apiKey').value.trim();
     
-    // 모바일 안내 팝업
     if (!apiKey || apiKey.length < 5) {
       alert('🔑 Google AI Studio API Key를 먼저 입력해 주세요.');
       document.getElementById('apiKey').focus();
@@ -531,13 +534,14 @@
     const bg = document.getElementById('background').value.trim();
     const lesson = document.getElementById('lesson').value.trim();
     const lengthVal = document.getElementById('storyLength').value;
+    const author = document.getElementById('authorName').value.trim() || "꼬마 작가";
     const btn = document.getElementById('generateBtn');
     const statusLog = document.getElementById('status-log');
     const bookContainer = document.getElementById('book-container');
     const pagesWrapper = document.getElementById('story-pages-wrapper');
     const controlPanel = document.getElementById('controlPanel');
 
-    saveApiKeyManually();
+    saveUserSession();
 
     const config = lengthConfig[lengthVal];
     const selectedGenre = genreGuides[genreKey] || genreGuides["custom"];
@@ -545,7 +549,7 @@
     btn.disabled = true;
     controlPanel.style.display = 'none';
     bookContainer.style.display = 'none';
-    statusLog.innerText = `✨ 1/${config.pages + 1}. 맞춤형 입체 대본을 작성 중입니다...`;
+    statusLog.innerText = `✨ 1/${config.pages + 1}. [${author}] 님만의 입체 대본을 작성 중입니다...`;
     pagesWrapper.innerHTML = '';
     stopVoice();
 
@@ -565,7 +569,7 @@
 [작성 규칙]
 1. 재미있고 통통 튀는 대사와 해설이 어우러진 대본 형태로 작성해줘.
 2. 각 페이지의 dialogue_list 배열에 문장 단위로 role과 emotion을 반드시 부여해줘:
-   - role: "narrator"(해설), "hero"(주인공/어린이), "villain"(악당/거인), "elder"(어른/왕), "friend"(조연/동물친구)
+   - role: "narrator", "hero", "villain", "elder", "friend"
    - emotion: "excited", "happy", "urgent", "angry", "curious", "whisper", "calm"
 3. full_text에는 전체 본문을 적어줘.
 4. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘.
@@ -601,9 +605,13 @@
       if (geminiData.error) throw new Error(geminiData.error.message);
 
       const storyData = JSON.parse(geminiData.candidates[0].content.parts[0].text);
+      
+      // 💡 사용자 고유 식별자와 작가 정보 부여
       currentStoryBookObject = {
+        userId: getUniqueUserIdentifier(),
+        author: author,
         title: storyData.title,
-        createdAt: new Date().toLocaleString(),
+        createdAt: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         pages: []
       };
 
@@ -632,7 +640,7 @@
       renderBookPages(currentStoryBookObject);
       showPage(0);
 
-      statusLog.innerText = '🎉 나만의 맞춤 동화책이 완성되었어요! [다역 입체 낭독 시작]을 눌러보세요.';
+      statusLog.innerText = `🎉 [${author}] 님의 동화책이 완성되었어요! [다역 입체 낭독 시작]을 눌러보세요.`;
       controlPanel.style.display = 'flex';
 
     } catch (err) {
@@ -866,8 +874,8 @@
   }
 
   async function playAllBooksSequentially() {
-    if (allLibraryBooks.length === 0) {
-      alert('서재에 저장된 책이 없습니다.');
+    if (myLibraryBooks.length === 0) {
+      alert('내 서재에 저장된 동화책이 없습니다.');
       return;
     }
     isLibraryPlayingMode = true;
@@ -878,18 +886,18 @@
   function playNextBookInLibrary() {
     if (!isPlaying && currentLibraryIndex > 0) return;
 
-    if (currentLibraryIndex >= allLibraryBooks.length) {
+    if (currentLibraryIndex >= myLibraryBooks.length) {
       if (isRepeatMode) {
         currentLibraryIndex = 0;
       } else {
-        alert('📚 서재의 모든 동화책 연속 재생이 완료되었습니다!');
+        alert('📚 내 서재의 모든 동화책 연속 재생이 완료되었습니다!');
         isLibraryPlayingMode = false;
         isPlaying = false;
         return;
       }
     }
 
-    const nextBook = allLibraryBooks[currentLibraryIndex];
+    const nextBook = myLibraryBooks[currentLibraryIndex];
     currentStoryBookObject = nextBook;
     renderBookPages(nextBook);
     showPage(0);
@@ -903,35 +911,49 @@
     }, 1000);
   }
 
+  // --- 💡 [핵심] 사용자별 독립 저장 및 불러오기 ---
   function saveCurrentStoryToDB() {
     if (!currentStoryBookObject) return;
+    
+    currentStoryBookObject.userId = getUniqueUserIdentifier();
+    currentStoryBookObject.author = document.getElementById('authorName').value.trim() || "꼬마 작가";
+
     const tx = db.transaction("books", "readwrite");
     const store = tx.objectStore("books");
     store.add(currentStoryBookObject);
     tx.oncomplete = () => {
-      alert(`[${currentStoryBookObject.title}]이(가) 내 서재에 안전하게 저장되었습니다!`);
+      alert(`[${currentStoryBookObject.title}]이(가) [${currentStoryBookObject.author}] 님의 서재에 안전하게 저장되었습니다!`);
       loadLibraryList();
     };
   }
 
   function loadLibraryList() {
     if (!db) return;
+    const currentUserId = getUniqueUserIdentifier();
+    const authorName = document.getElementById('authorName').value.trim() || "나";
+    
+    document.getElementById('libraryTitleLabel').innerText = `📚 [${authorName}] 작가님의 서재`;
+
     const tx = db.transaction("books", "readonly");
     const store = tx.objectStore("books");
     const req = store.getAll();
     const listEl = document.getElementById("library-list");
 
     req.onsuccess = () => {
-      allLibraryBooks = req.result;
-      if (allLibraryBooks.length === 0) {
-        listEl.innerHTML = `<p style="text-align: center; color: #94a3b8; padding: 20px;">저장된 동화책이 없습니다.</p>`;
+      const allBooks = req.result;
+      // 💡 현재 사용자 ID와 일치하는 책만 필터링하여 격리
+      myLibraryBooks = allBooks.filter(book => book.userId === currentUserId || !book.userId);
+
+      if (myLibraryBooks.length === 0) {
+        listEl.innerHTML = `<p style="text-align: center; color: #94a3b8; padding: 20px;">[${authorName}] 님의 서재에 보관된 동화책이 없습니다.</p>`;
         return;
       }
-      listEl.innerHTML = allLibraryBooks.map((book) => `
+
+      listEl.innerHTML = myLibraryBooks.map((book) => `
         <div class="library-item">
           <div class="library-info">
             <h4>📖 ${book.title}</h4>
-            <p>생성일: ${book.createdAt} (총 ${book.pages.length}페이지)</p>
+            <p>작가: <b>${book.author || '익명'}</b> | 저장일: ${book.createdAt} (총 ${book.pages.length}p)</p>
           </div>
           <div class="library-actions">
             <button class="btn-load" onclick="loadSingleBook(${book.id})">열기</button>
@@ -955,7 +977,7 @@
   }
 
   function deleteSavedBook(id) {
-    if (!confirm('이 동화책을 서재에서 삭제하시겠습니까?')) return;
+    if (!confirm('이 동화책을 내 서재에서 삭제하시겠습니까?')) return;
     const tx = db.transaction("books", "readwrite");
     tx.objectStore("books").delete(id);
     tx.oncomplete = () => loadLibraryList();
@@ -965,7 +987,10 @@
     if (!currentStoryBookObject) return;
     
     const printContainer = document.createElement('div');
-    printContainer.innerHTML = `<h1 style="text-align:center; font-size:24px; margin-bottom:24px; color:#1e293b;">📖 ${currentStoryBookObject.title}</h1>`;
+    printContainer.innerHTML = `
+      <h1 style="text-align:center; font-size:24px; margin-bottom:6px; color:#1e293b;">📖 ${currentStoryBookObject.title}</h1>
+      <p style="text-align:center; font-size:14px; color:#64748b; margin-bottom:24px;">글/그림: ${currentStoryBookObject.author || '어린이 작가'}</p>
+    `;
     
     currentStoryBookObject.pages.forEach(p => {
       const pDiv = document.createElement('div');
@@ -983,7 +1008,7 @@
 
     const opt = {
       margin: 10,
-      filename: `${currentStoryBookObject.title}.pdf`,
+      filename: `${currentStoryBookObject.title}_${currentStoryBookObject.author || '동화'}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }

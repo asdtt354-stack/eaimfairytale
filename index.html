@@ -34,7 +34,7 @@
       margin: 0 auto;
     }
 
-    /* 🎵 큼직하고 선명한 뮤니 인라인 헤더 */
+    /* 🎵 완벽하게 밀착되는 인라인 뮤니 로고 헤더 */
     .muni-header {
       display: flex;
       flex-direction: column;
@@ -45,38 +45,44 @@
     }
 
     .muni-title-row {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      flex-wrap: nowrap;
+      gap: 6px; /* 글자와의 간격을 자연스럽게 조절 */
     }
 
-    /* 캐릭터 영역 및 확대 배율 대폭 상향 */
+    /* 💡 네모 테두리/잔상 제거 및 수직 정렬 최적화 */
     .muni-inline-wrap {
-      width: 64px;
-      height: 64px;
+      width: 46px;
+      height: 46px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       flex-shrink: 0;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      position: relative;
+      top: 3px; /* 글자 높이와 맞게 살짝 아래로 내려 자연스럽게 어우러짐 */
     }
 
     .muni-inline-img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      transform: scale(2.8); /* 💡 여백 제거 후 캐릭터를 2.8배 큼직하게 확대 */
+      transform: scale(2.8);
       transform-origin: center center;
-      filter: drop-shadow(0 3px 6px rgba(236, 72, 153, 0.3));
+      background: transparent !important;
+      border: none !important;
+      filter: none !important; /* 네모 잔상을 유발하던 그림자 필터 완전 제거 */
       animation: muniRhythm 2.5s ease-in-out infinite;
     }
 
     @keyframes muniRhythm {
       0%, 100% { transform: scale(2.8) translateY(0) rotate(0deg); }
-      25% { transform: scale(2.8) translateY(-3px) rotate(-4deg); }
-      75% { transform: scale(2.8) translateY(-3px) rotate(4deg); }
+      25% { transform: scale(2.8) translateY(-2px) rotate(-3deg); }
+      75% { transform: scale(2.8) translateY(-2px) rotate(3deg); }
     }
 
     h2.muni-title { 
@@ -88,6 +94,7 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      line-height: 1.2;
     }
 
     .muni-subtitle {
@@ -295,7 +302,7 @@
 <body>
 
 <div class="card">
-  <!-- 🎵 큼직하고 귀여운 뮤니 인라인 헤더 -->
+  <!-- 🎵 글자와 완벽하게 어우러지는 뮤니 타이틀 -->
   <div class="muni-header">
     <div class="muni-title-row">
       <div class="muni-inline-wrap">

@@ -427,21 +427,14 @@ function pickGenre(value){
   let isBgmEnabled = true;
   let targetBgmVolume = 0.25;
 
-  // 🎹 외부 MP3가 모바일에서 막힐 때 사용하는 내장 BGM 엔진
-  let bgmAudioContext = null;
-  let bgmMasterGain = null;
-  let bgmSynthTimer = null;
-  let bgmSynthNodes = [];
-  let bgmUsingSynth = false;
-
   const bgmPlaylist = {
-    "fantasy": { name: "환상 판타지 오르골", url: "https://cdn.pixabay.com/download/audio/2022/05/16/audio_db6591201e.mp3?filename=fairytale-112349.mp3" },
-    "heroic": { name: "웅장한 영웅 서사곡", url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=cinematic-atmosphere-score-2-22136.mp3" },
-    "mystery": { name: "비밀 탐험 수수께끼", url: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=mystery-10825.mp3" },
-    "scifi": { name: "신비로운 우주 유영", url: "https://cdn.pixabay.com/download/audio/2022/03/24/audio_33890b0be9.mp3?filename=space-ambience-5627.mp3" },
-    "animal": { name: "따뜻한 숲속 어쿠스틱", url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_4ebc4c81d8.mp3?filename=happy-acoustic-guitar-music-children-cheerful-story-22081.mp3" },
-    "comic": { name: "유쾌하고 엉뚱한 실로폰", url: "https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f77c22.mp3?filename=funny-kids-123473.mp3" },
-    "custom": { name: "포근한 클래식 피아노", url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=relaxing-piano-music-113063.mp3" }
+    "fantasy": { name: "Moonlit Forest Path", url: "./assets/bgm/moonlit-forest-path.mp3" },
+    "heroic": { name: "Little Brave Hero", url: "./assets/bgm/little-brave-hero.mp3" },
+    "mystery": { name: "The Secret in the Box", url: "./assets/bgm/the-secret-in-the-box.mp3" },
+    "scifi": { name: "Starry Night Journey", url: "./assets/bgm/starry-night-journey.mp3" },
+    "animal": { name: "Sunny Bunny Trail", url: "./assets/bgm/sunny-bunny-trail.mp3" },
+    "comic": { name: "Pudding Parade", url: "./assets/bgm/pudding-parade.mp3" },
+    "custom": { name: "Moonlit Forest Path", url: "./assets/bgm/moonlit-forest-path.mp3" }
   };
 
   function handleGenreChange(genreKey) {
@@ -453,91 +446,6 @@ function pickGenre(value){
     const textEl = document.getElementById('bgmTitleText');
     if (textEl) textEl.innerText = `배경음악: ${bgmData.name}`;
     bgmAudio.src = bgmData.url;
-  }
-
-
-  function stopSynthBgm() {
-    if (bgmSynthTimer) {
-      clearInterval(bgmSynthTimer);
-      bgmSynthTimer = null;
-    }
-    for (const node of bgmSynthNodes) {
-      try { node.stop && node.stop(); } catch (e) {}
-      try { node.disconnect && node.disconnect(); } catch (e) {}
-    }
-    bgmSynthNodes = [];
-    bgmUsingSynth = false;
-  }
-
-  function getGenreSynthProfile(genreKey) {
-    const profiles = {
-      fantasy: { bpm: 72, wave: 'sine', notes: [261.63, 329.63, 392.00, 523.25], pattern: [0,2,1,3,2,1] },
-      heroic:  { bpm: 88, wave: 'triangle', notes: [196.00, 246.94, 293.66, 392.00], pattern: [0,2,3,2,1,3] },
-      mystery: { bpm: 64, wave: 'sine', notes: [220.00, 261.63, 311.13, 369.99], pattern: [0,2,1,3,1,2] },
-      scifi:   { bpm: 58, wave: 'sine', notes: [174.61, 220.00, 261.63, 349.23], pattern: [0,3,1,2,3,1] },
-      animal:  { bpm: 78, wave: 'triangle', notes: [261.63, 329.63, 392.00, 440.00], pattern: [0,1,2,1,3,2] },
-      comic:   { bpm: 104, wave: 'square', notes: [293.66, 369.99, 440.00, 587.33], pattern: [0,2,1,3,2,0] },
-      custom:  { bpm: 68, wave: 'sine', notes: [261.63, 329.63, 392.00, 493.88], pattern: [0,1,2,3,2,1] }
-    };
-    return profiles[genreKey] || profiles.fantasy;
-  }
-
-  async function startSynthBgm(genreKey) {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return false;
-
-      stopSynthBgm();
-
-      if (!bgmAudioContext) {
-        bgmAudioContext = new AudioCtx();
-      }
-      if (bgmAudioContext.state === 'suspended') {
-        await bgmAudioContext.resume();
-      }
-
-      bgmMasterGain = bgmAudioContext.createGain();
-      bgmMasterGain.gain.value = Math.max(0.02, targetBgmVolume * 0.36);
-      bgmMasterGain.connect(bgmAudioContext.destination);
-
-      const profile = getGenreSynthProfile(genreKey);
-      const beatMs = Math.round(60000 / profile.bpm);
-      let step = 0;
-      bgmUsingSynth = true;
-
-      const playTone = () => {
-        if (!isBgmEnabled || !bgmUsingSynth || !bgmAudioContext) return;
-
-        const now = bgmAudioContext.currentTime;
-        const freq = profile.notes[profile.pattern[step % profile.pattern.length]];
-        step++;
-
-        const osc = bgmAudioContext.createOscillator();
-        const gain = bgmAudioContext.createGain();
-        osc.type = profile.wave;
-        osc.frequency.value = freq;
-
-        // 아주 부드러운 동화 BGM 음형
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.10, now + 0.06);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(0.55, beatMs / 1000 * 0.9));
-
-        osc.connect(gain);
-        gain.connect(bgmMasterGain);
-        osc.start(now);
-        osc.stop(now + Math.max(0.65, beatMs / 1000));
-
-        bgmSynthNodes.push(osc, gain);
-        if (bgmSynthNodes.length > 40) bgmSynthNodes.splice(0, 20);
-      };
-
-      playTone();
-      bgmSynthTimer = setInterval(playTone, beatMs);
-      return true;
-    } catch (e) {
-      console.log('내장 BGM 시작 오류:', e);
-      return false;
-    }
   }
 
   function playBgmForCurrentStory() {
@@ -552,10 +460,7 @@ function pickGenre(value){
     const textEl = document.getElementById('bgmTitleText');
     if (textEl) textEl.innerText = `배경음악: ${bgmData.name}`;
 
-    // 먼저 외부 음원을 시도하고, 모바일에서 재생이 막히거나 로딩이 안 되면
-    // 즉시 브라우저 내장 BGM으로 전환합니다.
-    stopSynthBgm();
-
+    // src 속성 기준으로 비교해 불필요한 재로딩을 줄입니다.
     if (bgmAudio.getAttribute('src') !== bgmData.url) {
       bgmAudio.src = bgmData.url;
       try { bgmAudio.load(); } catch (e) {}
@@ -564,41 +469,24 @@ function pickGenre(value){
     bgmAudio.muted = false;
     bgmAudio.volume = targetBgmVolume;
 
-    let fallbackTimer = null;
-    const useFallback = async () => {
-      if (fallbackTimer) clearTimeout(fallbackTimer);
-      try { bgmAudio.pause(); } catch (e) {}
-      const ok = await startSynthBgm(genreKey);
-      if (ok && textEl) textEl.innerText = `배경음악: ${bgmData.name} · 내장 재생`;
-      return ok;
-    };
-
     try {
       const p = bgmAudio.play();
-
-      // play()는 성공했지만 실제 데이터가 안 오는 경우도 있어 2.2초 후 검사
-      fallbackTimer = setTimeout(() => {
-        if (!isBgmEnabled) return;
-        if (bgmAudio.paused || bgmAudio.readyState < 2 || bgmAudio.currentTime === 0) {
-          useFallback();
-        }
-      }, 2200);
-
       if (p && typeof p.then === 'function') {
-        return p.then(() => true).catch(() => useFallback());
+        return p.then(() => true).catch(e => {
+          console.log("BGM 재생 대기:", e);
+          return false;
+        });
       }
       return Promise.resolve(true);
     } catch (e) {
-      return useFallback();
+      console.log("BGM 재생 오류:", e);
+      return Promise.resolve(false);
     }
   }
 
   function stopBgm() {
-    try {
-      bgmAudio.pause();
-      bgmAudio.currentTime = 0;
-    } catch (e) {}
-    stopSynthBgm();
+    bgmAudio.pause();
+    bgmAudio.currentTime = 0;
   }
 
   function toggleBgmSound() {
@@ -616,23 +504,13 @@ function pickGenre(value){
       if (topBtn) { topBtn.className = "bgm-switch-btn off"; topBtn.innerText = "🔇 BGM: OFF"; }
       if (bottomBtn) { bottomBtn.className = "bgm-btn off"; bottomBtn.innerText = "🔇 배경음악: OFF"; }
       if (icon) icon.innerText = "🔇";
-      try { bgmAudio.pause(); } catch (e) {}
-      stopSynthBgm();
+      bgmAudio.pause();
     }
   }
 
   function changeBgmVolume(val) {
     targetBgmVolume = parseFloat(val);
     bgmAudio.volume = targetBgmVolume;
-    if (bgmMasterGain && bgmAudioContext) {
-      try {
-        bgmMasterGain.gain.setTargetAtTime(
-          Math.max(0.02, targetBgmVolume * 0.36),
-          bgmAudioContext.currentTime,
-          0.05
-        );
-      } catch (e) {}
-    }
   }
 
   // 💡 [모바일 음성 합성 엔진 안정화]
@@ -1341,9 +1219,6 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
         if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
           bgmAudio.volume = targetBgmVolume;
         }
-        if (bgmUsingSynth && bgmMasterGain && bgmAudioContext) {
-          try { bgmMasterGain.gain.setTargetAtTime(Math.max(0.02, targetBgmVolume * 0.36), bgmAudioContext.currentTime, 0.05); } catch (e) {}
-        }
         resolve(ok);
       };
 
@@ -1351,9 +1226,6 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
         if (options.startBgmOnStart && isBgmEnabled) playBgmForCurrentStory();
         if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
           bgmAudio.volume = targetBgmVolume * 0.30;
-        }
-        if (bgmUsingSynth && bgmMasterGain && bgmAudioContext) {
-          try { bgmMasterGain.gain.setTargetAtTime(Math.max(0.015, targetBgmVolume * 0.12), bgmAudioContext.currentTime, 0.05); } catch (e) {}
         }
         clearSpeechWatchdog();
         speechWatchdog = setInterval(() => {

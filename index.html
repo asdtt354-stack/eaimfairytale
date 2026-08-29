@@ -238,7 +238,7 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
       <div class="bgm-song" id="bgmTitleText">환상 판타지 오르골</div>
       <div class="bgm-row">
         <span id="bgmIcon">🎵</span>
-        <input type="range" class="bgm-slider" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.48" oninput="changeBgmVolume(this.value)">
+        <input type="range" class="bgm-slider" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.42" oninput="changeBgmVolume(this.value)">
         <button type="button" class="bgm-switch-btn" id="bgmSwitchTopBtn" onclick="toggleBgmSound()">BGM ON</button>
       </div>
     </div>
@@ -425,7 +425,7 @@ function pickGenre(value){
   bgmAudio.preload = 'auto';
   bgmAudio.playsInline = true;
   let isBgmEnabled = true;
-  let targetBgmVolume = 0.48;
+  let targetBgmVolume = 0.42;
 
   const bgmPlaylist = {
     "fantasy": { name: "Moonlit Forest Path", url: "./assets/bgm/moonlit-forest-path.mp3" },
@@ -441,7 +441,7 @@ function pickGenre(value){
   function getCurrentBgmSelection() {
     const actingStyle = document.getElementById('actingStyle')?.value || 'dynamic_theater';
     if (actingStyle === 'bedtime_calm') {
-      return { key: 'bedtime', data: bgmPlaylist.bedtime, volume: 0.38 };
+      return { key: 'bedtime', data: bgmPlaylist.bedtime, volume: 0.34 };
     }
 
     const genreEl = document.getElementById('storyGenre');

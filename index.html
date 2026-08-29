@@ -12,7 +12,7 @@
     body { 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; 
       margin: 0;
-      padding: 8px 10px;
+      padding: 12px 10px;
       background: linear-gradient(135deg, #fff9e6 0%, #e0f2fe 50%, #fce7f3 100%); 
       background-attachment: fixed;
       color: #334155; 
@@ -27,65 +27,62 @@
       max-width: 640px;
       background: rgba(255, 255, 255, 0.96); 
       backdrop-filter: blur(12px);
-      padding: 10px 16px 20px 16px; /* 상단 여백 대폭 축소 */
+      padding: 16px 16px 20px 16px;
       border-radius: 24px; 
       box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
       border: 2px solid #fef3c7;
       margin: 0 auto;
     }
 
-    /* 🎵 상하 여백을 완벽하게 밀착시킨 뮤니 헤더 */
+    /* 🎵 온전한 비율로 잘림 없이 출력되는 헤더 */
     .muni-header {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin: 0 0 6px 0;
+      margin-bottom: 12px;
       text-align: center;
     }
 
-    /* 이미지 자체의 상하 투명 여백을 크롭하여 밀착 */
     .muni-full-banner-wrap {
       width: 100%;
-      max-width: 420px;
-      height: 140px; /* 로고 프레임 높이 압축 */
+      max-width: 360px; /* 로고가 카드 폭에 딱 맞게 안착 */
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
-      margin: -6px auto -4px auto;
+      margin: 0 auto;
     }
 
     .muni-full-banner {
       width: 100%;
       height: auto;
       display: block;
-      transform: scale(1.35); /* 원본 상하 여백 잘라내고 캐릭터/글자 확대 */
-      transform-origin: center center;
+      object-fit: contain;
     }
 
     .muni-subtitle {
       font-size: 13px;
       color: #7c3aed;
       font-weight: 700;
-      margin: 0 0 8px 0;
+      margin-top: 6px;
+      margin-bottom: 4px;
       letter-spacing: -0.3px;
     }
     
     .tab-nav { 
       display: flex; 
       gap: 6px; 
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       background: #f1f5f9;
       padding: 4px;
       border-radius: 14px;
     }
     .tab-btn { 
       flex: 1; 
-      padding: 10px; 
+      padding: 11px; 
       background: transparent; 
       border: none; 
-      font-size: 14px; 
+      font-size: 14.5px; 
       font-weight: 700; 
       color: #64748b; 
       cursor: pointer; 
@@ -101,9 +98,9 @@
     .user-profile-box { 
       background: #f8fafc; 
       border: 1.5px dashed #cbd5e1; 
-      padding: 12px 14px; 
+      padding: 14px; 
       border-radius: 14px; 
-      margin-bottom: 14px; 
+      margin-bottom: 16px; 
     }
     .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .user-header label { color: #4f46e5; font-weight: 700; font-size: 13.5px; }
@@ -115,14 +112,14 @@
     .helper-text { font-size: 12px; color: #64748b; margin-top: 4px; line-height: 1.4; }
     .helper-alert { color: #4f46e5; font-weight: 600; }
 
-    .input-group { margin-bottom: 14px; }
-    label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 13.5px; color: #334155; }
+    .input-group { margin-bottom: 15px; }
+    label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 14px; color: #334155; }
     input, select { 
       width: 100%; 
-      padding: 11px 13px; 
+      padding: 12px 14px; 
       border: 1.5px solid #e2e8f0; 
       border-radius: 12px; 
-      font-size: 14.5px; 
+      font-size: 15px; 
       background: #ffffff; 
       transition: all 0.2s;
     }
@@ -136,20 +133,20 @@
       background: #fffbeb;
       border: 2px dashed #fcd34d;
       border-radius: 14px;
-      padding: 12px;
+      padding: 14px;
       text-align: center;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
     .photo-preview-wrapper {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 12px;
-      margin-top: 6px;
+      margin-top: 8px;
     }
     .photo-preview-img {
-      width: 65px;
-      height: 65px;
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid #f59e0b;
@@ -178,24 +175,24 @@
 
     button.primary-btn { 
       width: 100%; 
-      padding: 15px; 
+      padding: 16px; 
       background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); 
       color: white; 
       border: none; 
       border-radius: 14px; 
-      font-size: 16px; 
+      font-size: 16.5px; 
       font-weight: 800; 
       cursor: pointer; 
-      margin-top: 6px; 
+      margin-top: 8px; 
       box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3);
       touch-action: manipulation;
     }
     button.primary-btn:active { transform: scale(0.98); }
     
-    #status-log { margin-top: 12px; font-size: 14px; color: #4f46e5; text-align: center; font-weight: 700; }
+    #status-log { margin-top: 14px; font-size: 14px; color: #4f46e5; text-align: center; font-weight: 700; }
     
-    #book-container { margin-top: 18px; display: none; }
-    .story-title { font-size: 19px; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 12px; }
+    #book-container { margin-top: 20px; display: none; }
+    .story-title { font-size: 20px; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 14px; }
     
     .book-page-wrapper { width: 100%; position: relative; }
     .page-item { display: none; position: relative; width: 100%; aspect-ratio: 1/1; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.12); animation: fadeIn 0.3s ease-in-out; background: #e2e8f0; border: 3px solid #ffffff; }
@@ -215,7 +212,7 @@
       left: 0; 
       width: 100%; 
       background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 75%, rgba(0,0,0,0) 100%); 
-      padding: 30px 14px 14px 14px; 
+      padding: 34px 16px 16px 16px; 
       backdrop-filter: blur(4px); 
       -webkit-backdrop-filter: blur(4px); 
       max-height: 55%;
@@ -230,23 +227,23 @@
     .dialogue-elder { color: #fde047; }
     .emotion-tag { font-size: 11px; padding: 1px 5px; border-radius: 4px; background: rgba(255,255,255,0.2); color: #fff; margin-left: 4px; font-weight: normal; }
 
-    .page-nav-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; background: #f8fafc; padding: 10px 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; }
-    .page-nav-btn { background: #3b82f6; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .page-nav-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; background: #f8fafc; padding: 10px 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; }
+    .page-nav-btn { background: #3b82f6; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13.5px; font-weight: 700; cursor: pointer; }
     .page-nav-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
-    .page-indicator { font-size: 13.5px; font-weight: 800; color: #475569; }
+    .page-indicator { font-size: 14px; font-weight: 800; color: #475569; }
 
     .drama-control-box {
-      margin-top: 12px;
+      margin-top: 14px;
       background: #eff6ff;
       border: 1.5px solid #bfdbfe;
-      padding: 10px 12px;
+      padding: 12px 14px;
       border-radius: 12px;
     }
-    .drama-control-box label { color: #1e40af; font-size: 13px; margin-bottom: 4px; }
+    .drama-control-box label { color: #1e40af; font-size: 13.5px; margin-bottom: 6px; }
 
     .controls { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-    .controls button { flex: 1 1 calc(50% - 4px); padding: 11px 6px; background: #e2e8f0; border: none; border-radius: 10px; font-size: 13px; cursor: pointer; font-weight: 700; color: #334155; }
-    .controls button.read-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; flex: 1 1 100%; font-size: 15px; padding: 12px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25); }
+    .controls button { flex: 1 1 calc(50% - 4px); padding: 12px 6px; background: #e2e8f0; border: none; border-radius: 10px; font-size: 13.5px; cursor: pointer; font-weight: 700; color: #334155; }
+    .controls button.read-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; flex: 1 1 100%; font-size: 15.5px; padding: 13px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25); }
     
     .controls button.loop-btn { background: #f1f5f9; color: #475569; border: 1.5px solid #cbd5e1; }
     .controls button.loop-btn.active { background: #8b5cf6; color: white; border-color: #7c3aed; font-weight: 800; }
@@ -255,11 +252,11 @@
     .controls button.pdf-btn { background: #f59e0b; color: white; }
     .controls button.stop { background: #fee2e2; color: #991b1b; }
 
-    .library-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .library-play-all { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
-    .library-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 13px; background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; margin-bottom: 8px; }
+    .library-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .library-play-all { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .library-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; margin-bottom: 10px; }
     .library-info { flex: 1; text-align: left; }
-    .library-info h4 { margin: 0 0 3px 0; color: #1e293b; font-size: 14.5px; font-weight: 700; }
+    .library-info h4 { margin: 0 0 3px 0; color: #1e293b; font-size: 15px; font-weight: 700; }
     .library-info p { margin: 0; font-size: 11.5px; color: #64748b; }
     .library-actions { display: flex; gap: 6px; }
     .library-actions button { padding: 6px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 700; }
@@ -270,7 +267,7 @@
 <body>
 
 <div class="card">
-  <!-- 🎵 위아래 여백을 콤팩트하게 밀착시킨 헤더 -->
+  <!-- 🎵 온전한 배너 로고 헤더 -->
   <div class="muni-header">
     <div class="muni-full-banner-wrap">
       <img src="muni_title.jpg" class="muni-full-banner" alt="뮤니의 동화마을 이야기" onerror="this.src='muni_title.png'; this.onerror=function(){this.src='muni.png';};">
@@ -294,9 +291,9 @@
           <button class="btn-clear" onclick="clearUserSession()">초기화</button>
         </div>
       </div>
-      <input type="password" id="apiKey" placeholder="Google AI Studio API 키를 입력하세요" oninput="saveUserSession()" style="margin-bottom: 6px;">
+      <input type="password" id="apiKey" placeholder="Google AI Studio API 키를 입력하세요" oninput="saveUserSession()" style="margin-bottom: 8px;">
       
-      <label for="authorName" style="font-size: 12.5px; color: #334155; margin-top: 4px;">✍️ 책 저장을 위한 작가 닉네임 (필수)</label>
+      <label for="authorName" style="font-size: 13px; color: #334155; margin-top: 6px;">✍️ 책 저장을 위한 작가 닉네임 (필수)</label>
       <input type="text" id="authorName" placeholder="책 저장을 위해 닉네임을 적어주세요 (예: 민우 작가, 3학년 2반)" oninput="saveUserSession()">
       <div class="helper-text">
         <span class="helper-alert">💡 안내:</span> 같은 기기나 API 키를 함께 써도, <b>닉네임(이름)</b>을 적어주시면 나만의 서재에 따로 안전하게 보관됩니다.
@@ -305,8 +302,8 @@
 
     <!-- 📸 어린이 얼굴 사진 업로드 -->
     <div class="photo-upload-box">
-      <label style="color: #92400e; margin-bottom: 3px;">🧒 주인공 얼굴 사진 넣기 (선택)</label>
-      <p style="margin: 0 0 6px 0; font-size: 12px; color: #b45309;">아이 사진을 넣으면 동화 속 캐릭터로 쏙 들어갑니다!</p>
+      <label style="color: #92400e; margin-bottom: 4px;">🧒 주인공 얼굴 사진 넣기 (선택)</label>
+      <p style="margin: 0 0 8px 0; font-size: 12px; color: #b45309;">아이 사진을 넣으면 동화 속 캐릭터로 쏙 들어갑니다!</p>
       <input type="file" id="childPhotoInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
       <div class="photo-preview-wrapper">
         <img id="photoPreview" class="photo-preview-img" alt="아이 사진">
@@ -360,7 +357,7 @@
   <!-- 2. 서재 탭 -->
   <div id="library-view" style="display: none;">
     <div class="library-header">
-      <span id="libraryTitleLabel" style="font-weight: 700; color: #475569; font-size: 14.5px;">📚 나의 동화책 보관함</span>
+      <span id="libraryTitleLabel" style="font-weight: 700; color: #475569; font-size: 15px;">📚 나의 동화책 보관함</span>
       <button class="library-play-all" onclick="playAllBooksSequentially()">▶ 내 서재 연속 재생</button>
     </div>
     <div id="library-list">

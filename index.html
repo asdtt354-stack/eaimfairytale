@@ -35,7 +35,7 @@
       position: relative;
     }
 
-    /* 🎵 둥실둥실 떠다니는 동화풍 파티클 레이어 */
+    /* 🎵 둥실둥실 파티클 레이어 */
     .particle-container {
       position: absolute;
       top: 0;
@@ -68,7 +68,6 @@
       100% { transform: translateY(-4px) scale(1) rotate(-2deg); opacity: 0.75; }
     }
 
-    /* 🎵 헤더 및 배너 */
     .muni-header {
       display: flex;
       flex-direction: column;
@@ -101,7 +100,6 @@
 
     .muni-subtitle {
       font-size: 13.5px;
-      color: #6d28d9;
       font-weight: 800;
       margin: 0 0 6px 0;
       position: relative;
@@ -111,6 +109,25 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
+    /* 🎧 BGM 미니 컨트롤러 바 */
+    .bgm-control-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fdf4ff;
+      border: 1.5px solid #f5d0fe;
+      padding: 8px 12px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 2;
+    }
+    .bgm-info { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #86198f; }
+    .bgm-actions { display: flex; align-items: center; gap: 8px; }
+    .bgm-toggle-btn { background: #d946ef; color: white; border: none; padding: 4px 10px; border-radius: 8px; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+    .bgm-toggle-btn.off { background: #cbd5e1; color: #475569; }
+    .bgm-slider { width: 65px; accent-color: #d946ef; cursor: pointer; }
     
     .tab-nav { 
       display: flex; 
@@ -316,7 +333,7 @@
 <body>
 
 <div class="card">
-  <!-- ✨ 동화마을 반짝이 & 음표 파티클 레이어 -->
+  <!-- ✨ 동화마을 파티클 레이어 -->
   <div class="particle-container">
     <span class="sparkle sp1">✨</span>
     <span class="sparkle sp2">🎶</span>
@@ -332,6 +349,18 @@
       <img src="muni_title.jpg" class="muni-full-banner" alt="뮤니의 동화마을 이야기" onerror="this.src='muni_title.png'; this.onerror=function(){this.src='muni.png';};">
     </div>
     <div class="muni-subtitle">음악과 함께하는 나만의 입체 오디오 동화 공작소</div>
+  </div>
+
+  <!-- 🎧 BGM 제어 바 (배경음악 ON/OFF 및 볼륨) -->
+  <div class="bgm-control-bar">
+    <div class="bgm-info">
+      <span id="bgmIcon">🎵</span>
+      <span id="bgmTitleText">배경음악: 환상 판타지 오르골</span>
+    </div>
+    <div class="bgm-actions">
+      <input type="range" class="bgm-slider" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.25" oninput="changeBgmVolume(this.value)">
+      <button type="button" class="bgm-toggle-btn" id="bgmToggleBtn" onclick="toggleBgmSound()">BGM ON</button>
+    </div>
   </div>
 
   <div class="tab-nav">
@@ -371,10 +400,10 @@
       </div>
     </div>
 
-    <!-- 🎭 장르 선택 -->
+    <!-- 🎭 장르 선택 (BGM 자동 매칭) -->
     <div class="input-group">
       <label for="storyGenre">🎨 동화 장르 / 이야기 스타일</label>
-      <select id="storyGenre">
+      <select id="storyGenre" onchange="updateBgmGenrePreview(this.value)">
         <option value="fantasy" selected>✨ 환상 판타지 / 요정 이야기 (마법, 신비로운 모험)</option>
         <option value="heroic">⚔️ 영웅 & 신화 / 성경 / 역사 모험 (용기와 믿음의 대결)</option>
         <option value="mystery">🔍 흥미진진 추리 & 비밀 탐험 (지혜로운 수수께끼 풀기)</option>
@@ -469,6 +498,92 @@
   let childPhotoBase64 = null;
   let childPhotoMime = "image/jpeg";
 
+  // 🎵 --- [BGM 오디오 엔진] --- 🎵
+  let bgmAudio = new Audio();
+  bgmAudio.loop = true;
+  let isBgmEnabled = true;
+  let targetBgmVolume = 0.25;
+
+  // 장르별 고품질 로열티 프리 배경음악 스트림 URL 및 명칭
+  const bgmPlaylist = {
+    "fantasy": {
+      name: "환상 판타지 오르골",
+      url: "https://cdn.pixabay.com/download/audio/2022/05/16/audio_db6591201e.mp3?filename=fairytale-112349.mp3"
+    },
+    "heroic": {
+      name: "웅장한 영웅 서사곡",
+      url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=cinematic-atmosphere-score-2-22136.mp3"
+    },
+    "mystery": {
+      name: "비밀 탐험 수수께끼",
+      url: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=mystery-10825.mp3"
+    },
+    "scifi": {
+      name: "신비로운 우주 유영",
+      url: "https://cdn.pixabay.com/download/audio/2022/03/24/audio_33890b0be9.mp3?filename=space-ambience-5627.mp3"
+    },
+    "animal": {
+      name: "따뜻한 숲속 어쿠스틱",
+      url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_4ebc4c81d8.mp3?filename=happy-acoustic-guitar-music-children-cheerful-story-22081.mp3"
+    },
+    "comic": {
+      name: "유쾌하고 엉뚱한 실로폰",
+      url: "https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f77c22.mp3?filename=funny-kids-123473.mp3"
+    },
+    "custom": {
+      name: "포근한 클래식 피아노",
+      url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=relaxing-piano-music-113063.mp3"
+    }
+  };
+
+  function updateBgmGenrePreview(genreKey) {
+    const bgmData = bgmPlaylist[genreKey] || bgmPlaylist["fantasy"];
+    document.getElementById('bgmTitleText').innerText = `배경음악: ${bgmData.name}`;
+    bgmAudio.src = bgmData.url;
+  }
+
+  function playBgmForCurrentStory() {
+    if (!isBgmEnabled) return;
+    const genreKey = (currentStoryBookObject && currentStoryBookObject.genre) || document.getElementById('storyGenre').value;
+    const bgmData = bgmPlaylist[genreKey] || bgmPlaylist["fantasy"];
+    
+    if (bgmAudio.src !== bgmData.url) {
+      bgmAudio.src = bgmData.url;
+    }
+    bgmAudio.volume = targetBgmVolume;
+    bgmAudio.play().catch(e => console.log("BGM Play Notice:", e));
+  }
+
+  function stopBgm() {
+    bgmAudio.pause();
+    bgmAudio.currentTime = 0;
+  }
+
+  function toggleBgmSound() {
+    isBgmEnabled = !isBgmEnabled;
+    const btn = document.getElementById('bgmToggleBtn');
+    const icon = document.getElementById('bgmIcon');
+    if (isBgmEnabled) {
+      btn.className = "bgm-toggle-btn";
+      btn.innerText = "BGM ON";
+      icon.innerText = "🎵";
+      if (isPlaying) playBgmForCurrentStory();
+    } else {
+      btn.className = "bgm-toggle-btn off";
+      btn.innerText = "BGM OFF";
+      icon.innerText = "🔇";
+      bgmAudio.pause();
+    }
+  }
+
+  function changeBgmVolume(val) {
+    targetBgmVolume = parseFloat(val);
+    bgmAudio.volume = targetBgmVolume;
+  }
+
+  // 초기 BGM 프리뷰 세팅
+  updateBgmGenrePreview("fantasy");
+
   let availableVoices = [];
   function initVoices() {
     availableVoices = window.speechSynthesis.getVoices();
@@ -481,7 +596,6 @@
   function getUniqueUserIdentifier() {
     const key = document.getElementById('apiKey').value.trim();
     const author = document.getElementById('authorName').value.trim();
-    
     if (key.length >= 8) {
       return (author ? author + "_" : "user_") + key.slice(-8);
     }
@@ -491,7 +605,6 @@
   function saveUserSession() {
     const key = document.getElementById('apiKey').value.trim();
     const author = document.getElementById('authorName').value.trim();
-    
     try {
       localStorage.setItem("gemini_fairytale_api_key", key);
       localStorage.setItem("gemini_fairytale_author", author);
@@ -525,14 +638,12 @@
   };
   dbRequest.onsuccess = (e) => {
     db = e.target.result;
-    
     try {
       const savedKey = localStorage.getItem("gemini_fairytale_api_key");
       const savedAuthor = localStorage.getItem("gemini_fairytale_author");
       if (savedKey) document.getElementById('apiKey').value = savedKey;
       if (savedAuthor) document.getElementById('authorName').value = savedAuthor;
     } catch(e) {}
-
     loadLibraryList();
   };
 
@@ -640,6 +751,7 @@
     const controlPanel = document.getElementById('controlPanel');
 
     saveUserSession();
+    updateBgmGenrePreview(genreKey);
 
     const config = lengthConfig[lengthVal];
     const selectedGenre = genreGuides[genreKey] || genreGuides["custom"];
@@ -708,6 +820,7 @@
       currentStoryBookObject = {
         userId: getUniqueUserIdentifier(),
         author: author,
+        genre: genreKey,
         title: storyData.title,
         createdAt: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         pages: []
@@ -860,6 +973,9 @@
     stopVoice();
     isPlaying = true;
 
+    // 🎵 낭독 시작 시 배경음악 자동 재생
+    playBgmForCurrentStory();
+
     showPage(0);
     await speakDynamicLine('narrator', 'excited', `제목: ${currentStoryBookObject.title}`);
 
@@ -892,6 +1008,7 @@
         }, 1500);
       } else {
         isPlaying = false;
+        stopBgm(); // 낭독 종료 시 BGM 정지
       }
     }
   }
@@ -952,8 +1069,23 @@
       utterance.rate = rate;
       utterance.pitch = pitch;
 
-      utterance.onend = () => resolve();
-      utterance.onerror = () => resolve();
+      // 💡 [오디오 더킹] 목소리가 나올 때 BGM 볼륨을 살짝 낮춰 또렷하게 들리게 함
+      if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
+        bgmAudio.volume = targetBgmVolume * 0.45;
+      }
+
+      utterance.onend = () => {
+        if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
+          bgmAudio.volume = targetBgmVolume;
+        }
+        resolve();
+      };
+      utterance.onerror = () => {
+        if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
+          bgmAudio.volume = targetBgmVolume;
+        }
+        resolve();
+      };
 
       window.speechSynthesis.speak(utterance);
     });
@@ -991,6 +1123,7 @@
         alert('📚 내 서재의 모든 동화책 연속 재생이 완료되었습니다!');
         isLibraryPlayingMode = false;
         isPlaying = false;
+        stopBgm();
         return;
       }
     }
@@ -1014,6 +1147,7 @@
     
     currentStoryBookObject.userId = getUniqueUserIdentifier();
     currentStoryBookObject.author = document.getElementById('authorName').value.trim() || "꼬마 작가";
+    currentStoryBookObject.genre = document.getElementById('storyGenre').value;
 
     const tx = db.transaction("books", "readwrite");
     const store = tx.objectStore("books");
@@ -1069,6 +1203,7 @@
       renderBookPages(book);
       showPage(0);
       switchTab('create');
+      updateBgmGenrePreview(book.genre || "fantasy");
     };
   }
 
@@ -1120,12 +1255,19 @@
     if (tab === 'library') loadLibraryList();
   }
 
-  function pauseVoice() { window.speechSynthesis.pause(); }
-  function resumeVoice() { window.speechSynthesis.resume(); }
+  function pauseVoice() { 
+    window.speechSynthesis.pause(); 
+    bgmAudio.pause();
+  }
+  function resumeVoice() { 
+    window.speechSynthesis.resume(); 
+    if (isBgmEnabled) bgmAudio.play();
+  }
   function stopVoice() {
     isPlaying = false;
     isLibraryPlayingMode = false;
     window.speechSynthesis.cancel();
+    stopBgm();
   }
 </script>
 

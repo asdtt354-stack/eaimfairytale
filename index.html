@@ -162,54 +162,69 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
   .theme-chips{grid-template-columns:repeat(2,1fr)}
 }
 
-.kakao-guide-overlay{
-  position:fixed; inset:0; z-index:99999; display:none;
-  align-items:center; justify-content:center; padding:20px;
-  background:rgba(30,24,42,.72); backdrop-filter:blur(8px);
+.voice-status{margin-top:10px;padding:9px 10px;border-radius:11px;background:#f8f5ff;color:#6959a8;font-size:12px;line-height:1.5}
+
+
+.browser-guide-overlay,.install-guide-overlay{
+  position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:18px;
+  background:rgba(30,24,42,.72);backdrop-filter:blur(8px)
 }
-.kakao-guide-overlay.show{display:flex}
-.kakao-guide-card{
-  width:min(460px,100%); background:#fffdfc; border-radius:24px; padding:24px;
-  box-shadow:0 24px 70px rgba(0,0,0,.28); text-align:center;
-  border:1px solid #eadff8;
+.browser-guide-overlay.show,.install-guide-overlay.show{display:flex}
+.guide-card{
+  width:min(460px,100%);background:#fffdfc;border:1px solid #eadff8;border-radius:24px;padding:24px;
+  box-shadow:0 24px 70px rgba(0,0,0,.28);text-align:center
 }
-.kakao-guide-icon{font-size:44px; margin-bottom:8px}
-.kakao-guide-card h2{margin:0 0 10px; font-size:22px; color:#53318d}
-.kakao-guide-card p{margin:0 0 12px; color:#596379; line-height:1.65; font-size:14px}
-.kakao-guide-steps{
-  text-align:left; background:#f8f4ff; border:1px solid #eadff8;
-  border-radius:15px; padding:13px 15px; margin:14px 0; color:#4f5870;
-  font-size:13.5px; line-height:1.7;
+.guide-card h2{margin:2px 0 10px;color:#53318d;font-size:22px}
+.guide-card p{color:#596379;line-height:1.65;font-size:14px}
+.guide-steps{text-align:left;background:#f8f4ff;border:1px solid #eadff8;border-radius:15px;padding:13px 15px;margin:14px 0;color:#4f5870;font-size:13.5px;line-height:1.7}
+.guide-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.guide-actions button,.install-app-btn{
+  border:0;border-radius:12px;padding:12px 10px;font-weight:900;cursor:pointer
 }
-.kakao-guide-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px}
-.kakao-guide-actions button{
-  border:0; border-radius:12px; padding:12px 10px; font-weight:900; cursor:pointer;
+.guide-primary{background:#7354e7;color:#fff}.guide-secondary{background:#f0edf5;color:#5b6170}
+.install-app-btn{
+  position:fixed;right:16px;bottom:16px;z-index:9000;background:linear-gradient(135deg,#7354e7,#d445bd);
+  color:#fff;box-shadow:0 8px 22px rgba(95,63,170,.28);display:none
 }
-.kakao-copy-btn{background:#7354e7; color:#fff}
-.kakao-close-btn{background:#f0edf5; color:#5b6170}
-.voice-status{
-  margin-top:10px; padding:9px 10px; border-radius:11px;
-  background:#f8f5ff; color:#6959a8; font-size:12px; line-height:1.5;
-}
+.install-app-btn.show{display:block}
 
 </style>
+
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#7354e7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="뮤니 동화마을">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+
 </head>
 <body>
 
-<div class="kakao-guide-overlay" id="kakaoGuideOverlay" aria-hidden="true">
-  <div class="kakao-guide-card">
-    <div class="kakao-guide-icon">🎧</div>
+<div class="browser-guide-overlay" id="kakaoGuideOverlay">
+  <div class="guide-card">
+    <div style="font-size:44px">🎧</div>
     <h2>동화 낭독은 일반 브라우저에서 열어주세요</h2>
-    <p>카카오톡 안의 브라우저에서는 음성 낭독 기능이 제한되거나 같은 목소리로만 재생될 수 있어요.</p>
-    <div class="kakao-guide-steps" id="kakaoGuideSteps">
-      브라우저 안내를 준비하고 있어요.
-    </div>
-    <div class="kakao-guide-actions">
-      <button type="button" class="kakao-copy-btn" onclick="copyCurrentLink()">🔗 링크 복사</button>
-      <button type="button" class="kakao-close-btn" onclick="closeKakaoGuide()">일단 계속 보기</button>
+    <p>카카오톡 안에서는 음성 낭독이 제한되거나 같은 목소리로만 들릴 수 있어요.</p>
+    <div class="guide-steps" id="kakaoGuideSteps"></div>
+    <div class="guide-actions">
+      <button type="button" class="guide-primary" onclick="copyCurrentLink()">🔗 링크 복사</button>
+      <button type="button" class="guide-secondary" onclick="closeKakaoGuide()">일단 계속 보기</button>
     </div>
   </div>
 </div>
+
+<div class="install-guide-overlay" id="installGuideOverlay">
+  <div class="guide-card">
+    <div style="font-size:44px">📱</div>
+    <h2>뮤니 동화마을을 앱처럼 저장하기</h2>
+    <div class="guide-steps" id="installGuideSteps"></div>
+    <div class="guide-actions">
+      <button type="button" class="guide-primary" id="nativeInstallBtn" onclick="triggerNativeInstall()">앱으로 설치</button>
+      <button type="button" class="guide-secondary" onclick="closeInstallGuide()">닫기</button>
+    </div>
+  </div>
+</div>
+<button type="button" class="install-app-btn" id="installAppBtn" onclick="openInstallGuide()">📱 앱으로 저장</button>
 
 <div class="app-shell">
   <section class="hero">
@@ -490,11 +505,9 @@ function pickGenre(value){
 
   function initVoices() {
     if (typeof window.speechSynthesis === 'undefined') return;
-    const voices = window.speechSynthesis.getVoices();
-    if (voices && voices.length) {
-      availableVoices = voices;
-      updateVoiceStatus();
-    }
+    const voices = window.speechSynthesis.getVoices() || [];
+    if (voices.length) availableVoices = voices;
+    updateVoiceStatus();
   }
 
   if (typeof window.speechSynthesis !== 'undefined') {
@@ -593,7 +606,7 @@ function pickGenre(value){
       if (btn) btn.disabled = true;
       if (controlPanel) controlPanel.style.display = 'none';
       if (bookContainer) bookContainer.style.display = 'none';
-      if (statusLog) statusLog.innerText = `✨ 1/${config.pages + 1}. [${author}] 작가님의 맞춤 입체 대본을 작성 중입니다...`;
+      if (statusLog) statusLog.innerText = `✨ [${lengthVal}분 · ${config.pages}페이지] ${author} 작가님의 맞춤 동화를 만드는 중입니다...`;
       if (pagesWrapper) pagesWrapper.innerHTML = '';
       stopVoice();
 
@@ -612,12 +625,18 @@ function pickGenre(value){
 - 주제/교훈: ${lesson ? lesson : '마음이 따뜻해지는 감동 교훈'}
 
 [작성 규칙]
+0. 반드시 정확히 ${config.pages}페이지로 작성해줘. pages 배열의 항목 수는 정확히 ${config.pages}개여야 해.
 1. 재미있고 통통 튀는 대사와 해설이 어우러진 대본 형태로 작성해줘.
 2. 각 페이지의 dialogue_list 배열에 문장 단위로 role과 emotion을 반드시 부여해줘:
    - role: "narrator", "hero", "villain", "elder", "friend"
    - emotion: "excited", "happy", "urgent", "angry", "curious", "whisper", "calm"
 3. full_text에는 전체 본문을 적어줘.
 4. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘.
+
+[페이지 수 최종 확인]
+- 선택된 동화 길이: ${lengthVal}분
+- 반드시 생성할 페이지 수: ${config.pages}페이지
+- pages 배열 길이가 ${config.pages}가 아니면 잘못된 출력이야.
 
 [출력 규격: 순수 JSON만 출력]
 {
@@ -650,7 +669,16 @@ function pickGenre(value){
 
       const storyData = JSON.parse(geminiData.candidates[0].content.parts[0].text);
       
-      currentStoryBookObject = {
+      
+      // ✅ 선택 시간에 맞춰 페이지 수 고정
+      if (!Array.isArray(storyData.pages)) storyData.pages = [];
+      storyData.pages = storyData.pages.slice(0, config.pages);
+
+      if (storyData.pages.length < config.pages) {
+        throw new Error(`AI가 ${storyData.pages.length}페이지만 생성했습니다. 다시 만들기를 눌러주세요. (필요: ${config.pages}페이지)`);
+      }
+
+currentStoryBookObject = {
         userId: getUniqueUserIdentifier(),
         author: author,
         genre: genreKey,
@@ -1050,12 +1078,14 @@ function pickGenre(value){
   function getKoreanVoices() {
     const all = Array.isArray(availableVoices) ? availableVoices : [];
     const ko = all.filter(v => v.lang && String(v.lang).toLowerCase().startsWith('ko'));
-    // 같은 voiceURI가 중복으로 잡히는 모바일 브라우저가 있어 중복 제거
     const unique = [];
     const seen = new Set();
     for (const v of ko) {
       const key = v.voiceURI || `${v.name}|${v.lang}`;
-      if (!seen.has(key)) { seen.add(key); unique.push(v); }
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(v);
+      }
     }
     return unique;
   }
@@ -1065,13 +1095,13 @@ function pickGenre(value){
     if (!el) return;
     const ko = getKoreanVoices();
     if (ko.length >= 3) {
-      el.innerHTML = `🎙️ 한국어 음성 <b>${ko.length}개</b>를 찾았어요. 등장인물별로 서로 다른 음성을 우선 배정합니다.`;
+      el.innerHTML = `🎙️ 한국어 음성 <b>${ko.length}개</b>를 찾았어요. 역할별로 다른 음성을 우선 사용합니다.`;
     } else if (ko.length === 2) {
-      el.innerHTML = `🎙️ 한국어 음성 <b>2개</b>를 찾았어요. 목소리 2개 + 음높이·속도 변화로 역할을 구분합니다.`;
+      el.innerHTML = `🎙️ 한국어 음성 <b>2개</b>를 찾았어요. 음성 2개와 음높이·속도 연기로 역할을 나눕니다.`;
     } else if (ko.length === 1) {
-      el.innerHTML = `🎙️ 이 기기에는 한국어 음성이 <b>1개</b>만 있어요. 다역은 같은 기본 음성에 음높이·속도 연기를 크게 달리해 구분합니다.`;
+      el.innerHTML = `🎙️ 한국어 음성이 <b>1개</b>라서 음높이·속도를 크게 달리해 역할을 구분합니다.`;
     } else {
-      el.innerHTML = `🎙️ 한국어 음성 목록을 아직 불러오지 못했어요. 낭독 버튼을 누르면 다시 확인합니다.`;
+      el.innerHTML = `🎙️ 한국어 음성을 불러오는 중이에요. 낭독 버튼을 누르면 다시 확인합니다.`;
     }
   }
 
@@ -1080,7 +1110,6 @@ function pickGenre(value){
     const r = String(role || '').toLowerCase();
     const em = String(emotion || '').toLowerCase();
 
-    // 기기에 여러 한국어 음성이 있을 때 역할별로 '서로 다른 voiceURI'를 고정 배정
     let idx = 0; // narrator
     if (r.includes('hero') || r.includes('child')) idx = 1;
     else if (r.includes('friend')) idx = 2;
@@ -1089,7 +1118,6 @@ function pickGenre(value){
 
     const voice = voices.length ? voices[idx % voices.length] : null;
 
-    // 음성이 1개뿐인 모바일에서도 역할 차이가 느껴지도록 변화폭을 의도적으로 크게 설정
     let rate = 1.0, pitch = 1.0;
     if (styleMode === 'bedtime_calm') {
       if (r.includes('villain') || r.includes('elder') || r.includes('king')) { rate = 0.82; pitch = 0.72; }
@@ -1129,7 +1157,6 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
       if (!isPlaying || sessionId !== speechSessionId) { resolve(false); return; }
 
       initVoices();
-      updateVoiceStatus();
 
       const utterance = new SpeechSynthesisUtterance(cleanText);
       currentUtterance = utterance;
@@ -1145,7 +1172,6 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
       utterance.pitch = profile.pitch;
 
       let finished = false;
-      let started = false;
       let hardTimeout = null;
 
       const finish = (ok = true) => {
@@ -1161,7 +1187,6 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
       };
 
       utterance.onstart = () => {
-        started = true;
         if (options.startBgmOnStart && isBgmEnabled) playBgmForCurrentStory();
         if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
           bgmAudio.volume = targetBgmVolume * 0.30;
@@ -1174,15 +1199,11 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
       };
 
       utterance.onend = () => finish(true);
-      utterance.onerror = (event) => {
-        console.warn('Speech synthesis error:', event && event.error ? event.error : event);
-        finish(false);
-      };
+      utterance.onerror = () => finish(false);
 
       const estimatedMs = Math.max(18000, Math.min(90000, cleanText.length * 430));
       hardTimeout = setTimeout(() => {
         if (!finished) {
-          console.warn('Speech watchdog timeout. started=', started, 'text=', cleanText.slice(0, 30));
           try { window.speechSynthesis.cancel(); } catch (e) {}
           finish(false);
         }
@@ -1192,134 +1213,6 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
         window.speechSynthesis.resume();
         window.speechSynthesis.speak(utterance);
       } catch (e) {
-        console.error('speechSynthesis.speak failed:', e);
-        finish(false);
-      }
-    });
-  }) {
-    return new Promise((resolve) => {
-      if (typeof window.speechSynthesis === 'undefined' || typeof SpeechSynthesisUtterance === 'undefined') {
-        resolve(false);
-        return;
-      }
-
-      const cleanText = String(rawText || '').replace(/[*#"]/g, '').trim();
-      if (!cleanText) { resolve(true); return; }
-
-      const sessionId = options.sessionId ?? speechSessionId;
-      if (!isPlaying || sessionId !== speechSessionId) { resolve(false); return; }
-
-      initVoices();
-
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      currentUtterance = utterance; // iOS에서 GC로 발화가 끊기는 문제 방지
-      utterance.lang = 'ko-KR';
-      utterance.volume = 1;
-
-      const styleEl = document.getElementById('actingStyle');
-      const styleMode = styleEl ? styleEl.value : 'dynamic_theater';
-
-      const koVoices = availableVoices.filter(v => v.lang && v.lang.toLowerCase().startsWith('ko'));
-      const maleVoice = koVoices.find(v => /male|남성|minho|standard-c/i.test(v.name));
-      const femaleVoice = koVoices.find(v => /female|여성|yuna|sora|heami|google/i.test(v.name));
-      const defaultVoice = femaleVoice || koVoices[0] || null;
-
-      const r = (role || '').toLowerCase();
-      const em = (emotion || '').toLowerCase();
-      let rate = 1.0;
-      let pitch = 1.0;
-
-      if (styleMode === 'dynamic_theater') {
-        if (r.includes('hero') || r.includes('child') || r.includes('friend')) {
-          if (femaleVoice) utterance.voice = femaleVoice;
-          else if (defaultVoice) utterance.voice = defaultVoice;
-          if (em === 'excited' || em === 'happy') { rate = 1.06; pitch = 1.08; }
-          else if (em === 'urgent') { rate = 1.10; pitch = 1.05; }
-          else if (em === 'whisper') { rate = 0.94; pitch = 1.02; }
-          else { rate = 1.02; pitch = 1.05; }
-        } else if (r.includes('villain') || r.includes('monster') || r.includes('giant')) {
-          if (maleVoice) utterance.voice = maleVoice;
-          else if (defaultVoice) utterance.voice = defaultVoice;
-          if (em === 'angry') { rate = 1.02; pitch = 0.92; }
-          else { rate = 0.96; pitch = 0.94; }
-        } else if (r.includes('elder') || r.includes('king')) {
-          if (maleVoice) utterance.voice = maleVoice;
-          else if (defaultVoice) utterance.voice = defaultVoice;
-          rate = 0.95; pitch = 0.96;
-        } else {
-          if (femaleVoice) utterance.voice = femaleVoice;
-          else if (defaultVoice) utterance.voice = defaultVoice;
-          if (em === 'excited') { rate = 1.04; pitch = 1.04; }
-        }
-      } else {
-        rate = 0.92; pitch = 0.98;
-        if ((r.includes('villain') || r.includes('elder')) && maleVoice) utterance.voice = maleVoice;
-        else if (femaleVoice) utterance.voice = femaleVoice;
-        else if (defaultVoice) utterance.voice = defaultVoice;
-      }
-
-      utterance.rate = rate;
-      utterance.pitch = pitch;
-
-      let finished = false;
-      let started = false;
-      let hardTimeout = null;
-
-      const finish = (ok = true) => {
-        if (finished) return;
-        finished = true;
-        if (hardTimeout) clearTimeout(hardTimeout);
-        clearSpeechWatchdog();
-        if (currentUtterance === utterance) currentUtterance = null;
-        if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
-          bgmAudio.volume = targetBgmVolume;
-        }
-        resolve(ok);
-      };
-
-      utterance.onstart = () => {
-        started = true;
-        if (options.startBgmOnStart && isBgmEnabled) {
-          playBgmForCurrentStory();
-        }
-        if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
-          bgmAudio.volume = targetBgmVolume * 0.35;
-        }
-
-        // Chrome 계열의 장문 발화가 멈추는 현상 완화.
-        clearSpeechWatchdog();
-        speechWatchdog = setInterval(() => {
-          if (!isPlaying || sessionId !== speechSessionId || isSpeechPaused) return;
-          try { window.speechSynthesis.resume(); } catch (e) {}
-        }, 4000);
-      };
-
-      utterance.onend = () => finish(true);
-      utterance.onerror = (event) => {
-        console.warn('Speech synthesis error:', event && event.error ? event.error : event);
-        // cancel/interrupted는 사용자가 정지한 경우가 많으므로 재생 종료로 처리
-        const err = event && event.error ? event.error : '';
-        if (err === 'canceled' || err === 'interrupted') finish(false);
-        else finish(false);
-      };
-
-      // 12초 고정 타임아웃은 긴 문장을 중간에 넘겨버릴 수 있었습니다.
-      // 문장 길이에 따라 충분히 기다리고, 정말 멈춘 경우에만 다음으로 진행합니다.
-      const estimatedMs = Math.max(18000, Math.min(90000, cleanText.length * 420));
-      hardTimeout = setTimeout(() => {
-        if (!finished) {
-          console.warn('Speech watchdog timeout. started=', started, 'text=', cleanText.slice(0, 30));
-          try { window.speechSynthesis.cancel(); } catch (e) {}
-          finish(false);
-        }
-      }, estimatedMs);
-
-      try {
-        // iOS에서 pause 상태가 남아 있으면 speak()가 무음이 될 수 있습니다.
-        window.speechSynthesis.resume();
-        window.speechSynthesis.speak(utterance);
-      } catch (e) {
-        console.error('speechSynthesis.speak failed:', e);
         finish(false);
       }
     });
@@ -1546,61 +1439,95 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
 </script>
 
 <script>
-(function(){
-  function isKakaoTalkBrowser(){
-    const ua = navigator.userAgent || '';
-    return /KAKAOTALK|DaumApps/i.test(ua);
+let deferredInstallPrompt = null;
+
+function isIOSDevice(){
+  const ua = navigator.userAgent || '';
+  return /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+function isKakaoTalkBrowser(){
+  return /KAKAOTALK|DaumApps/i.test(navigator.userAgent || '');
+}
+function isStandaloneMode(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function closeKakaoGuide(){
+  document.getElementById('kakaoGuideOverlay')?.classList.remove('show');
+}
+function copyCurrentLink(){
+  const url = location.href;
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(url).then(()=>alert('링크를 복사했어요. Chrome 또는 Safari 주소창에 붙여넣어 주세요.'));
+  } else {
+    const ta=document.createElement('textarea'); ta.value=url; document.body.appendChild(ta); ta.select();
+    try{document.execCommand('copy')}catch(e){} ta.remove();
+    alert('링크를 복사했어요. Chrome 또는 Safari 주소창에 붙여넣어 주세요.');
   }
-  function isIOS(){
-    const ua = navigator.userAgent || '';
-    return /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+function openInstallGuide(){
+  const overlay=document.getElementById('installGuideOverlay');
+  const steps=document.getElementById('installGuideSteps');
+  const nativeBtn=document.getElementById('nativeInstallBtn');
+  if (!overlay || !steps || !nativeBtn) return;
+
+  if (isStandaloneMode()) {
+    steps.innerHTML='<b>이미 앱처럼 설치되어 있어요.</b><br>홈 화면에서 뮤니 동화마을 아이콘을 눌러 실행하면 됩니다.';
+    nativeBtn.style.display='none';
+  } else if (isIOSDevice()) {
+    steps.innerHTML='<b>아이폰 / 아이패드 Safari</b><br>① 아래쪽 <b>공유 버튼(□↑)</b>을 누르세요.<br>② <b>홈 화면에 추가</b>를 선택하세요.<br>③ 이름을 확인하고 <b>추가</b>를 누르면 앱 아이콘이 생겨요.';
+    nativeBtn.style.display='none';
+  } else if (deferredInstallPrompt) {
+    steps.innerHTML='<b>안드로이드 Chrome</b><br><b>앱으로 설치</b> 버튼을 누르면 홈 화면에 뮤니 동화마을이 설치됩니다.';
+    nativeBtn.style.display='block';
+  } else {
+    steps.innerHTML='<b>안드로이드 Chrome</b><br>오른쪽 위 <b>⋮</b> 메뉴를 누른 뒤 <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>를 선택하세요.';
+    nativeBtn.style.display='none';
   }
-  window.closeKakaoGuide = function(){
-    const ov = document.getElementById('kakaoGuideOverlay');
-    if (ov){ ov.classList.remove('show'); ov.setAttribute('aria-hidden','true'); }
-  };
-  window.copyCurrentLink = async function(){
-    const url = location.href;
-    try {
-      await navigator.clipboard.writeText(url);
-      alert('링크를 복사했어요. Chrome 또는 Safari 주소창에 붙여넣어 열어주세요.');
-    } catch(e) {
-      const ta = document.createElement('textarea');
-      ta.value = url; document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); } catch(err) {}
-      ta.remove();
-      alert('링크를 복사했어요. Chrome 또는 Safari 주소창에 붙여넣어 열어주세요.');
+  overlay.classList.add('show');
+}
+function closeInstallGuide(){
+  document.getElementById('installGuideOverlay')?.classList.remove('show');
+}
+async function triggerNativeInstall(){
+  if (!deferredInstallPrompt) { openInstallGuide(); return; }
+  deferredInstallPrompt.prompt();
+  try { await deferredInstallPrompt.userChoice; } catch(e) {}
+  deferredInstallPrompt = null;
+  document.getElementById('nativeInstallBtn').style.display='none';
+}
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredInstallPrompt=e;
+  if (!isStandaloneMode()) document.getElementById('installAppBtn')?.classList.add('show');
+});
+window.addEventListener('appinstalled', ()=>{
+  deferredInstallPrompt=null;
+  document.getElementById('installAppBtn')?.classList.remove('show');
+  closeInstallGuide();
+});
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  setTimeout(()=>{ try{initVoices(); updateVoiceStatus();}catch(e){} }, 500);
+
+  if (!isStandaloneMode()) {
+    document.getElementById('installAppBtn')?.classList.add('show');
+  }
+
+  if (isKakaoTalkBrowser()) {
+    const ov=document.getElementById('kakaoGuideOverlay');
+    const steps=document.getElementById('kakaoGuideSteps');
+    if (steps) {
+      steps.innerHTML = isIOSDevice()
+        ? '<b>아이폰 / 아이패드</b><br>① 카카오톡의 <b>⋯</b> 메뉴를 누르세요.<br>② <b>Safari로 열기</b> 또는 <b>기본 브라우저로 열기</b>를 선택하세요.<br>③ 메뉴가 없으면 <b>링크 복사</b> 후 Safari 주소창에 붙여넣으세요.'
+        : '<b>안드로이드</b><br>① 오른쪽 위 <b>⋮</b> 메뉴를 누르세요.<br>② <b>다른 브라우저로 열기</b> 또는 <b>Chrome으로 열기</b>를 선택하세요.<br>③ 메뉴가 없으면 <b>링크 복사</b> 후 Chrome 주소창에 붙여넣으세요.';
     }
-  };
+    ov?.classList.add('show');
+  }
 
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(function(){
-      if (typeof initVoices === 'function') initVoices();
-      if (typeof updateVoiceStatus === 'function') updateVoiceStatus();
-    }, 300);
-
-    if (!isKakaoTalkBrowser()) return;
-    const ov = document.getElementById('kakaoGuideOverlay');
-    const steps = document.getElementById('kakaoGuideSteps');
-    if (!ov || !steps) return;
-
-    if (isIOS()) {
-      steps.innerHTML =
-        '<b>아이폰 / 아이패드</b><br>' +
-        '① 카카오톡 화면의 <b>⋯ 더보기</b>를 누르세요.<br>' +
-        '② <b>Safari로 열기</b> 또는 <b>기본 브라우저로 열기</b>를 선택하세요.<br>' +
-        '③ 메뉴가 보이지 않으면 아래 <b>링크 복사</b> 후 Safari 주소창에 붙여넣으세요.';
-    } else {
-      steps.innerHTML =
-        '<b>안드로이드</b><br>' +
-        '① 카카오톡 오른쪽 위의 <b>⋮</b> 메뉴를 누르세요.<br>' +
-        '② <b>다른 브라우저로 열기</b> 또는 <b>Chrome으로 열기</b>를 선택하세요.<br>' +
-        '③ 메뉴가 보이지 않으면 아래 <b>링크 복사</b> 후 Chrome 주소창에 붙여넣으세요.';
-    }
-    ov.classList.add('show');
-    ov.setAttribute('aria-hidden','false');
-  });
-})();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js').catch(err=>console.log('SW:',err));
+  }
+});
 </script>
 
 </body>

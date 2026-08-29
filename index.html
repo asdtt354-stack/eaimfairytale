@@ -77,15 +77,19 @@
       border-radius: 14px; 
       margin-bottom: 18px; 
     }
-    .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .user-header label { color: #4f46e5; font-weight: 700; font-size: 13.5px; }
     .user-actions { display: flex; gap: 6px; align-items: center; }
     .user-status { font-size: 12px; color: #10b981; font-weight: bold; display: none; }
     .btn-small { background: #6366f1; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; cursor: pointer; font-weight: 600; }
     .btn-clear { background: none; border: none; color: #ef4444; font-size: 11.5px; cursor: pointer; text-decoration: underline; }
     
-    .input-group { margin-bottom: 15px; }
-    label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 14px; color: #334155; }
+    /* 💡 친절한 가이드 안내 문구 스타일 */
+    .helper-text { font-size: 12px; color: #64748b; margin-top: 4px; line-height: 1.4; }
+    .helper-alert { color: #4f46e5; font-weight: 600; }
+
+    .input-group { margin-bottom: 16px; }
+    label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 14px; color: #334155; }
     input, select { 
       width: 100%; 
       padding: 12px 14px; 
@@ -248,10 +252,10 @@
 
   <!-- 1. 제작 탭 -->
   <div id="create-view">
-    <!-- 👤 사용자별 독립 계정 및 API 키 설정 -->
+    <!-- 👤 닉네임 & API 키 상자 (안내 문구 추가) -->
     <div class="user-profile-box">
       <div class="user-header">
-        <label for="apiKey">🔑 나의 API Key & 작가 닉네임</label>
+        <label for="apiKey">🔑 API Key & 내 서재 닉네임</label>
         <div class="user-actions">
           <span class="user-status" id="apiStatus">💾 저장됨</span>
           <button class="btn-small" onclick="saveUserSession()">설정 저장</button>
@@ -259,7 +263,13 @@
         </div>
       </div>
       <input type="password" id="apiKey" placeholder="Google AI Studio API 키를 입력하세요" oninput="saveUserSession()" style="margin-bottom: 8px;">
-      <input type="text" id="authorName" placeholder="작가 이름 / 닉네임 (예: 민우 작가, 3학년 2반)" oninput="saveUserSession()">
+      
+      <!-- 💡 닉네임 입력 라벨 & 안내 문구 -->
+      <label for="authorName" style="font-size: 13px; color: #334155; margin-top: 6px;">✍️ 책 저장을 위한 작가 닉네임 (필수)</label>
+      <input type="text" id="authorName" placeholder="책 저장을 위해 닉네임을 적어주세요 (예: 민우 작가, 3학년 2반)" oninput="saveUserSession()">
+      <div class="helper-text">
+        <span class="helper-alert">💡 안내:</span> 같은 기기나 API 키를 함께 써도, <b>닉네임(이름)</b>을 적어주시면 나만의 서재에 따로 안전하게 보관됩니다.
+      </div>
     </div>
 
     <!-- 📸 어린이 얼굴 사진 업로드 -->
@@ -301,21 +311,23 @@
       <input type="text" id="lesson" value="겉모습보다 강한 용기와 믿음의 승리">
     </div>
     
+    <!-- ⏱ 시간(분량) 선택 (안내 문구 추가) -->
     <div class="input-group">
-      <label for="storyLength">⏱ 이야기 분량</label>
+      <label for="storyLength">⏱ 동화 구연 시간을 선택해주세요</label>
       <select id="storyLength">
-        <option value="2">2분 (약 4페이지 - 속도감 있는 역할극)</option>
-        <option value="3" selected>3분 (약 6페이지 - 대화가 풍성한 오디오 드라마)</option>
-        <option value="5">5분 (약 8페이지 - 깊이 있는 모험 서사극)</option>
-        <option value="10">10분 (약 10페이지 - 장편 입체 낭독극)</option>
+        <option value="2">2분 동화 (약 4페이지 - 속도감 있는 역할극)</option>
+        <option value="3" selected>3분 동화 (약 6페이지 - 대화가 풍성한 오디오 드라마)</option>
+        <option value="5">5분 동화 (약 8페이지 - 깊이 있는 모험 서사극)</option>
+        <option value="10">10분 동화 (약 10페이지 - 장편 입체 낭독극)</option>
       </select>
+      <div class="helper-text">💡 원하는 낭독 길이에 맞춰 AI가 이야기와 삽화 페이지 수를 알맞게 조절합니다.</div>
     </div>
 
     <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎭 마법의 동화책 & 삽화 만들기</button>
     <div id="status-log"></div>
   </div>
 
-  <!-- 2. 서재 탭 (사용자별 맞춤 서재) -->
+  <!-- 2. 서재 탭 -->
   <div id="library-view" style="display: none;">
     <div class="library-header">
       <span id="libraryTitleLabel" style="font-weight: 700; color: #475569; font-size: 15px;">📚 나의 동화책 보관함</span>
@@ -380,19 +392,16 @@
   }
   initVoices();
 
-  // --- 💡 [핵심] 사용자 고유 식별자(User Key) 생성 함수 ---
   function getUniqueUserIdentifier() {
     const key = document.getElementById('apiKey').value.trim();
     const author = document.getElementById('authorName').value.trim();
     
-    // API 키의 뒤 8자리 또는 닉네임을 조합하여 고유한 사용자 ID 생성
     if (key.length >= 8) {
       return (author ? author + "_" : "user_") + key.slice(-8);
     }
     return author ? author : "default_guest";
   }
 
-  // 로컬 세션 저장
   function saveUserSession() {
     const key = document.getElementById('apiKey').value.trim();
     const author = document.getElementById('authorName').value.trim();
@@ -406,7 +415,6 @@
     status.style.display = 'inline';
     setTimeout(() => { status.style.display = 'none'; }, 1500);
 
-    // 사용자 정보가 바뀌면 해당 사용자의 서재 목록으로 새로고침
     loadLibraryList();
   }
 
@@ -421,7 +429,6 @@
     alert('사용자 정보가 초기화되었습니다.');
   }
 
-  // --- IndexedDB 초기화 ---
   const dbRequest = indexedDB.open("FairytaleAppDB_MultiUser", 3);
   dbRequest.onupgradeneeded = (e) => {
     db = e.target.result;
@@ -433,7 +440,6 @@
   dbRequest.onsuccess = (e) => {
     db = e.target.result;
     
-    // 이전 저장 세션 복원
     try {
       const savedKey = localStorage.getItem("gemini_fairytale_api_key");
       const savedAuthor = localStorage.getItem("gemini_fairytale_author");
@@ -522,10 +528,18 @@
 
   async function generateStoryAndImages() {
     const apiKey = document.getElementById('apiKey').value.trim();
+    const author = document.getElementById('authorName').value.trim();
     
     if (!apiKey || apiKey.length < 5) {
       alert('🔑 Google AI Studio API Key를 먼저 입력해 주세요.');
       document.getElementById('apiKey').focus();
+      return;
+    }
+
+    // 💡 닉네임 미입력 시 친절한 안내 팝업
+    if (!author) {
+      alert('✍️ 나만의 서재에 안전하게 책을 저장하기 위해 [작가 닉네임]을 적어주세요!');
+      document.getElementById('authorName').focus();
       return;
     }
 
@@ -534,7 +548,6 @@
     const bg = document.getElementById('background').value.trim();
     const lesson = document.getElementById('lesson').value.trim();
     const lengthVal = document.getElementById('storyLength').value;
-    const author = document.getElementById('authorName').value.trim() || "꼬마 작가";
     const btn = document.getElementById('generateBtn');
     const statusLog = document.getElementById('status-log');
     const bookContainer = document.getElementById('book-container');
@@ -549,19 +562,20 @@
     btn.disabled = true;
     controlPanel.style.display = 'none';
     bookContainer.style.display = 'none';
-    statusLog.innerText = `✨ 1/${config.pages + 1}. [${author}] 님만의 입체 대본을 작성 중입니다...`;
+    statusLog.innerText = `✨ 1/${config.pages + 1}. [${author}] 작가님의 맞춤 입체 대본을 작성 중입니다...`;
     pagesWrapper.innerHTML = '';
     stopVoice();
 
     const promptText = `
 너는 유명 성우들이 연기할 역동적이고 재미있는 '어린이 오디오 드라마' 극작가야.
-신나는 부분은 와글와글 신나게, 긴장되는 부분은 손에 땀을 쥐게 생동감 넘치게 써줘!
+신나는 부분은 와글와글 신나게, 긴장되는 부분은 손에땀을 쥐게 생동감 넘치게 써줘!
 
 [장르 연출]
 - 장르: ${document.getElementById('storyGenre').selectedOptions[0].text}
 - 스타일: ${selectedGenre.storyGuide}
 
 [이야기 설정]
+- 작가 이름: ${author}
 - 등장인물/주인공: ${char}
 - 배경: ${bg}
 - 주제/교훈: ${lesson}
@@ -606,7 +620,6 @@
 
       const storyData = JSON.parse(geminiData.candidates[0].content.parts[0].text);
       
-      // 💡 사용자 고유 식별자와 작가 정보 부여
       currentStoryBookObject = {
         userId: getUniqueUserIdentifier(),
         author: author,
@@ -640,7 +653,7 @@
       renderBookPages(currentStoryBookObject);
       showPage(0);
 
-      statusLog.innerText = `🎉 [${author}] 님의 동화책이 완성되었어요! [다역 입체 낭독 시작]을 눌러보세요.`;
+      statusLog.innerText = `🎉 [${author}] 작가님의 동화책이 완성되었어요! [다역 입체 낭독 시작]을 눌러보세요.`;
       controlPanel.style.display = 'flex';
 
     } catch (err) {
@@ -911,7 +924,6 @@
     }, 1000);
   }
 
-  // --- 💡 [핵심] 사용자별 독립 저장 및 불러오기 ---
   function saveCurrentStoryToDB() {
     if (!currentStoryBookObject) return;
     
@@ -941,7 +953,6 @@
 
     req.onsuccess = () => {
       const allBooks = req.result;
-      // 💡 현재 사용자 ID와 일치하는 책만 필터링하여 격리
       myLibraryBooks = allBooks.filter(book => book.userId === currentUserId || !book.userId);
 
       if (myLibraryBooks.length === 0) {

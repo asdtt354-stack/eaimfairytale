@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>뮤니의 동화마을 이야기</title>
-  <!-- PDF 변환 라이브러리 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -34,78 +33,30 @@
       margin: 0 auto;
     }
 
-    /* 🎵 [핵심] 캐릭터와 제목이 겹치는 맞춤 배너 헤더 */
+    /* 🎵 캔바에서 완성한 통 이미지 로고 배너 */
     .muni-header {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
       text-align: center;
     }
 
-    .muni-banner-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      padding: 8px 10px;
-      min-height: 95px;
-    }
-
-    /* 큼직하게 뒤에 서 있는 뮤니 캐릭터 */
-    .muni-char-box {
-      width: 105px;
-      height: 105px;
-      position: relative;
-      z-index: 1; /* 글자 박스 뒤에 배치 */
-      margin-right: -32px; /* 💡 글자 상자와 32px 겹치도록 설정 */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: visible;
-      flex-shrink: 0;
-    }
-
-    .muni-char-img {
+    .muni-full-banner {
       width: 100%;
-      height: 100%;
-      object-fit: contain;
-      transform: scale(1.65); /* 캐릭터 자체를 시원하게 확대 */
-      transform-origin: center bottom;
-      animation: muniBounce 3s ease-in-out infinite;
-    }
-
-    @keyframes muniBounce {
-      0%, 100% { transform: scale(1.65) translateY(0); }
-      50% { transform: scale(1.65) translateY(-4px); }
-    }
-
-    /* 뮤니 앞쪽으로 살짝 겹치는 둥근 제목 뱃지 */
-    .muni-title-badge {
-      background: #ffe4e6; /* 시안의 은은한 살구빛 핑크 톤 */
-      border: 2px solid #fecdd3;
-      padding: 9px 18px 9px 24px;
-      border-radius: 18px;
-      position: relative;
-      z-index: 2; /* 캐릭터 몸통 위로 겹쳐짐 */
-      box-shadow: 0 4px 14px rgba(244, 114, 182, 0.18);
-    }
-
-    h2.muni-title { 
-      margin: 0; 
-      color: #1e293b; 
-      font-size: 21px; 
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      white-space: nowrap;
+      max-width: 320px; /* 로고가 적당하고 선명하게 보이는 최적 크기 */
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      filter: drop-shadow(0 4px 12px rgba(244, 114, 182, 0.2));
     }
 
     .muni-subtitle {
       font-size: 13px;
       color: #8b5cf6;
       font-weight: 600;
-      margin-top: 4px;
+      margin-top: 6px;
     }
     
     .tab-nav { 
@@ -306,16 +257,9 @@
 <body>
 
 <div class="card">
-  <!-- 🎵 캐릭터와 글자가 겹쳐지는 프리미엄 로고 헤더 -->
+  <!-- 🎵 캔바에서 완성한 투명 통 이미지 로고 배너 -->
   <div class="muni-header">
-    <div class="muni-banner-wrapper">
-      <div class="muni-char-box">
-        <img src="muni.png" id="muniLogoImg" class="muni-char-img" alt="뮤니" onerror="this.src='muni.jpg'">
-      </div>
-      <div class="muni-title-badge">
-        <h2 class="muni-title">뮤니의 동화마을 이야기 ✨</h2>
-      </div>
-    </div>
+    <img src="muni_title.png" class="muni-full-banner" alt="뮤니의 동화마을 이야기" onerror="this.src='muni.png'">
     <div class="muni-subtitle">음악과 함께하는 나만의 입체 오디오 동화 공작소</div>
   </div>
 

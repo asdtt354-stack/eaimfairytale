@@ -371,15 +371,7 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
               <li>BGM을 켜면 오디오 동화 분위기가 더 살아나요.</li>
             </ul>
           </section>
-          <section class="side-card">
-            <h3>🎧 음성 & 효과</h3>
-            <div class="audio-feature-grid">
-              <div class="audio-feature"><b>🎙️</b>다역 낭독</div>
-              <div class="audio-feature"><b>🎭</b>감정 연기</div>
-              <div class="audio-feature"><b>🎵</b>장르 BGM</div>
-            </div>
-            <div class="voice-status" id="voiceStatus">🎙️ 이 기기의 한국어 음성을 확인하는 중이에요.</div>
-          </section>
+          
           <section class="side-card">
             <h3>📚 나의 동화 서재</h3>
             <p class="side-note">완성한 동화를 저장하면 내 서재에서 다시 열고 이어서 들을 수 있어요.</p>
@@ -502,6 +494,8 @@ function pickGenre(value){
   let speechSessionId = 0;
   let speechWatchdog = null;
   let isSpeechPaused = false;
+  let lastStoppedPageIndex = 0;
+  let wasStoppedByUser = false;
 
   function initVoices() {
     if (typeof window.speechSynthesis === 'undefined') return;
@@ -996,7 +990,7 @@ currentStoryBookObject = {
   }
 
   // 💡 [모바일 안정형 연속 낭독 루프]
-  async function startContinuousReading(onCompleteCallback = null) {
+  async function startContinuousReading(onCompleteCallback = null, startPageIndex = 0) {
     if (!currentStoryBookObject) return;
 
     if (typeof window.speechSynthesis === 'undefined' || typeof SpeechSynthesisUtterance === 'undefined') {
@@ -1013,20 +1007,28 @@ currentStoryBookObject = {
 
     isPlaying = true;
     isSpeechPaused = false;
-    showPage(0);
+    wasStoppedByUser = false;
 
-    // 첫 문장은 반드시 '낭독 시작' 버튼의 사용자 제스처 흐름에서 바로 speak 합니다.
-    // BGM은 음성이 실제 시작된 뒤 켭니다.
-    const firstOk = await speakDynamicLine(
-      'narrator',
-      'excited',
-      `제목: ${currentStoryBookObject.title}`,
-      { sessionId: mySession, startBgmOnStart: true }
-    );
+    const safeStartPage = Math.max(0, Math.min(
+      Number(startPageIndex) || 0,
+      Math.max(0, currentStoryBookObject.pages.length - 1)
+    ));
+    showPage(safeStartPage);
 
-    if (!firstOk || !isPlaying || mySession !== speechSessionId) return;
+    // 처음부터 들을 때만 제목을 읽습니다.
+    if (safeStartPage === 0) {
+      const firstOk = await speakDynamicLine(
+        'narrator',
+        'excited',
+        `제목: ${currentStoryBookObject.title}`,
+        { sessionId: mySession, startBgmOnStart: true }
+      );
+      if (!firstOk || !isPlaying || mySession !== speechSessionId) return;
+    } else if (isBgmEnabled) {
+      playBgmForCurrentStory();
+    }
 
-    for (let i = 0; i < currentStoryBookObject.pages.length; i++) {
+    for (let i = safeStartPage; i < currentStoryBookObject.pages.length; i++) {
       if (!isPlaying || mySession !== speechSessionId) break;
       showPage(i);
 
@@ -1417,22 +1419,43 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
   }
 
   function resumeVoice() {
-    isSpeechPaused = false;
-    if (typeof window.speechSynthesis !== 'undefined') {
-      try { window.speechSynthesis.resume(); } catch (e) {}
+    if (!currentStoryBookObject) return;
+
+    if (isPlaying && isSpeechPaused) {
+      isSpeechPaused = false;
+      if (typeof window.speechSynthesis !== 'undefined') {
+        try { window.speechSynthesis.resume(); } catch (e) {}
+      }
+      if (isBgmEnabled && bgmAudio) {
+        bgmAudio.volume = currentUtterance ? targetBgmVolume * 0.35 : targetBgmVolume;
+        const p = bgmAudio.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+      }
+      return;
     }
-    if (isBgmEnabled && bgmAudio && isPlaying) {
-      bgmAudio.volume = currentUtterance ? targetBgmVolume * 0.35 : targetBgmVolume;
-      const p = bgmAudio.play();
-      if (p && typeof p.catch === 'function') p.catch(() => {});
+
+    if (!isPlaying && wasStoppedByUser) {
+      const pageToResume = Math.max(0, Math.min(
+        lastStoppedPageIndex,
+        Math.max(0, currentStoryBookObject.pages.length - 1)
+      ));
+      startContinuousReading(null, pageToResume);
+      return;
+    }
+
+    if (!isPlaying) {
+      startContinuousReading(null, currentPageIndex || 0);
     }
   }
 
   function stopVoice() {
+    lastStoppedPageIndex = currentPageIndex || 0;
+    wasStoppedByUser = true;
+
     isPlaying = false;
     isLibraryPlayingMode = false;
     isSpeechPaused = false;
-    speechSessionId += 1; // 진행 중인 async 낭독 루프 즉시 무효화
+    speechSessionId += 1;
     safeCancelSpeech();
     stopBgm();
   }

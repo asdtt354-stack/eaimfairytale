@@ -13,7 +13,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; 
       margin: 0;
       padding: 12px 10px;
-      /* 🌈 전체 배경을 더 화사하고 따뜻한 동화마을 톤으로 보강 */
       background: radial-gradient(circle at 50% 10%, #fff1f2 0%, #e0e7ff 45%, #fef3c7 100%);
       background-attachment: fixed;
       color: #334155; 
@@ -26,19 +25,50 @@
     .card { 
       width: 100%;
       max-width: 640px;
-      /* 🎨 카드 내부에도 화사하고 생동감 넘치는 파스텔 그라데이션 배경 적용 */
       background: linear-gradient(180deg, #ffffff 0%, #fff7ed 40%, #fdf2f8 80%, #ffffff 100%);
       backdrop-filter: blur(12px);
-      padding: 10px 16px 20px 16px;
+      padding: 14px 16px 20px 16px;
       border-radius: 28px; 
       box-shadow: 0 16px 36px rgba(244, 114, 182, 0.16), 0 4px 12px rgba(0,0,0,0.04); 
       border: 2.5px solid #fde68a;
       margin: 0 auto;
       position: relative;
-      overflow: hidden;
     }
 
-    /* 🎵 캐릭터 상단 여백을 당겨 올린 밀착 헤더 */
+    /* 🎵 둥실둥실 떠다니는 동화풍 파티클 레이어 */
+    .particle-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 200px;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 1;
+    }
+
+    .sparkle {
+      position: absolute;
+      font-size: 16px;
+      opacity: 0.85;
+      user-select: none;
+      animation: floatSparkle 3s ease-in-out infinite alternate;
+    }
+
+    .sp1 { top: 12px; left: 16%; animation-delay: 0s; font-size: 18px; }
+    .sp2 { top: 38px; right: 15%; animation-delay: 0.7s; font-size: 20px; }
+    .sp3 { top: 80px; left: 8%; animation-delay: 1.4s; font-size: 15px; }
+    .sp4 { top: 75px; right: 8%; animation-delay: 0.4s; font-size: 17px; }
+    .sp5 { top: 110px; left: 20%; animation-delay: 1.8s; font-size: 14px; }
+    .sp6 { top: 115px; right: 20%; animation-delay: 1.1s; font-size: 16px; }
+
+    @keyframes floatSparkle {
+      0% { transform: translateY(0px) scale(0.9) rotate(-5deg); opacity: 0.6; }
+      50% { transform: translateY(-8px) scale(1.15) rotate(10deg); opacity: 1; }
+      100% { transform: translateY(-4px) scale(1) rotate(-2deg); opacity: 0.75; }
+    }
+
+    /* 🎵 헤더 및 배너 */
     .muni-header {
       display: flex;
       flex-direction: column;
@@ -47,6 +77,7 @@
       margin-bottom: 12px;
       text-align: center;
       position: relative;
+      z-index: 2;
     }
 
     .muni-full-banner-wrap {
@@ -56,7 +87,6 @@
       align-items: center;
       justify-content: center;
       margin: 0 auto;
-      /* 💡 이미지 상단/하단 투명 여백을 동시에 압축하여 밀착 */
       margin-top: -30px;
       margin-bottom: -36px;
     }
@@ -66,7 +96,7 @@
       height: auto;
       display: block;
       object-fit: contain;
-      filter: drop-shadow(0 4px 12px rgba(244, 114, 182, 0.25));
+      filter: drop-shadow(0 6px 14px rgba(244, 114, 182, 0.28));
     }
 
     .muni-subtitle {
@@ -90,6 +120,8 @@
       padding: 5px;
       border-radius: 16px;
       border: 1px solid #e2e8f0;
+      position: relative;
+      z-index: 2;
     }
     .tab-btn { 
       flex: 1; 
@@ -116,6 +148,8 @@
       border-radius: 16px; 
       margin-bottom: 16px; 
       box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      position: relative;
+      z-index: 2;
     }
     .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .user-header label { color: #4f46e5; font-weight: 700; font-size: 13.5px; }
@@ -282,7 +316,17 @@
 <body>
 
 <div class="card">
-  <!-- 🎵 상단 여백을 압축하고 배경색과 일체화된 헤더 -->
+  <!-- ✨ 동화마을 반짝이 & 음표 파티클 레이어 -->
+  <div class="particle-container">
+    <span class="sparkle sp1">✨</span>
+    <span class="sparkle sp2">🎶</span>
+    <span class="sparkle sp3">⭐</span>
+    <span class="sparkle sp4">🎵</span>
+    <span class="sparkle sp5">💖</span>
+    <span class="sparkle sp6">✨</span>
+  </div>
+
+  <!-- 🎵 밀착된 뮤니 배너 로고 헤더 -->
   <div class="muni-header">
     <div class="muni-full-banner-wrap">
       <img src="muni_title.jpg" class="muni-full-banner" alt="뮤니의 동화마을 이야기" onerror="this.src='muni_title.png'; this.onerror=function(){this.src='muni.png';};">

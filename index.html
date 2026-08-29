@@ -35,7 +35,7 @@
       position: relative;
     }
 
-    /* 🎵 파티클 레이어 */
+    /* 🎵 둥실둥실 파티클 */
     .particle-container {
       position: absolute;
       top: 0;
@@ -43,7 +43,6 @@
       width: 100%;
       height: 200px;
       pointer-events: none;
-      overflow: visible;
       z-index: 1;
     }
 
@@ -52,6 +51,7 @@
       font-size: 16px;
       opacity: 0.85;
       user-select: none;
+      pointer-events: none;
       animation: floatSparkle 3s ease-in-out infinite alternate;
     }
 
@@ -88,6 +88,7 @@
       margin: 0 auto;
       margin-top: -30px;
       margin-bottom: -36px;
+      pointer-events: none;
     }
 
     .muni-full-banner {
@@ -96,6 +97,7 @@
       display: block;
       object-fit: contain;
       filter: drop-shadow(0 6px 14px rgba(244, 114, 182, 0.28));
+      pointer-events: none;
     }
 
     .muni-subtitle {
@@ -108,6 +110,7 @@
       background: linear-gradient(90deg, #7c3aed, #db2777);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      pointer-events: none;
     }
 
     /* 🎧 BGM 미니 컨트롤러 바 */
@@ -121,7 +124,7 @@
       border-radius: 14px;
       margin-bottom: 14px;
       position: relative;
-      z-index: 2;
+      z-index: 5;
     }
     .bgm-info { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #86198f; }
     .bgm-actions { display: flex; align-items: center; gap: 8px; }
@@ -138,12 +141,8 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      transition: all 0.2s;
     }
-    .bgm-switch-btn.off { 
-      background: #e2e8f0; 
-      color: #64748b; 
-    }
+    .bgm-switch-btn.off { background: #e2e8f0; color: #64748b; }
     .bgm-slider { width: 65px; accent-color: #d946ef; cursor: pointer; }
     
     .tab-nav { 
@@ -155,7 +154,7 @@
       border-radius: 16px;
       border: 1px solid #e2e8f0;
       position: relative;
-      z-index: 2;
+      z-index: 5;
     }
     .tab-btn { 
       flex: 1; 
@@ -183,19 +182,19 @@
       margin-bottom: 16px; 
       box-shadow: 0 2px 8px rgba(0,0,0,0.02);
       position: relative;
-      z-index: 2;
+      z-index: 5;
     }
     .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .user-header label { color: #4f46e5; font-weight: 700; font-size: 13.5px; }
     .user-actions { display: flex; gap: 6px; align-items: center; }
     .user-status { font-size: 12px; color: #10b981; font-weight: bold; display: none; }
-    .btn-small { background: #6366f1; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; cursor: pointer; font-weight: 600; }
-    .btn-clear { background: none; border: none; color: #ef4444; font-size: 11.5px; cursor: pointer; text-decoration: underline; }
+    .btn-small { background: #6366f1; color: white; border: none; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; }
+    .btn-clear { background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer; text-decoration: underline; }
     
     .helper-text { font-size: 12px; color: #64748b; margin-top: 4px; line-height: 1.4; }
     .helper-alert { color: #4f46e5; font-weight: 600; }
 
-    .input-group { margin-bottom: 15px; }
+    .input-group { margin-bottom: 15px; position: relative; z-index: 5; }
     label { display: block; font-weight: 700; margin-bottom: 5px; font-size: 14px; color: #334155; }
     input, select { 
       width: 100%; 
@@ -219,6 +218,8 @@
       padding: 14px;
       text-align: center;
       margin-bottom: 16px;
+      position: relative;
+      z-index: 5;
     }
     .photo-preview-wrapper {
       display: flex;
@@ -256,25 +257,42 @@
       display: none;
     }
 
-    button.primary-btn { 
+    /* 💡 [모바일 터치 100% 즉각 반응 버튼] */
+    .primary-btn { 
       width: 100%; 
       padding: 16px; 
       background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); 
       color: white; 
       border: none; 
-      border-radius: 14px; 
-      font-size: 16.5px; 
+      border-radius: 16px; 
+      font-size: 17px; 
       font-weight: 800; 
       cursor: pointer; 
-      margin-top: 8px; 
-      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3);
-      touch-action: manipulation;
+      margin-top: 10px; 
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+      position: relative;
+      z-index: 100 !important;
+      display: block;
+      text-align: center;
+      user-select: none;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
     }
-    button.primary-btn:active { transform: scale(0.98); }
+    .primary-btn:active { 
+      transform: scale(0.96); 
+      background: linear-gradient(135deg, #4f46e5 0%, #db2777 100%);
+    }
     
-    #status-log { margin-top: 14px; font-size: 14px; color: #4f46e5; text-align: center; font-weight: 700; }
+    #status-log { 
+      margin-top: 14px; 
+      font-size: 14px; 
+      color: #4f46e5; 
+      text-align: center; 
+      font-weight: 700; 
+      position: relative;
+      z-index: 5;
+    }
     
-    #book-container { margin-top: 20px; display: none; }
+    #book-container { margin-top: 20px; display: none; position: relative; z-index: 5; }
     .story-title { font-size: 20px; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 14px; }
     
     .book-page-wrapper { width: 100%; position: relative; }
@@ -324,7 +342,7 @@
     }
     .drama-control-box label { color: #1e40af; font-size: 13.5px; margin-bottom: 6px; }
 
-    .controls { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .controls { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; position: relative; z-index: 5; }
     .controls button { flex: 1 1 calc(50% - 4px); padding: 12px 6px; background: #e2e8f0; border: none; border-radius: 10px; font-size: 13.5px; cursor: pointer; font-weight: 700; color: #334155; }
     .controls button.read-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; flex: 1 1 100%; font-size: 15.5px; padding: 13px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25); }
     
@@ -353,7 +371,7 @@
 <body>
 
 <div class="card">
-  <!-- ✨ 동화마을 파티클 레이어 -->
+  <!-- ✨ 파티클 레이어 -->
   <div class="particle-container">
     <span class="sparkle sp1">✨</span>
     <span class="sparkle sp2">🎶</span>
@@ -363,7 +381,7 @@
     <span class="sparkle sp6">✨</span>
   </div>
 
-  <!-- 🎵 밀착된 뮤니 배너 로고 헤더 -->
+  <!-- 🎵 배너 로고 -->
   <div class="muni-header">
     <div class="muni-full-banner-wrap">
       <img src="muni_title.jpg" class="muni-full-banner" alt="뮤니의 동화마을 이야기" onerror="this.src='muni_title.png'; this.onerror=function(){this.src='muni.png';};">
@@ -371,21 +389,21 @@
     <div class="muni-subtitle">음악과 함께하는 나만의 입체 오디오 동화 공작소</div>
   </div>
 
-  <!-- 🎧 상단 BGM 컨트롤러 바 -->
+  <!-- 🎧 상단 BGM 바 -->
   <div class="bgm-control-bar">
     <div class="bgm-info">
       <span id="bgmIcon">🎵</span>
       <span id="bgmTitleText">배경음악: 환상 판타지 오르골</span>
     </div>
     <div class="bgm-actions">
-      <input type="range" class="bgm-slider" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.25" oninput="changeBgmVolume(this.value)" title="음악 볼륨 조절">
+      <input type="range" class="bgm-slider" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.25" oninput="changeBgmVolume(this.value)">
       <button type="button" class="bgm-switch-btn" id="bgmSwitchTopBtn" onclick="toggleBgmSound()">🎵 BGM: ON</button>
     </div>
   </div>
 
   <div class="tab-nav">
-    <button class="tab-btn active" id="tabCreateBtn" onclick="switchTab('create')">✨ 새 동화 만들기</button>
-    <button class="tab-btn" id="tabLibraryBtn" onclick="switchTab('library')">📚 내 서재 보관함</button>
+    <button type="button" class="tab-btn active" id="tabCreateBtn" onclick="switchTab('create')">✨ 새 동화 만들기</button>
+    <button type="button" class="tab-btn" id="tabLibraryBtn" onclick="switchTab('library')">📚 내 서재 보관함</button>
   </div>
 
   <!-- 1. 제작 탭 -->
@@ -395,8 +413,8 @@
         <label for="apiKey">🔑 API Key & 내 서재 닉네임</label>
         <div class="user-actions">
           <span class="user-status" id="apiStatus">💾 저장됨</span>
-          <button class="btn-small" onclick="saveUserSession()">설정 저장</button>
-          <button class="btn-clear" onclick="clearUserSession()">초기화</button>
+          <button type="button" class="btn-small" onclick="saveUserSession()">설정 저장</button>
+          <button type="button" class="btn-clear" onclick="clearUserSession()">초기화</button>
         </div>
       </div>
       <input type="password" id="apiKey" placeholder="Google AI Studio API 키를 입력하세요" oninput="saveUserSession()" style="margin-bottom: 8px;">
@@ -408,7 +426,7 @@
       </div>
     </div>
 
-    <!-- 📸 어린이 얼굴 사진 업로드 -->
+    <!-- 📸 얼굴 사진 업로드 -->
     <div class="photo-upload-box">
       <label style="color: #92400e; margin-bottom: 4px;">🧒 주인공 얼굴 사진 넣기 (선택)</label>
       <p style="margin: 0 0 8px 0; font-size: 12px; color: #b45309;">아이 사진을 넣으면 동화 속 캐릭터로 쏙 들어갑니다!</p>
@@ -420,10 +438,10 @@
       </div>
     </div>
 
-    <!-- 🎭 장르 선택 (BGM 자동 매칭) -->
+    <!-- 🎭 장르 선택 -->
     <div class="input-group">
       <label for="storyGenre">🎨 동화 장르 / 이야기 스타일</label>
-      <select id="storyGenre" onchange="updateBgmGenrePreview(this.value)">
+      <select id="storyGenre" onchange="handleGenreChange(this.value)">
         <option value="fantasy" selected>✨ 환상 판타지 / 요정 이야기 (마법, 신비로운 모험)</option>
         <option value="heroic">⚔️ 영웅 & 신화 / 성경 / 역사 모험 (용기와 믿음의 대결)</option>
         <option value="mystery">🔍 흥미진진 추리 & 비밀 탐험 (지혜로운 수수께끼 풀기)</option>
@@ -435,15 +453,15 @@
     </div>
     
     <div class="input-group">
-      <label>🐰 등장인물 / 주인공 이름</label>
+      <label for="character">🐰 등장인물 / 주인공 이름</label>
       <input type="text" id="character" value="용감한 양치기 소년 다윗과 거인 골리앗">
     </div>
     <div class="input-group">
-      <label>🏰 배경</label>
+      <label for="background">🏰 배경</label>
       <input type="text" id="background" value="고대 엘라 골짜기 전장">
     </div>
     <div class="input-group">
-      <label>💡 교훈 / 주제</label>
+      <label for="lesson">💡 교훈 / 주제</label>
       <input type="text" id="lesson" value="겉모습보다 강한 용기와 믿음의 승리">
     </div>
     
@@ -458,15 +476,16 @@
       <div class="helper-text">💡 원하는 낭독 길이에 맞춰 이야기와 삽화 페이지 수를 조절합니다.</div>
     </div>
 
-    <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎭 뮤니와 함께 동화책 만들기</button>
+    <!-- 💡 [모바일에서 즉시 눌리는 메인 액션 버튼] -->
+    <button type="button" class="primary-btn" id="generateBtn">🎭 뮤니와 함께 동화책 만들기</button>
     <div id="status-log"></div>
   </div>
 
   <!-- 2. 서재 탭 -->
-  <div id="library-view" style="display: none;">
+  <div id="library-view" style="display: none; position: relative; z-index: 5;">
     <div class="library-header">
       <span id="libraryTitleLabel" style="font-weight: 700; color: #475569; font-size: 15px;">📚 나의 동화책 보관함</span>
-      <button class="library-play-all" onclick="playAllBooksSequentially()">▶ 내 서재 연속 재생</button>
+      <button type="button" class="library-play-all" onclick="playAllBooksSequentially()">▶ 내 서재 연속 재생</button>
     </div>
     <div id="library-list">
       <p style="text-align: center; color: #94a3b8; padding: 20px;">저장된 동화책이 없습니다.</p>
@@ -479,9 +498,9 @@
     <div class="book-page-wrapper" id="story-pages-wrapper"></div>
 
     <div class="page-nav-bar">
-      <button class="page-nav-btn" id="prevPageBtn" onclick="goToPrevPage()">◀ 이전 페이지</button>
+      <button type="button" class="page-nav-btn" id="prevPageBtn" onclick="goToPrevPage()">◀ 이전 페이지</button>
       <span class="page-indicator" id="pageIndicator">1 / 1</span>
-      <button class="page-nav-btn" id="nextPageBtn" onclick="goToNextPage()">다음 페이지 ▶</button>
+      <button type="button" class="page-nav-btn" id="nextPageBtn" onclick="goToNextPage()">다음 페이지 ▶</button>
     </div>
 
     <div class="drama-control-box">
@@ -495,14 +514,14 @@
   
   <!-- 4. 컨트롤 패널 -->
   <div class="controls" id="controlPanel" style="display: none;">
-    <button class="read-btn" id="readBtn" onclick="startContinuousReading()">📢 다역 입체 낭독 시작</button>
-    <button class="bgm-btn" id="bgmControlBtn" onclick="toggleBgmSound()">🎵 배경음악: ON</button>
-    <button class="loop-btn" id="loopBtn" onclick="toggleRepeatMode()">🔁 반복 재생: OFF</button>
-    <button onclick="pauseVoice()">⏸ 일시정지</button>
-    <button onclick="resumeVoice()">▶ 이어듣기</button>
-    <button class="stop" onclick="stopVoice()">⏹ 정지</button>
-    <button class="save-btn" onclick="saveCurrentStoryToDB()">💾 내 서재에 저장</button>
-    <button class="pdf-btn" onclick="exportToPDF()">📄 PDF 다운로드</button>
+    <button type="button" class="read-btn" id="readBtn" onclick="startContinuousReading()">📢 다역 입체 낭독 시작</button>
+    <button type="button" class="bgm-btn" id="bgmControlBtn" onclick="toggleBgmSound()">🎵 배경음악: ON</button>
+    <button type="button" class="loop-btn" id="loopBtn" onclick="toggleRepeatMode()">🔁 반복 재생: OFF</button>
+    <button type="button" onclick="pauseVoice()">⏸ 일시정지</button>
+    <button type="button" onclick="resumeVoice()">▶ 이어듣기</button>
+    <button type="button" class="stop" onclick="stopVoice()">⏹ 정지</button>
+    <button type="button" class="save-btn" onclick="saveCurrentStoryToDB()">💾 내 서재에 저장</button>
+    <button type="button" class="pdf-btn" onclick="exportToPDF()">📄 PDF 다운로드</button>
   </div>
 </div>
 
@@ -519,46 +538,30 @@
   let childPhotoBase64 = null;
   let childPhotoMime = "image/jpeg";
 
-  // 🎵 --- [BGM 오디오 엔진] --- 🎵
+  // 🎵 --- BGM 오디오 엔진 ---
   let bgmAudio = new Audio();
   bgmAudio.loop = true;
   let isBgmEnabled = true;
   let targetBgmVolume = 0.25;
 
   const bgmPlaylist = {
-    "fantasy": {
-      name: "환상 판타지 오르골",
-      url: "https://cdn.pixabay.com/download/audio/2022/05/16/audio_db6591201e.mp3?filename=fairytale-112349.mp3"
-    },
-    "heroic": {
-      name: "웅장한 영웅 서사곡",
-      url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=cinematic-atmosphere-score-2-22136.mp3"
-    },
-    "mystery": {
-      name: "비밀 탐험 수수께끼",
-      url: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=mystery-10825.mp3"
-    },
-    "scifi": {
-      name: "신비로운 우주 유영",
-      url: "https://cdn.pixabay.com/download/audio/2022/03/24/audio_33890b0be9.mp3?filename=space-ambience-5627.mp3"
-    },
-    "animal": {
-      name: "따뜻한 숲속 어쿠스틱",
-      url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_4ebc4c81d8.mp3?filename=happy-acoustic-guitar-music-children-cheerful-story-22081.mp3"
-    },
-    "comic": {
-      name: "유쾌하고 엉뚱한 실로폰",
-      url: "https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f77c22.mp3?filename=funny-kids-123473.mp3"
-    },
-    "custom": {
-      name: "포근한 클래식 피아노",
-      url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=relaxing-piano-music-113063.mp3"
-    }
+    "fantasy": { name: "환상 판타지 오르골", url: "https://cdn.pixabay.com/download/audio/2022/05/16/audio_db6591201e.mp3?filename=fairytale-112349.mp3" },
+    "heroic": { name: "웅장한 영웅 서사곡", url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=cinematic-atmosphere-score-2-22136.mp3" },
+    "mystery": { name: "비밀 탐험 수수께끼", url: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=mystery-10825.mp3" },
+    "scifi": { name: "신비로운 우주 유영", url: "https://cdn.pixabay.com/download/audio/2022/03/24/audio_33890b0be9.mp3?filename=space-ambience-5627.mp3" },
+    "animal": { name: "따뜻한 숲속 어쿠스틱", url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_4ebc4c81d8.mp3?filename=happy-acoustic-guitar-music-children-cheerful-story-22081.mp3" },
+    "comic": { name: "유쾌하고 엉뚱한 실로폰", url: "https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939f77c22.mp3?filename=funny-kids-123473.mp3" },
+    "custom": { name: "포근한 클래식 피아노", url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=relaxing-piano-music-113063.mp3" }
   };
+
+  function handleGenreChange(genreKey) {
+    updateBgmGenrePreview(genreKey);
+  }
 
   function updateBgmGenrePreview(genreKey) {
     const bgmData = bgmPlaylist[genreKey] || bgmPlaylist["fantasy"];
-    document.getElementById('bgmTitleText').innerText = `배경음악: ${bgmData.name}`;
+    const textEl = document.getElementById('bgmTitleText');
+    if (textEl) textEl.innerText = `배경음악: ${bgmData.name}`;
     bgmAudio.src = bgmData.url;
   }
 
@@ -571,7 +574,7 @@
       bgmAudio.src = bgmData.url;
     }
     bgmAudio.volume = targetBgmVolume;
-    bgmAudio.play().catch(e => console.log("BGM 재생 안내:", e));
+    bgmAudio.play().catch(e => console.log("BGM 재생 대기:", e));
   }
 
   function stopBgm() {
@@ -601,16 +604,11 @@
   function changeBgmVolume(val) {
     targetBgmVolume = parseFloat(val);
     bgmAudio.volume = targetBgmVolume;
-    if (targetBgmVolume === 0 && isBgmEnabled) {
-      toggleBgmSound();
-    } else if (targetBgmVolume > 0 && !isBgmEnabled) {
-      toggleBgmSound();
-    }
   }
 
   updateBgmGenrePreview("fantasy");
 
-  // 🎙️ --- [음성 합성 안정화 엔진] --- 🎙️
+  // 음성 엔진
   let availableVoices = [];
   function initVoices() {
     availableVoices = window.speechSynthesis.getVoices();
@@ -621,8 +619,8 @@
   initVoices();
 
   function getUniqueUserIdentifier() {
-    const key = document.getElementById('apiKey').value.trim();
-    const author = document.getElementById('authorName').value.trim();
+    const key = (document.getElementById('apiKey').value || '').trim();
+    const author = (document.getElementById('authorName').value || '').trim();
     if (key.length >= 8) {
       return (author ? author + "_" : "user_") + key.slice(-8);
     }
@@ -630,17 +628,18 @@
   }
 
   function saveUserSession() {
-    const key = document.getElementById('apiKey').value.trim();
-    const author = document.getElementById('authorName').value.trim();
+    const key = (document.getElementById('apiKey').value || '').trim();
+    const author = (document.getElementById('authorName').value || '').trim();
     try {
       localStorage.setItem("gemini_fairytale_api_key", key);
       localStorage.setItem("gemini_fairytale_author", author);
     } catch(e) {}
 
     const status = document.getElementById('apiStatus');
-    status.style.display = 'inline';
-    setTimeout(() => { status.style.display = 'none'; }, 1500);
-
+    if (status) {
+      status.style.display = 'inline';
+      setTimeout(() => { status.style.display = 'none'; }, 1500);
+    }
     loadLibraryList();
   }
 
@@ -655,6 +654,7 @@
     alert('사용자 정보가 초기화되었습니다.');
   }
 
+  // DB 초기화
   const dbRequest = indexedDB.open("FairytaleAppDB_MultiUser", 3);
   dbRequest.onupgradeneeded = (e) => {
     db = e.target.result;
@@ -750,9 +750,10 @@
     }
   };
 
+  // 💡 [동화 제작 핵심 실행 함수]
   async function generateStoryAndImages() {
-    const apiKey = document.getElementById('apiKey').value.trim();
-    const author = document.getElementById('authorName').value.trim();
+    const apiKey = (document.getElementById('apiKey').value || '').trim();
+    const author = (document.getElementById('authorName').value || '').trim();
     
     if (!apiKey || apiKey.length < 5) {
       alert('🔑 Google AI Studio API Key를 먼저 입력해 주세요.');
@@ -767,9 +768,9 @@
     }
 
     const genreKey = document.getElementById('storyGenre').value;
-    const char = document.getElementById('character').value.trim();
-    const bg = document.getElementById('background').value.trim();
-    const lesson = document.getElementById('lesson').value.trim();
+    const char = (document.getElementById('character').value || '').trim();
+    const bg = (document.getElementById('background').value || '').trim();
+    const lesson = (document.getElementById('lesson').value || '').trim();
     const lengthVal = document.getElementById('storyLength').value;
     const btn = document.getElementById('generateBtn');
     const statusLog = document.getElementById('status-log');
@@ -780,7 +781,7 @@
     saveUserSession();
     updateBgmGenrePreview(genreKey);
 
-    const config = lengthConfig[lengthVal];
+    const config = lengthConfig[lengthVal] || { pages: 6 };
     const selectedGenre = genreGuides[genreKey] || genreGuides["custom"];
 
     btn.disabled = true;
@@ -888,6 +889,14 @@
     }
   }
 
+  // 💡 [모바일 이벤트 리스너 바인딩]
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById('generateBtn');
+    if (btn) {
+      btn.addEventListener('click', generateStoryAndImages);
+    }
+  });
+
   async function generateGeminiImage(apiKey, prompt, inputImageBase64 = null) {
     const parts = [];
 
@@ -992,8 +1001,14 @@
     document.getElementById('nextPageBtn').disabled = (currentPageIndex === total - 1);
   }
 
-  function goToPrevPage() { showPage(currentPageIndex - 1); }
-  function goToNextPage() { showPage(currentPageIndex + 1); }
+  function goToPrevPage() { 
+    if (isPlaying) stopVoice();
+    showPage(currentPageIndex - 1); 
+  }
+  function goToNextPage() { 
+    if (isPlaying) stopVoice();
+    showPage(currentPageIndex + 1); 
+  }
 
   async function startContinuousReading(onCompleteCallback = null) {
     if (!currentStoryBookObject) return;
@@ -1017,7 +1032,6 @@
         for (const line of pageData.dialogue_list) {
           if (!isPlaying) break;
           await speakDynamicLine(line.role || 'narrator', line.emotion || 'calm', line.text);
-          // 💡 문장 간 여유 있는 딜레이로 오디오 떨림 방지
           const delay = line.emotion === 'urgent' ? 140 : 220;
           await new Promise(r => setTimeout(r, delay));
         }
@@ -1042,13 +1056,11 @@
     }
   }
 
-  // 🎙️ --- [안정화된 다역 음성 발화 함수] --- 🎙️
   function speakDynamicLine(role, emotion, rawText) {
     return new Promise((resolve) => {
       const cleanText = rawText.replace(/[*#"]/g, '').trim();
       if (!cleanText) return resolve();
 
-      // 이전 남아있는 음성 버퍼 정리
       window.speechSynthesis.cancel();
 
       const utterance = new SpeechSynthesisUtterance(cleanText);
@@ -1059,7 +1071,6 @@
       if (availableVoices.length === 0) initVoices();
       const koVoices = availableVoices.filter(v => v.lang.startsWith('ko'));
       
-      // 고품질 기본 한국어 보이스 우선 탐색
       const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남성') || v.name.includes('Minho') || v.name.includes('Standard-C'));
       const femaleVoice = koVoices.find(v => v.name.includes('Female') || v.name.includes('여성') || v.name.includes('Yuna') || v.name.includes('Sora') || v.name.includes('Google') || v.name.includes('Heami'));
       const defaultVoice = femaleVoice || koVoices[0] || null;
@@ -1067,7 +1078,6 @@
       const r = (role || '').toLowerCase();
       const em = (emotion || '').toLowerCase();
 
-      // 💡 [안정화 핵심] 피치와 속도를 0.92~1.08 내외로 부드럽게 조정하여 떨림 제거
       let rate = 1.0;
       let pitch = 1.0;
 
@@ -1095,7 +1105,6 @@
           rate = 0.95; pitch = 0.96;
         } 
         else {
-          // 해설자 (Narrator)
           if (femaleVoice) utterance.voice = femaleVoice;
           else if (defaultVoice) utterance.voice = defaultVoice;
 
@@ -1103,7 +1112,6 @@
           else { rate = 1.0; pitch = 1.0; }
         }
       } else {
-        // 베드타임 모드
         rate = 0.92; pitch = 0.98;
         if (r.includes('villain') || r.includes('elder')) {
           if (maleVoice) utterance.voice = maleVoice;
@@ -1115,7 +1123,6 @@
       utterance.rate = rate;
       utterance.pitch = pitch;
 
-      // 오디오 더킹
       if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
         bgmAudio.volume = targetBgmVolume * 0.45;
       }
@@ -1133,7 +1140,6 @@
       utterance.onend = finishSpeak;
       utterance.onerror = finishSpeak;
 
-      // 일부 브라우저의 긴 문장 멈춤 현상 방지 타임아웃
       setTimeout(() => {
         if (!isFinished && !window.speechSynthesis.speaking) {
           finishSpeak();
@@ -1199,7 +1205,7 @@
     if (!currentStoryBookObject) return;
     
     currentStoryBookObject.userId = getUniqueUserIdentifier();
-    currentStoryBookObject.author = document.getElementById('authorName').value.trim() || "꼬마 작가";
+    currentStoryBookObject.author = (document.getElementById('authorName').value || '').trim() || "꼬마 작가";
     currentStoryBookObject.genre = document.getElementById('storyGenre').value;
 
     const tx = db.transaction("books", "readwrite");
@@ -1214,9 +1220,10 @@
   function loadLibraryList() {
     if (!db) return;
     const currentUserId = getUniqueUserIdentifier();
-    const authorName = document.getElementById('authorName').value.trim() || "나";
+    const authorName = (document.getElementById('authorName').value || '').trim() || "나";
     
-    document.getElementById('libraryTitleLabel').innerText = `📚 [${authorName}] 작가님의 서재`;
+    const titleEl = document.getElementById('libraryTitleLabel');
+    if (titleEl) titleEl.innerText = `📚 [${authorName}] 작가님의 서재`;
 
     const tx = db.transaction("books", "readonly");
     const store = tx.objectStore("books");
@@ -1239,8 +1246,8 @@
             <p>작가: <b>${book.author || '익명'}</b> | 저장일: ${book.createdAt} (총 ${book.pages.length}p)</p>
           </div>
           <div class="library-actions">
-            <button class="btn-load" onclick="loadSingleBook(${book.id})">열기</button>
-            <button class="btn-delete" onclick="deleteSavedBook(${book.id})">삭제</button>
+            <button type="button" class="btn-load" onclick="loadSingleBook(${book.id})">열기</button>
+            <button type="button" class="btn-delete" onclick="deleteSavedBook(${book.id})">삭제</button>
           </div>
         </div>
       `).join('');

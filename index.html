@@ -9,6 +9,10 @@
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
+    html {
+      scroll-behavior: smooth;
+    }
+
     body { 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; 
       margin: 0;
@@ -258,7 +262,6 @@
       display: none;
     }
 
-    /* 💡 [모바일 완벽 터치 최적화 버튼] */
     .primary-btn { 
       width: 100%; 
       padding: 16px; 
@@ -285,16 +288,24 @@
     
     #status-log { 
       margin-top: 14px; 
-      font-size: 14px; 
+      font-size: 14.5px; 
       color: #4f46e5; 
       text-align: center; 
       font-weight: 700; 
       position: relative;
       z-index: 5;
+      line-height: 1.5;
     }
     
-    #book-container { margin-top: 20px; display: none; position: relative; z-index: 5; }
-    .story-title { font-size: 20px; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 14px; }
+    #book-container { 
+      margin-top: 24px; 
+      display: none; 
+      position: relative; 
+      z-index: 5; 
+      padding-top: 10px;
+      border-top: 2px dashed #fcd34d;
+    }
+    .story-title { font-size: 21px; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 14px; }
     
     .book-page-wrapper { width: 100%; position: relative; }
     .page-item { display: none; position: relative; width: 100%; aspect-ratio: 1/1; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.12); animation: fadeIn 0.3s ease-in-out; background: #e2e8f0; border: 3px solid #ffffff; }
@@ -455,15 +466,15 @@
     
     <div class="input-group">
       <label for="character">🐰 등장인물 / 주인공 이름</label>
-      <input type="text" id="character" value="용감한 양치기 소년 다윗과 거인 골리앗">
+      <input type="text" id="character" placeholder="비워두시면 뮤니가 멋진 주인공을 만들어줘요! (예: 꼬마 토끼, 우주비행사)">
     </div>
     <div class="input-group">
       <label for="background">🏰 배경</label>
-      <input type="text" id="background" value="고대 엘라 골짜기 전장">
+      <input type="text" id="background" placeholder="비워두시면 신비로운 장소로 자동 생성돼요! (예: 은하수 별나라, 무지개 숲)">
     </div>
     <div class="input-group">
       <label for="lesson">💡 교훈 / 주제</label>
-      <input type="text" id="lesson" value="겉모습보다 강한 용기와 믿음의 승리">
+      <input type="text" id="lesson" placeholder="비워두시면 따뜻한 감동 이야기로 만들어줘요! (예: 진정한 용기, 나눔의 행복)">
     </div>
     
     <div class="input-group">
@@ -477,7 +488,7 @@
       <div class="helper-text">💡 원하는 낭독 길이에 맞춰 이야기와 삽화 페이지 수를 조절합니다.</div>
     </div>
 
-    <!-- 💡 [모바일에서 즉시 반응하는 메인 액션 버튼] -->
+    <!-- 💡 [메인 액션 버튼] -->
     <button type="button" class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎭 뮤니와 함께 동화책 만들기</button>
     <div id="status-log"></div>
   </div>
@@ -527,7 +538,6 @@
 </div>
 
 <script>
-  // 💡 [전역 변수]
   let currentStoryBookObject = null;
   let db = null;
   let isPlaying = false;
@@ -607,9 +617,38 @@
     bgmAudio.volume = targetBgmVolume;
   }
 
-  // 💡 [동화 제작 핵심 실행 함수 - 최상단 배치]
+  // 💡 [모바일 음성 합성 엔진 잠금 해제 및 최적화]
+  let availableVoices = [];
+  function initVoices() {
+    if (typeof speechSynthesis !== 'undefined') {
+      availableVoices = window.speechSynthesis.getVoices();
+    }
+  }
+  if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = initVoices;
+  }
+  initVoices();
+
+  // 💡 [모바일 사파리/크롬 오디오 언락 함수 - 터치 즉시 실행]
+  function unlockMobileAudio() {
+    if (typeof speechSynthesis !== 'undefined') {
+      const dummyUtter = new SpeechSynthesisUtterance('');
+      dummyUtter.volume = 0;
+      dummyUtter.rate = 1;
+      window.speechSynthesis.speak(dummyUtter);
+    }
+    if (bgmAudio) {
+      bgmAudio.play().then(() => {
+        if (!isBgmEnabled) bgmAudio.pause();
+      }).catch(() => {});
+    }
+  }
+
+  // 💡 [동화 제작 함수]
   async function generateStoryAndImages() {
     try {
+      unlockMobileAudio(); // 터치 즉시 모바일 오디오 권한 획득
+
       const apiKeyEl = document.getElementById('apiKey');
       const authorEl = document.getElementById('authorName');
       const genreEl = document.getElementById('storyGenre');
@@ -667,9 +706,9 @@
 
 [이야기 설정]
 - 작가 이름: ${author}
-- 등장인물/주인공: ${char}
-- 배경: ${bg}
-- 주제/교훈: ${lesson}
+- 등장인물/주인공: ${char ? char : '장르에 맞는 매력적인 주인공 자동 창작'}
+- 배경: ${bg ? bg : '장르에 맞는 아름다운 배경 자동 창작'}
+- 주제/교훈: ${lesson ? lesson : '마음이 따뜻해지는 감동 교훈'}
 
 [작성 규칙]
 1. 재미있고 통통 튀는 대사와 해설이 어우러진 대본 형태로 작성해줘.
@@ -745,8 +784,15 @@
       renderBookPages(currentStoryBookObject);
       showPage(0);
 
-      if (statusLog) statusLog.innerText = `🎉 [${author}] 작가님의 동화책이 완성되었어요! [다역 입체 낭독 시작]을 눌러보세요.`;
+      if (statusLog) statusLog.innerText = `🎉 [${author}] 작가님의 동화책이 완성되었어요! 아래에서 바로 읽어보세요!`;
       if (controlPanel) controlPanel.style.display = 'flex';
+
+      setTimeout(() => {
+        const bookView = document.getElementById('book-container');
+        if (bookView) {
+          bookView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
 
     } catch (err) {
       const statusLog = document.getElementById('status-log');
@@ -792,18 +838,6 @@
     throw new Error('이미지 없음');
   }
 
-  // 음성 엔진
-  let availableVoices = [];
-  function initVoices() {
-    if (typeof speechSynthesis !== 'undefined') {
-      availableVoices = window.speechSynthesis.getVoices();
-    }
-  }
-  if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = initVoices;
-  }
-  initVoices();
-
   function getUniqueUserIdentifier() {
     const key = (document.getElementById('apiKey')?.value || '').trim();
     const author = (document.getElementById('authorName')?.value || '').trim();
@@ -841,7 +875,6 @@
     alert('사용자 정보가 초기화되었습니다.');
   }
 
-  // DB 안전 초기화
   try {
     if (typeof indexedDB !== 'undefined') {
       const dbRequest = indexedDB.open("FairytaleAppDB_MultiUser", 3);
@@ -1033,8 +1066,11 @@
     showPage(currentPageIndex + 1); 
   }
 
+  // 💡 [모바일에서 즉시 소리 나오는 낭독 루프]
   async function startContinuousReading(onCompleteCallback = null) {
     if (!currentStoryBookObject) return;
+    
+    unlockMobileAudio(); // 낭독 버튼 누른 순간 오디오 언락
     stopVoice();
     isPlaying = true;
 
@@ -1053,7 +1089,7 @@
         for (const line of pageData.dialogue_list) {
           if (!isPlaying) break;
           await speakDynamicLine(line.role || 'narrator', line.emotion || 'calm', line.text);
-          const delay = line.emotion === 'urgent' ? 140 : 220;
+          const delay = line.emotion === 'urgent' ? 140 : 200;
           await new Promise(r => setTimeout(r, delay));
         }
       } else {
@@ -1077,13 +1113,14 @@
     }
   }
 
+  // 💡 [모바일 무음 완벽 해결: 단일 발화 보증 함수]
   function speakDynamicLine(role, emotion, rawText) {
     return new Promise((resolve) => {
       if (typeof speechSynthesis === 'undefined') return resolve();
       const cleanText = rawText.replace(/[*#"]/g, '').trim();
       if (!cleanText) return resolve();
 
-      window.speechSynthesis.cancel();
+      if (availableVoices.length === 0) initVoices();
 
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = 'ko-KR';
@@ -1091,9 +1128,7 @@
       const styleEl = document.getElementById('actingStyle');
       const styleMode = styleEl ? styleEl.value : 'dynamic_theater';
 
-      if (availableVoices.length === 0) initVoices();
-      const koVoices = availableVoices.filter(v => v.lang.startsWith('ko'));
-      
+      const koVoices = availableVoices.filter(v => v.lang && v.lang.startsWith('ko'));
       const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남성') || v.name.includes('Minho') || v.name.includes('Standard-C'));
       const femaleVoice = koVoices.find(v => v.name.includes('Female') || v.name.includes('여성') || v.name.includes('Yuna') || v.name.includes('Sora') || v.name.includes('Google') || v.name.includes('Heami'));
       const defaultVoice = femaleVoice || koVoices[0] || null;
@@ -1150,24 +1185,25 @@
         bgmAudio.volume = targetBgmVolume * 0.45;
       }
 
-      let isFinished = false;
-      function finishSpeak() {
-        if (isFinished) return;
-        isFinished = true;
+      let isDone = false;
+      function onEndHandler() {
+        if (isDone) return;
+        isDone = true;
         if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
           bgmAudio.volume = targetBgmVolume;
         }
         resolve();
       }
 
-      utterance.onend = finishSpeak;
-      utterance.onerror = finishSpeak;
+      utterance.onend = onEndHandler;
+      utterance.onerror = onEndHandler;
 
+      // 모바일 백그라운드 멈춤 방지 가드 (최대 12초 후 강제 다음 대사)
       setTimeout(() => {
-        if (!isFinished && !window.speechSynthesis.speaking) {
-          finishSpeak();
+        if (!isDone) {
+          onEndHandler();
         }
-      }, 10000);
+      }, 12000);
 
       window.speechSynthesis.speak(utterance);
     });
@@ -1298,6 +1334,11 @@
         showPage(0);
         switchTab('create');
         updateBgmGenrePreview(book.genre || "fantasy");
+        
+        setTimeout(() => {
+          const bookView = document.getElementById('book-container');
+          if (bookView) bookView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
       };
     } catch(e) {}
   }

@@ -34,23 +34,25 @@
       margin: 0 auto;
     }
 
-    /* 🎵 온전한 비율로 잘림 없이 출력되는 헤더 */
+    /* 🎵 제목과 소제목 간격을 완벽하게 밀착시킨 헤더 */
     .muni-header {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       text-align: center;
     }
 
     .muni-full-banner-wrap {
       width: 100%;
-      max-width: 360px; /* 로고가 카드 폭에 딱 맞게 안착 */
+      max-width: 380px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto;
+      /* 💡 이미지 자체의 하단 투명 여백을 당겨 올려 소제목과 밀착 */
+      margin-bottom: -40px; 
     }
 
     .muni-full-banner {
@@ -61,11 +63,12 @@
     }
 
     .muni-subtitle {
-      font-size: 13px;
+      font-size: 13.5px;
       color: #7c3aed;
       font-weight: 700;
-      margin-top: 6px;
-      margin-bottom: 4px;
+      margin: 0 0 4px 0;
+      position: relative;
+      z-index: 2;
       letter-spacing: -0.3px;
     }
     
@@ -267,7 +270,7 @@
 <body>
 
 <div class="card">
-  <!-- 🎵 온전한 배너 로고 헤더 -->
+  <!-- 🎵 완벽하게 밀착된 뮤니 배너 로고 -->
   <div class="muni-header">
     <div class="muni-full-banner-wrap">
       <img src="muni_title.jpg" class="muni-full-banner" alt="뮤니의 동화마을 이야기" onerror="this.src='muni_title.png'; this.onerror=function(){this.src='muni.png';};">

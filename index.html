@@ -35,7 +35,7 @@
       position: relative;
     }
 
-    /* 🎵 둥실둥실 파티클 레이어 */
+    /* 🎵 파티클 레이어 */
     .particle-container {
       position: absolute;
       top: 0;
@@ -118,15 +118,32 @@
       background: #fdf4ff;
       border: 1.5px solid #f5d0fe;
       padding: 8px 12px;
-      border-radius: 12px;
+      border-radius: 14px;
       margin-bottom: 14px;
       position: relative;
       z-index: 2;
     }
     .bgm-info { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #86198f; }
     .bgm-actions { display: flex; align-items: center; gap: 8px; }
-    .bgm-toggle-btn { background: #d946ef; color: white; border: none; padding: 4px 10px; border-radius: 8px; font-size: 11.5px; font-weight: 700; cursor: pointer; }
-    .bgm-toggle-btn.off { background: #cbd5e1; color: #475569; }
+    
+    .bgm-switch-btn { 
+      background: linear-gradient(135deg, #d946ef 0%, #a855f7 100%); 
+      color: white; 
+      border: none; 
+      padding: 6px 12px; 
+      border-radius: 8px; 
+      font-size: 12px; 
+      font-weight: 800; 
+      cursor: pointer; 
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .bgm-switch-btn.off { 
+      background: #e2e8f0; 
+      color: #64748b; 
+    }
     .bgm-slider { width: 65px; accent-color: #d946ef; cursor: pointer; }
     
     .tab-nav { 
@@ -311,6 +328,9 @@
     .controls button { flex: 1 1 calc(50% - 4px); padding: 12px 6px; background: #e2e8f0; border: none; border-radius: 10px; font-size: 13.5px; cursor: pointer; font-weight: 700; color: #334155; }
     .controls button.read-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; flex: 1 1 100%; font-size: 15.5px; padding: 13px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25); }
     
+    .controls button.bgm-btn { background: #fdf4ff; color: #86198f; border: 1.5px solid #f5d0fe; }
+    .controls button.bgm-btn.off { background: #f1f5f9; color: #94a3b8; border-color: #cbd5e1; }
+
     .controls button.loop-btn { background: #f1f5f9; color: #475569; border: 1.5px solid #cbd5e1; }
     .controls button.loop-btn.active { background: #8b5cf6; color: white; border-color: #7c3aed; font-weight: 800; }
     
@@ -351,15 +371,15 @@
     <div class="muni-subtitle">음악과 함께하는 나만의 입체 오디오 동화 공작소</div>
   </div>
 
-  <!-- 🎧 BGM 제어 바 (배경음악 ON/OFF 및 볼륨) -->
+  <!-- 🎧 상단 BGM 컨트롤러 바 -->
   <div class="bgm-control-bar">
     <div class="bgm-info">
       <span id="bgmIcon">🎵</span>
       <span id="bgmTitleText">배경음악: 환상 판타지 오르골</span>
     </div>
     <div class="bgm-actions">
-      <input type="range" class="bgm-slider" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.25" oninput="changeBgmVolume(this.value)">
-      <button type="button" class="bgm-toggle-btn" id="bgmToggleBtn" onclick="toggleBgmSound()">BGM ON</button>
+      <input type="range" class="bgm-slider" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.25" oninput="changeBgmVolume(this.value)" title="음악 볼륨 조절">
+      <button type="button" class="bgm-switch-btn" id="bgmSwitchTopBtn" onclick="toggleBgmSound()">🎵 BGM: ON</button>
     </div>
   </div>
 
@@ -467,7 +487,7 @@
     <div class="drama-control-box">
       <label for="actingStyle">🎙️ 낭독 연기 스타일</label>
       <select id="actingStyle">
-        <option value="dynamic_theater" selected>🔥 활기찬 다이내믹 극장 모드 (생생한 감정 연기 & 빠른 템포)</option>
+        <option value="dynamic_theater" selected>🔥 활기찬 다이내믹 극장 모드 (생생한 감정 연기 & 안정된 톤)</option>
         <option value="bedtime_calm">🌙 잔잔한 베드타임 모드 (편안하고 포근한 수면 톤)</option>
       </select>
     </div>
@@ -476,6 +496,7 @@
   <!-- 4. 컨트롤 패널 -->
   <div class="controls" id="controlPanel" style="display: none;">
     <button class="read-btn" id="readBtn" onclick="startContinuousReading()">📢 다역 입체 낭독 시작</button>
+    <button class="bgm-btn" id="bgmControlBtn" onclick="toggleBgmSound()">🎵 배경음악: ON</button>
     <button class="loop-btn" id="loopBtn" onclick="toggleRepeatMode()">🔁 반복 재생: OFF</button>
     <button onclick="pauseVoice()">⏸ 일시정지</button>
     <button onclick="resumeVoice()">▶ 이어듣기</button>
@@ -504,7 +525,6 @@
   let isBgmEnabled = true;
   let targetBgmVolume = 0.25;
 
-  // 장르별 고품질 로열티 프리 배경음악 스트림 URL 및 명칭
   const bgmPlaylist = {
     "fantasy": {
       name: "환상 판타지 오르골",
@@ -551,7 +571,7 @@
       bgmAudio.src = bgmData.url;
     }
     bgmAudio.volume = targetBgmVolume;
-    bgmAudio.play().catch(e => console.log("BGM Play Notice:", e));
+    bgmAudio.play().catch(e => console.log("BGM 재생 안내:", e));
   }
 
   function stopBgm() {
@@ -561,17 +581,19 @@
 
   function toggleBgmSound() {
     isBgmEnabled = !isBgmEnabled;
-    const btn = document.getElementById('bgmToggleBtn');
+    const topBtn = document.getElementById('bgmSwitchTopBtn');
+    const bottomBtn = document.getElementById('bgmControlBtn');
     const icon = document.getElementById('bgmIcon');
+
     if (isBgmEnabled) {
-      btn.className = "bgm-toggle-btn";
-      btn.innerText = "BGM ON";
-      icon.innerText = "🎵";
+      if (topBtn) { topBtn.className = "bgm-switch-btn"; topBtn.innerText = "🎵 BGM: ON"; }
+      if (bottomBtn) { bottomBtn.className = "bgm-btn"; bottomBtn.innerText = "🎵 배경음악: ON"; }
+      if (icon) icon.innerText = "🎵";
       if (isPlaying) playBgmForCurrentStory();
     } else {
-      btn.className = "bgm-toggle-btn off";
-      btn.innerText = "BGM OFF";
-      icon.innerText = "🔇";
+      if (topBtn) { topBtn.className = "bgm-switch-btn off"; topBtn.innerText = "🔇 BGM: OFF"; }
+      if (bottomBtn) { bottomBtn.className = "bgm-btn off"; bottomBtn.innerText = "🔇 배경음악: OFF"; }
+      if (icon) icon.innerText = "🔇";
       bgmAudio.pause();
     }
   }
@@ -579,11 +601,16 @@
   function changeBgmVolume(val) {
     targetBgmVolume = parseFloat(val);
     bgmAudio.volume = targetBgmVolume;
+    if (targetBgmVolume === 0 && isBgmEnabled) {
+      toggleBgmSound();
+    } else if (targetBgmVolume > 0 && !isBgmEnabled) {
+      toggleBgmSound();
+    }
   }
 
-  // 초기 BGM 프리뷰 세팅
   updateBgmGenrePreview("fantasy");
 
+  // 🎙️ --- [음성 합성 안정화 엔진] --- 🎙️
   let availableVoices = [];
   function initVoices() {
     availableVoices = window.speechSynthesis.getVoices();
@@ -973,8 +1000,9 @@
     stopVoice();
     isPlaying = true;
 
-    // 🎵 낭독 시작 시 배경음악 자동 재생
-    playBgmForCurrentStory();
+    if (isBgmEnabled) {
+      playBgmForCurrentStory();
+    }
 
     showPage(0);
     await speakDynamicLine('narrator', 'excited', `제목: ${currentStoryBookObject.title}`);
@@ -989,7 +1017,8 @@
         for (const line of pageData.dialogue_list) {
           if (!isPlaying) break;
           await speakDynamicLine(line.role || 'narrator', line.emotion || 'calm', line.text);
-          const delay = line.emotion === 'urgent' ? 60 : 120;
+          // 💡 문장 간 여유 있는 딜레이로 오디오 떨림 방지
+          const delay = line.emotion === 'urgent' ? 140 : 220;
           await new Promise(r => setTimeout(r, delay));
         }
       } else {
@@ -1008,15 +1037,19 @@
         }, 1500);
       } else {
         isPlaying = false;
-        stopBgm(); // 낭독 종료 시 BGM 정지
+        stopBgm();
       }
     }
   }
 
+  // 🎙️ --- [안정화된 다역 음성 발화 함수] --- 🎙️
   function speakDynamicLine(role, emotion, rawText) {
     return new Promise((resolve) => {
       const cleanText = rawText.replace(/[*#"]/g, '').trim();
       if (!cleanText) return resolve();
+
+      // 이전 남아있는 음성 버퍼 정리
+      window.speechSynthesis.cancel();
 
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = 'ko-KR';
@@ -1025,40 +1058,53 @@
 
       if (availableVoices.length === 0) initVoices();
       const koVoices = availableVoices.filter(v => v.lang.startsWith('ko'));
+      
+      // 고품질 기본 한국어 보이스 우선 탐색
       const maleVoice = koVoices.find(v => v.name.includes('Male') || v.name.includes('남성') || v.name.includes('Minho') || v.name.includes('Standard-C'));
-      const femaleVoice = koVoices.find(v => v.name.includes('Female') || v.name.includes('여성') || v.name.includes('Yuna') || v.name.includes('Sora') || v.name.includes('Google'));
+      const femaleVoice = koVoices.find(v => v.name.includes('Female') || v.name.includes('여성') || v.name.includes('Yuna') || v.name.includes('Sora') || v.name.includes('Google') || v.name.includes('Heami'));
+      const defaultVoice = femaleVoice || koVoices[0] || null;
 
       const r = (role || '').toLowerCase();
       const em = (emotion || '').toLowerCase();
 
+      // 💡 [안정화 핵심] 피치와 속도를 0.92~1.08 내외로 부드럽게 조정하여 떨림 제거
       let rate = 1.0;
       let pitch = 1.0;
 
       if (styleMode === 'dynamic_theater') {
         if (r.includes('hero') || r.includes('child') || r.includes('friend')) {
           if (femaleVoice) utterance.voice = femaleVoice;
-          if (em === 'excited' || em === 'happy') { rate = 1.18; pitch = 1.22; }
-          else if (em === 'urgent') { rate = 1.25; pitch = 1.15; }
-          else if (em === 'whisper') { rate = 0.88; pitch = 1.05; }
-          else { rate = 1.10; pitch = 1.15; }
+          else if (defaultVoice) utterance.voice = defaultVoice;
+
+          if (em === 'excited' || em === 'happy') { rate = 1.06; pitch = 1.08; }
+          else if (em === 'urgent') { rate = 1.10; pitch = 1.05; }
+          else if (em === 'whisper') { rate = 0.94; pitch = 1.02; }
+          else { rate = 1.02; pitch = 1.05; }
         } 
         else if (r.includes('villain') || r.includes('monster') || r.includes('giant')) {
           if (maleVoice) utterance.voice = maleVoice;
-          if (em === 'angry') { rate = 1.05; pitch = 0.78; }
-          else { rate = 0.95; pitch = 0.82; }
+          else if (defaultVoice) utterance.voice = defaultVoice;
+
+          if (em === 'angry') { rate = 1.02; pitch = 0.92; }
+          else { rate = 0.96; pitch = 0.94; }
         } 
         else if (r.includes('elder') || r.includes('king')) {
           if (maleVoice) utterance.voice = maleVoice;
-          rate = 0.95; pitch = 0.90;
+          else if (defaultVoice) utterance.voice = defaultVoice;
+
+          rate = 0.95; pitch = 0.96;
         } 
         else {
+          // 해설자 (Narrator)
           if (femaleVoice) utterance.voice = femaleVoice;
-          if (em === 'excited' || em === 'happy') { rate = 1.12; pitch = 1.10; }
-          else if (em === 'urgent') { rate = 1.18; pitch = 1.08; }
-          else { rate = 1.05; pitch = 1.05; }
+          else if (defaultVoice) utterance.voice = defaultVoice;
+
+          if (em === 'excited') { rate = 1.04; pitch = 1.04; }
+          else { rate = 1.0; pitch = 1.0; }
         }
       } else {
-        rate = 0.88; pitch = 1.0;
+        // 베드타임 모드
+        rate = 0.92; pitch = 0.98;
         if (r.includes('villain') || r.includes('elder')) {
           if (maleVoice) utterance.voice = maleVoice;
         } else {
@@ -1069,23 +1115,30 @@
       utterance.rate = rate;
       utterance.pitch = pitch;
 
-      // 💡 [오디오 더킹] 목소리가 나올 때 BGM 볼륨을 살짝 낮춰 또렷하게 들리게 함
+      // 오디오 더킹
       if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
         bgmAudio.volume = targetBgmVolume * 0.45;
       }
 
-      utterance.onend = () => {
+      let isFinished = false;
+      function finishSpeak() {
+        if (isFinished) return;
+        isFinished = true;
         if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
           bgmAudio.volume = targetBgmVolume;
         }
         resolve();
-      };
-      utterance.onerror = () => {
-        if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
-          bgmAudio.volume = targetBgmVolume;
+      }
+
+      utterance.onend = finishSpeak;
+      utterance.onerror = finishSpeak;
+
+      // 일부 브라우저의 긴 문장 멈춤 현상 방지 타임아웃
+      setTimeout(() => {
+        if (!isFinished && !window.speechSynthesis.speaking) {
+          finishSpeak();
         }
-        resolve();
-      };
+      }, 10000);
 
       window.speechSynthesis.speak(utterance);
     });

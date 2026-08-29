@@ -1,5 +1,5 @@
-const CACHE_NAME='muni-story-v9';
-const APP_SHELL=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./assets/bgm/moonlit-forest-path.mp3','./assets/bgm/little-brave-hero.mp3','./assets/bgm/the-secret-in-the-box.mp3','./assets/bgm/starry-night-journey.mp3','./assets/bgm/sunny-bunny-trail.mp3','./assets/bgm/pudding-parade.mp3'];
+const CACHE_NAME='muni-story-v11';
+const APP_SHELL=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./assets/bgm/moonlit-forest-path.mp3','./assets/bgm/little-brave-hero.mp3','./assets/bgm/the-secret-in-the-box.mp3','./assets/bgm/starry-night-journey.mp3','./assets/bgm/sunny-bunny-trail.mp3','./assets/bgm/pudding-parade.mp3','./assets/bgm/moonlit-pillow-song.mp3'];
 
 self.addEventListener('install', event=>{
   event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL)));

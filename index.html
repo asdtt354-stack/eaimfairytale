@@ -238,7 +238,7 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
       <div class="bgm-song" id="bgmTitleText">환상 판타지 오르골</div>
       <div class="bgm-row">
         <span id="bgmIcon">🎵</span>
-        <input type="range" class="bgm-slider" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.25" oninput="changeBgmVolume(this.value)">
+        <input type="range" class="bgm-slider" id="bgmVolumeSlider" min="0" max="1" step="0.05" value="0.48" oninput="changeBgmVolume(this.value)">
         <button type="button" class="bgm-switch-btn" id="bgmSwitchTopBtn" onclick="toggleBgmSound()">BGM ON</button>
       </div>
     </div>
@@ -342,7 +342,7 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
             </div>
             <div class="drama-control-box">
               <label for="actingStyle">🎙️ 낭독 연기 스타일</label>
-              <select id="actingStyle">
+              <select id="actingStyle" onchange="handleActingStyleChange()">
                 <option value="dynamic_theater" selected>🔥 활기찬 다이내믹 극장 모드</option>
                 <option value="bedtime_calm">🌙 잔잔한 베드타임 모드</option>
               </select>
@@ -425,7 +425,7 @@ function pickGenre(value){
   bgmAudio.preload = 'auto';
   bgmAudio.playsInline = true;
   let isBgmEnabled = true;
-  let targetBgmVolume = 0.25;
+  let targetBgmVolume = 0.48;
 
   const bgmPlaylist = {
     "fantasy": { name: "Moonlit Forest Path", url: "./assets/bgm/moonlit-forest-path.mp3" },
@@ -434,29 +434,66 @@ function pickGenre(value){
     "scifi": { name: "Starry Night Journey", url: "./assets/bgm/starry-night-journey.mp3" },
     "animal": { name: "Sunny Bunny Trail", url: "./assets/bgm/sunny-bunny-trail.mp3" },
     "comic": { name: "Pudding Parade", url: "./assets/bgm/pudding-parade.mp3" },
+    "bedtime": { name: "Moonlit Pillow Song", url: "./assets/bgm/moonlit-pillow-song.mp3" },
     "custom": { name: "Moonlit Forest Path", url: "./assets/bgm/moonlit-forest-path.mp3" }
   };
 
-  function handleGenreChange(genreKey) {
-    updateBgmGenrePreview(genreKey);
-  }
-
-  function updateBgmGenrePreview(genreKey) {
-    const bgmData = bgmPlaylist[genreKey] || bgmPlaylist["fantasy"];
-    const textEl = document.getElementById('bgmTitleText');
-    if (textEl) textEl.innerText = `배경음악: ${bgmData.name}`;
-    bgmAudio.src = bgmData.url;
-  }
-
-  function playBgmForCurrentStory() {
-    if (!isBgmEnabled || !bgmAudio) return Promise.resolve(false);
+  function getCurrentBgmSelection() {
+    const actingStyle = document.getElementById('actingStyle')?.value || 'dynamic_theater';
+    if (actingStyle === 'bedtime_calm') {
+      return { key: 'bedtime', data: bgmPlaylist.bedtime, volume: 0.38 };
+    }
 
     const genreEl = document.getElementById('storyGenre');
     const genreKey =
       (currentStoryBookObject && currentStoryBookObject.genre) ||
       (genreEl ? genreEl.value : 'fantasy');
 
-    const bgmData = bgmPlaylist[genreKey] || bgmPlaylist["fantasy"];
+    return {
+      key: genreKey,
+      data: bgmPlaylist[genreKey] || bgmPlaylist.fantasy,
+      volume: targetBgmVolume
+    };
+  }
+
+  function handleActingStyleChange() {
+    const selection = getCurrentBgmSelection();
+    const textEl = document.getElementById('bgmTitleText');
+    if (textEl) textEl.innerText = `배경음악: ${selection.data.name}`;
+
+    const wasPlaying = bgmAudio && !bgmAudio.paused;
+    if (bgmAudio.getAttribute('src') !== selection.data.url) {
+      bgmAudio.src = selection.data.url;
+      try { bgmAudio.load(); } catch (e) {}
+    }
+    bgmAudio.volume = selection.volume;
+
+    if (wasPlaying && isBgmEnabled) {
+      try {
+        const p = bgmAudio.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+      } catch (e) {}
+    }
+  }
+
+  function handleGenreChange(genreKey) {
+    updateBgmGenrePreview(genreKey);
+  }
+
+  function updateBgmGenrePreview(genreKey) {
+    const selection = getCurrentBgmSelection();
+    const bgmData = selection.data;
+    const textEl = document.getElementById('bgmTitleText');
+    if (textEl) textEl.innerText = `배경음악: ${bgmData.name}`;
+    bgmAudio.src = bgmData.url;
+    bgmAudio.volume = selection.volume;
+  }
+
+  function playBgmForCurrentStory() {
+    if (!isBgmEnabled || !bgmAudio) return Promise.resolve(false);
+
+    const selection = getCurrentBgmSelection();
+    const bgmData = selection.data;
     const textEl = document.getElementById('bgmTitleText');
     if (textEl) textEl.innerText = `배경음악: ${bgmData.name}`;
 
@@ -467,7 +504,7 @@ function pickGenre(value){
     }
 
     bgmAudio.muted = false;
-    bgmAudio.volume = targetBgmVolume;
+    bgmAudio.volume = selection.volume;
 
     try {
       const p = bgmAudio.play();
@@ -1217,7 +1254,7 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
         clearSpeechWatchdog();
         if (currentUtterance === utterance) currentUtterance = null;
         if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
-          bgmAudio.volume = targetBgmVolume;
+          bgmAudio.volume = getCurrentBgmSelection().volume;
         }
         resolve(ok);
       };
@@ -1225,7 +1262,7 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
       utterance.onstart = () => {
         if (options.startBgmOnStart && isBgmEnabled) playBgmForCurrentStory();
         if (isBgmEnabled && bgmAudio && !bgmAudio.paused) {
-          bgmAudio.volume = targetBgmVolume * 0.30;
+          bgmAudio.volume = getCurrentBgmSelection().volume * 0.68;
         }
         clearSpeechWatchdog();
         speechWatchdog = setInterval(() => {

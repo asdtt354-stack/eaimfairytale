@@ -13,7 +13,8 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; 
       margin: 0;
       padding: 12px 10px;
-      background: linear-gradient(135deg, #fff9e6 0%, #e0f2fe 50%, #fce7f3 100%); 
+      /* 🌈 전체 배경을 더 화사하고 따뜻한 동화마을 톤으로 보강 */
+      background: radial-gradient(circle at 50% 10%, #fff1f2 0%, #e0e7ff 45%, #fef3c7 100%);
       background-attachment: fixed;
       color: #334155; 
       min-height: 100vh;
@@ -25,34 +26,39 @@
     .card { 
       width: 100%;
       max-width: 640px;
-      background: rgba(255, 255, 255, 0.96); 
+      /* 🎨 카드 내부에도 화사하고 생동감 넘치는 파스텔 그라데이션 배경 적용 */
+      background: linear-gradient(180deg, #ffffff 0%, #fff7ed 40%, #fdf2f8 80%, #ffffff 100%);
       backdrop-filter: blur(12px);
-      padding: 16px 16px 20px 16px;
-      border-radius: 24px; 
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
-      border: 2px solid #fef3c7;
+      padding: 10px 16px 20px 16px;
+      border-radius: 28px; 
+      box-shadow: 0 16px 36px rgba(244, 114, 182, 0.16), 0 4px 12px rgba(0,0,0,0.04); 
+      border: 2.5px solid #fde68a;
       margin: 0 auto;
+      position: relative;
+      overflow: hidden;
     }
 
-    /* 🎵 제목과 소제목 간격을 완벽하게 밀착시킨 헤더 */
+    /* 🎵 캐릭터 상단 여백을 당겨 올린 밀착 헤더 */
     .muni-header {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       text-align: center;
+      position: relative;
     }
 
     .muni-full-banner-wrap {
       width: 100%;
-      max-width: 380px;
+      max-width: 390px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto;
-      /* 💡 이미지 자체의 하단 투명 여백을 당겨 올려 소제목과 밀착 */
-      margin-bottom: -40px; 
+      /* 💡 이미지 상단/하단 투명 여백을 동시에 압축하여 밀착 */
+      margin-top: -30px;
+      margin-bottom: -36px;
     }
 
     .muni-full-banner {
@@ -60,16 +66,20 @@
       height: auto;
       display: block;
       object-fit: contain;
+      filter: drop-shadow(0 4px 12px rgba(244, 114, 182, 0.25));
     }
 
     .muni-subtitle {
       font-size: 13.5px;
-      color: #7c3aed;
-      font-weight: 700;
-      margin: 0 0 4px 0;
+      color: #6d28d9;
+      font-weight: 800;
+      margin: 0 0 6px 0;
       position: relative;
       z-index: 2;
       letter-spacing: -0.3px;
+      background: linear-gradient(90deg, #7c3aed, #db2777);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     
     .tab-nav { 
@@ -77,8 +87,9 @@
       gap: 6px; 
       margin-bottom: 16px;
       background: #f1f5f9;
-      padding: 4px;
-      border-radius: 14px;
+      padding: 5px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
     }
     .tab-btn { 
       flex: 1; 
@@ -86,24 +97,25 @@
       background: transparent; 
       border: none; 
       font-size: 14.5px; 
-      font-weight: 700; 
+      font-weight: 800; 
       color: #64748b; 
       cursor: pointer; 
-      border-radius: 10px; 
+      border-radius: 12px; 
       transition: all 0.2s ease;
     }
     .tab-btn.active { 
       background: #ffffff; 
       color: #6366f1; 
-      box-shadow: 0 3px 10px rgba(0,0,0,0.06); 
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12); 
     }
 
     .user-profile-box { 
-      background: #f8fafc; 
+      background: #ffffff; 
       border: 1.5px dashed #cbd5e1; 
       padding: 14px; 
-      border-radius: 14px; 
+      border-radius: 16px; 
       margin-bottom: 16px; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
     }
     .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .user-header label { color: #4f46e5; font-weight: 700; font-size: 13.5px; }
@@ -116,7 +128,7 @@
     .helper-alert { color: #4f46e5; font-weight: 600; }
 
     .input-group { margin-bottom: 15px; }
-    label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 14px; color: #334155; }
+    label { display: block; font-weight: 700; margin-bottom: 5px; font-size: 14px; color: #334155; }
     input, select { 
       width: 100%; 
       padding: 12px 14px; 
@@ -135,7 +147,7 @@
     .photo-upload-box {
       background: #fffbeb;
       border: 2px dashed #fcd34d;
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 14px;
       text-align: center;
       margin-bottom: 16px;
@@ -270,7 +282,7 @@
 <body>
 
 <div class="card">
-  <!-- 🎵 완벽하게 밀착된 뮤니 배너 로고 -->
+  <!-- 🎵 상단 여백을 압축하고 배경색과 일체화된 헤더 -->
   <div class="muni-header">
     <div class="muni-full-banner-wrap">
       <img src="muni_title.jpg" class="muni-full-banner" alt="뮤니의 동화마을 이야기" onerror="this.src='muni_title.png'; this.onerror=function(){this.src='muni.png';};">

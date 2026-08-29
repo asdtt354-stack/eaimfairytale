@@ -34,7 +34,7 @@
       margin: 0 auto;
     }
 
-    /* 🎵 뮤니 캐릭터 헤더 (캐릭터 줌인 확대) */
+    /* 🎵 제목 앞에 자연스럽게 들어가는 뮤니 인라인 헤더 */
     .muni-header {
       display: flex;
       flex-direction: column;
@@ -44,53 +44,47 @@
       text-align: center;
     }
 
-    .muni-avatar-wrap {
-      width: 130px;
-      height: 130px;
-      background: radial-gradient(circle, #ffffff 60%, #fff1f2 100%);
-      border-radius: 50%;
+    .muni-title-row {
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 10px 28px rgba(236, 72, 153, 0.28);
-      border: 4px solid #fbcfe8;
-      margin-bottom: 12px;
-      overflow: hidden;
-      animation: floatMotion 3s ease-in-out infinite;
-      position: relative;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    .muni-avatar-img {
-      width: 100%;
-      height: 100%;
+    /* 동그라미 테두리 없이 투명 캐릭터만 깨끗하게 표시 */
+    .muni-inline-img {
+      width: 52px;
+      height: 52px;
       object-fit: contain;
-      /* 💡 주변 여백을 자르고 캐릭터를 2.3배 확대하여 원 안에 꽉 채움 */
-      transform: scale(2.3); 
-      transform-origin: center center;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.08));
+      background: transparent;
+      border: none;
+      filter: drop-shadow(0 3px 6px rgba(236, 72, 153, 0.25));
+      animation: muniRhythm 2.5s ease-in-out infinite;
     }
 
-    @keyframes floatMotion {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-6px); }
+    @keyframes muniRhythm {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-3px) rotate(-4deg); }
+      75% { transform: translateY(-3px) rotate(4deg); }
     }
 
     h2.muni-title { 
       margin: 0; 
       color: #1e293b; 
-      font-size: 23px; 
+      font-size: 22.5px; 
       font-weight: 800;
       letter-spacing: -0.5px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
 
     .muni-subtitle {
       font-size: 13px;
       color: #8b5cf6;
       font-weight: 600;
-      margin-top: 4px;
+      margin-top: 6px;
     }
     
     .tab-nav { 
@@ -291,12 +285,12 @@
 <body>
 
 <div class="card">
-  <!-- 🎵 큼직하고 선명한 뮤니 헤더 -->
+  <!-- 🎵 제목 앞에 뮤니가 들어간 세련된 인라인 로고 헤더 -->
   <div class="muni-header">
-    <div class="muni-avatar-wrap">
-      <img src="muni.png" id="muniLogoImg" class="muni-avatar-img" alt="뮤니" onerror="this.src='muni.jpg'">
+    <div class="muni-title-row">
+      <img src="muni.png" id="muniLogoImg" class="muni-inline-img" alt="뮤니" onerror="this.src='muni.jpg'">
+      <h2 class="muni-title">뮤니의 동화마을 이야기 ✨</h2>
     </div>
-    <h2 class="muni-title">🎧 뮤니의 동화마을 이야기 ✨</h2>
     <div class="muni-subtitle">음악과 함께하는 나만의 입체 오디오 동화 공작소</div>
   </div>
 

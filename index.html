@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>나만의 동화책 제작 & 서재</title>
+  <title>뮤니의 동화마을 이야기</title>
   <!-- PDF 변환 라이브러리 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
@@ -34,13 +34,58 @@
       margin: 0 auto;
     }
 
-    h2 { 
-      margin: 0 0 18px 0; 
+    /* 🎵 뮤니 캐릭터 헤더 스타일 */
+    .muni-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .muni-avatar-wrap {
+      width: 88px;
+      height: 88px;
+      background: #111827; /* 검정 배경 캐릭터 돋보임 */
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px rgba(236, 72, 153, 0.25);
+      border: 3px solid #fbcfe8;
+      margin-bottom: 10px;
+      overflow: hidden;
+      animation: floatMotion 3s ease-in-out infinite;
+    }
+
+    .muni-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    @keyframes floatMotion {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+
+    h2.muni-title { 
+      margin: 0; 
       color: #1e293b; 
-      font-size: 22px; 
-      text-align: center; 
+      font-size: 23px; 
       font-weight: 800;
       letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .muni-subtitle {
+      font-size: 13px;
+      color: #8b5cf6;
+      font-weight: 600;
+      margin-top: 4px;
     }
     
     .tab-nav { 
@@ -69,7 +114,6 @@
       box-shadow: 0 3px 10px rgba(0,0,0,0.06); 
     }
 
-    /* 사용자 식별 및 API 키 상자 */
     .user-profile-box { 
       background: #f8fafc; 
       border: 1.5px dashed #cbd5e1; 
@@ -84,7 +128,6 @@
     .btn-small { background: #6366f1; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11.5px; cursor: pointer; font-weight: 600; }
     .btn-clear { background: none; border: none; color: #ef4444; font-size: 11.5px; cursor: pointer; text-decoration: underline; }
     
-    /* 💡 친절한 가이드 안내 문구 스타일 */
     .helper-text { font-size: 12px; color: #64748b; margin-top: 4px; line-height: 1.4; }
     .helper-alert { color: #4f46e5; font-weight: 600; }
 
@@ -243,7 +286,15 @@
 <body>
 
 <div class="card">
-  <h2>📖 동화마을 이야기 공작소</h2>
+  <!-- 🎵 뮤니의 동화마을 이야기 상단 헤더 -->
+  <div class="muni-header">
+    <div class="muni-avatar-wrap">
+      <!-- 💡 동일 폴더에 이미지 파일(예: muni.jpg)을 넣거나 base64 이미지를 넣으시면 됩니다 -->
+      <img src="muni.jpg" id="muniLogoImg" class="muni-avatar-img" alt="뮤니" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'.9em\' font-size=\'90\'>👧🎶</text></svg>'">
+    </div>
+    <h2 class="muni-title">🎧 뮤니의 동화마을 이야기 ✨</h2>
+    <div class="muni-subtitle">음악과 함께하는 나만의 입체 오디오 동화 공작소</div>
+  </div>
 
   <div class="tab-nav">
     <button class="tab-btn active" id="tabCreateBtn" onclick="switchTab('create')">✨ 새 동화 만들기</button>
@@ -252,7 +303,6 @@
 
   <!-- 1. 제작 탭 -->
   <div id="create-view">
-    <!-- 👤 닉네임 & API 키 상자 (안내 문구 추가) -->
     <div class="user-profile-box">
       <div class="user-header">
         <label for="apiKey">🔑 API Key & 내 서재 닉네임</label>
@@ -264,7 +314,6 @@
       </div>
       <input type="password" id="apiKey" placeholder="Google AI Studio API 키를 입력하세요" oninput="saveUserSession()" style="margin-bottom: 8px;">
       
-      <!-- 💡 닉네임 입력 라벨 & 안내 문구 -->
       <label for="authorName" style="font-size: 13px; color: #334155; margin-top: 6px;">✍️ 책 저장을 위한 작가 닉네임 (필수)</label>
       <input type="text" id="authorName" placeholder="책 저장을 위해 닉네임을 적어주세요 (예: 민우 작가, 3학년 2반)" oninput="saveUserSession()">
       <div class="helper-text">
@@ -311,7 +360,6 @@
       <input type="text" id="lesson" value="겉모습보다 강한 용기와 믿음의 승리">
     </div>
     
-    <!-- ⏱ 시간(분량) 선택 (안내 문구 추가) -->
     <div class="input-group">
       <label for="storyLength">⏱ 동화 구연 시간을 선택해주세요</label>
       <select id="storyLength">
@@ -320,10 +368,10 @@
         <option value="5">5분 동화 (약 8페이지 - 깊이 있는 모험 서사극)</option>
         <option value="10">10분 동화 (약 10페이지 - 장편 입체 낭독극)</option>
       </select>
-      <div class="helper-text">💡 원하는 낭독 길이에 맞춰 AI가 이야기와 삽화 페이지 수를 알맞게 조절합니다.</div>
+      <div class="helper-text">💡 원하는 낭독 길이에 맞춰 이야기와 삽화 페이지 수를 조절합니다.</div>
     </div>
 
-    <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎭 마법의 동화책 & 삽화 만들기</button>
+    <button class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎭 뮤니와 함께 동화책 만들기</button>
     <div id="status-log"></div>
   </div>
 
@@ -536,7 +584,6 @@
       return;
     }
 
-    // 💡 닉네임 미입력 시 친절한 안내 팝업
     if (!author) {
       alert('✍️ 나만의 서재에 안전하게 책을 저장하기 위해 [작가 닉네임]을 적어주세요!');
       document.getElementById('authorName').focus();
@@ -568,7 +615,7 @@
 
     const promptText = `
 너는 유명 성우들이 연기할 역동적이고 재미있는 '어린이 오디오 드라마' 극작가야.
-신나는 부분은 와글와글 신나게, 긴장되는 부분은 손에땀을 쥐게 생동감 넘치게 써줘!
+신나는 부분은 와글와글 신나게, 긴장되는 부분은 손에 땀을 쥐게 생동감 넘치게 써줘!
 
 [장르 연출]
 - 장르: ${document.getElementById('storyGenre').selectedOptions[0].text}

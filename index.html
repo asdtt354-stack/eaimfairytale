@@ -422,6 +422,8 @@ function pickGenre(value){
   // 🎵 --- BGM 오디오 엔진 ---
   let bgmAudio = new Audio();
   bgmAudio.loop = true;
+  bgmAudio.preload = 'auto';
+  bgmAudio.playsInline = true;
   let isBgmEnabled = true;
   let targetBgmVolume = 0.25;
 
@@ -447,14 +449,39 @@ function pickGenre(value){
   }
 
   function playBgmForCurrentStory() {
-    if (!isBgmEnabled) return;
-    const genreKey = (currentStoryBookObject && currentStoryBookObject.genre) || document.getElementById('storyGenre').value;
+    if (!isBgmEnabled || !bgmAudio) return Promise.resolve(false);
+
+    const genreEl = document.getElementById('storyGenre');
+    const genreKey =
+      (currentStoryBookObject && currentStoryBookObject.genre) ||
+      (genreEl ? genreEl.value : 'fantasy');
+
     const bgmData = bgmPlaylist[genreKey] || bgmPlaylist["fantasy"];
-    if (bgmAudio.src !== bgmData.url) {
+    const textEl = document.getElementById('bgmTitleText');
+    if (textEl) textEl.innerText = `배경음악: ${bgmData.name}`;
+
+    // src 속성 기준으로 비교해 불필요한 재로딩을 줄입니다.
+    if (bgmAudio.getAttribute('src') !== bgmData.url) {
       bgmAudio.src = bgmData.url;
+      try { bgmAudio.load(); } catch (e) {}
     }
+
+    bgmAudio.muted = false;
     bgmAudio.volume = targetBgmVolume;
-    bgmAudio.play().catch(e => console.log("BGM 재생 대기:", e));
+
+    try {
+      const p = bgmAudio.play();
+      if (p && typeof p.then === 'function') {
+        return p.then(() => true).catch(e => {
+          console.log("BGM 재생 대기:", e);
+          return false;
+        });
+      }
+      return Promise.resolve(true);
+    } catch (e) {
+      console.log("BGM 재생 오류:", e);
+      return Promise.resolve(false);
+    }
   }
 
   function stopBgm() {
@@ -993,6 +1020,13 @@ currentStoryBookObject = {
   async function startContinuousReading(onCompleteCallback = null, startPageIndex = 0) {
     if (!currentStoryBookObject) return;
 
+    // 🎵 모바일 핵심:
+    // '낭독 시작/이어듣기' 버튼을 누른 바로 그 순간 BGM을 재생합니다.
+    // await나 음성 onstart 뒤에 play()를 호출하면 모바일 브라우저가 자동재생으로 막을 수 있습니다.
+    if (isBgmEnabled) {
+      playBgmForCurrentStory();
+    }
+
     if (typeof window.speechSynthesis === 'undefined' || typeof SpeechSynthesisUtterance === 'undefined') {
       alert('이 브라우저는 음성 낭독 기능을 지원하지 않습니다. Safari 또는 Chrome 최신 버전으로 열어주세요.');
       return;
@@ -1021,7 +1055,7 @@ currentStoryBookObject = {
         'narrator',
         'excited',
         `제목: ${currentStoryBookObject.title}`,
-        { sessionId: mySession, startBgmOnStart: true }
+        { sessionId: mySession, startBgmOnStart: false }
       );
       if (!firstOk || !isPlaying || mySession !== speechSessionId) return;
     } else if (isBgmEnabled) {

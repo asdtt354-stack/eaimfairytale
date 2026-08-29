@@ -34,7 +34,7 @@
       margin: 0 auto;
     }
 
-    /* 🎵 뮤니 캐릭터 헤더 (투명 PNG 최적화) */
+    /* 🎵 뮤니 캐릭터 헤더 (캐릭터 줌인 확대) */
     .muni-header {
       display: flex;
       flex-direction: column;
@@ -45,31 +45,34 @@
     }
 
     .muni-avatar-wrap {
-      width: 115px;
-      height: 115px;
-      background: radial-gradient(circle, #ffffff 60%, #fff1f2 100%); /* 화사하고 부드러운 화이트/핑크 배경 */
+      width: 130px;
+      height: 130px;
+      background: radial-gradient(circle, #ffffff 60%, #fff1f2 100%);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 24px rgba(236, 72, 153, 0.22);
-      border: 3.5px solid #fbcfe8;
+      box-shadow: 0 10px 28px rgba(236, 72, 153, 0.28);
+      border: 4px solid #fbcfe8;
       margin-bottom: 12px;
       overflow: hidden;
       animation: floatMotion 3s ease-in-out infinite;
-      padding: 6px;
+      position: relative;
     }
 
     .muni-avatar-img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.06)); /* 투명 외곽선에 부드러운 입체감 */
+      /* 💡 주변 여백을 자르고 캐릭터를 2.3배 확대하여 원 안에 꽉 채움 */
+      transform: scale(2.3); 
+      transform-origin: center center;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.08));
     }
 
     @keyframes floatMotion {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
+      50% { transform: translateY(-6px); }
     }
 
     h2.muni-title { 
@@ -288,10 +291,9 @@
 <body>
 
 <div class="card">
-  <!-- 🎵 투명 배경 최적화 뮤니 헤더 -->
+  <!-- 🎵 큼직하고 선명한 뮤니 헤더 -->
   <div class="muni-header">
     <div class="muni-avatar-wrap">
-      <!-- 💡 muni.png (투명 PNG) 파일 우선 로드 -->
       <img src="muni.png" id="muniLogoImg" class="muni-avatar-img" alt="뮤니" onerror="this.src='muni.jpg'">
     </div>
     <h2 class="muni-title">🎧 뮤니의 동화마을 이야기 ✨</h2>

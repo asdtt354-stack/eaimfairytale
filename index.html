@@ -42,7 +42,7 @@
       left: 0;
       width: 100%;
       height: 200px;
-      pointer-events: none;
+      pointer-events: none !important;
       z-index: 1;
     }
 
@@ -51,7 +51,7 @@
       font-size: 16px;
       opacity: 0.85;
       user-select: none;
-      pointer-events: none;
+      pointer-events: none !important;
       animation: floatSparkle 3s ease-in-out infinite alternate;
     }
 
@@ -77,6 +77,7 @@
       text-align: center;
       position: relative;
       z-index: 2;
+      pointer-events: none;
     }
 
     .muni-full-banner-wrap {
@@ -257,7 +258,7 @@
       display: none;
     }
 
-    /* 💡 [모바일 터치 100% 즉각 반응 버튼] */
+    /* 💡 [모바일 완벽 터치 최적화 버튼] */
     .primary-btn { 
       width: 100%; 
       padding: 16px; 
@@ -267,15 +268,15 @@
       border-radius: 16px; 
       font-size: 17px; 
       font-weight: 800; 
-      cursor: pointer; 
+      cursor: pointer !important; 
       margin-top: 10px; 
       box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
       position: relative;
-      z-index: 100 !important;
+      z-index: 50 !important;
       display: block;
       text-align: center;
       user-select: none;
-      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      touch-action: manipulation;
     }
     .primary-btn:active { 
       transform: scale(0.96); 
@@ -476,8 +477,8 @@
       <div class="helper-text">💡 원하는 낭독 길이에 맞춰 이야기와 삽화 페이지 수를 조절합니다.</div>
     </div>
 
-    <!-- 💡 [모바일에서 즉시 눌리는 메인 액션 버튼] -->
-    <button type="button" class="primary-btn" id="generateBtn">🎭 뮤니와 함께 동화책 만들기</button>
+    <!-- 💡 [모바일에서 즉시 반응하는 메인 액션 버튼] -->
+    <button type="button" class="primary-btn" id="generateBtn" onclick="generateStoryAndImages()">🎭 뮤니와 함께 동화책 만들기</button>
     <div id="status-log"></div>
   </div>
 
@@ -526,8 +527,9 @@
 </div>
 
 <script>
+  // 💡 [전역 변수]
   let currentStoryBookObject = null;
-  let db;
+  let db = null;
   let isPlaying = false;
   let isRepeatMode = false;
   let isLibraryPlayingMode = false;
@@ -569,7 +571,6 @@
     if (!isBgmEnabled) return;
     const genreKey = (currentStoryBookObject && currentStoryBookObject.genre) || document.getElementById('storyGenre').value;
     const bgmData = bgmPlaylist[genreKey] || bgmPlaylist["fantasy"];
-    
     if (bgmAudio.src !== bgmData.url) {
       bgmAudio.src = bgmData.url;
     }
@@ -606,12 +607,197 @@
     bgmAudio.volume = targetBgmVolume;
   }
 
-  updateBgmGenrePreview("fantasy");
+  // 💡 [동화 제작 핵심 실행 함수 - 최상단 배치]
+  async function generateStoryAndImages() {
+    try {
+      const apiKeyEl = document.getElementById('apiKey');
+      const authorEl = document.getElementById('authorName');
+      const genreEl = document.getElementById('storyGenre');
+      const charEl = document.getElementById('character');
+      const bgEl = document.getElementById('background');
+      const lessonEl = document.getElementById('lesson');
+      const lengthEl = document.getElementById('storyLength');
+      const btn = document.getElementById('generateBtn');
+      const statusLog = document.getElementById('status-log');
+      const bookContainer = document.getElementById('book-container');
+      const pagesWrapper = document.getElementById('story-pages-wrapper');
+      const controlPanel = document.getElementById('controlPanel');
+
+      const apiKey = (apiKeyEl ? apiKeyEl.value : '').trim();
+      const author = (authorEl ? authorEl.value : '').trim();
+      
+      if (!apiKey || apiKey.length < 5) {
+        alert('🔑 Google AI Studio API Key를 먼저 입력해 주세요.');
+        if (apiKeyEl) apiKeyEl.focus();
+        return;
+      }
+
+      if (!author) {
+        alert('✍️ 나만의 서재에 안전하게 책을 저장하기 위해 [작가 닉네임]을 적어주세요!');
+        if (authorEl) authorEl.focus();
+        return;
+      }
+
+      const genreKey = genreEl ? genreEl.value : "fantasy";
+      const char = (charEl ? charEl.value : '').trim();
+      const bg = (bgEl ? bgEl.value : '').trim();
+      const lesson = (lessonEl ? lessonEl.value : '').trim();
+      const lengthVal = lengthEl ? lengthEl.value : "3";
+
+      saveUserSession();
+      updateBgmGenrePreview(genreKey);
+
+      const config = lengthConfig[lengthVal] || { pages: 6 };
+      const selectedGenre = genreGuides[genreKey] || genreGuides["custom"];
+
+      if (btn) btn.disabled = true;
+      if (controlPanel) controlPanel.style.display = 'none';
+      if (bookContainer) bookContainer.style.display = 'none';
+      if (statusLog) statusLog.innerText = `✨ 1/${config.pages + 1}. [${author}] 작가님의 맞춤 입체 대본을 작성 중입니다...`;
+      if (pagesWrapper) pagesWrapper.innerHTML = '';
+      stopVoice();
+
+      const promptText = `
+너는 유명 성우들이 연기할 역동적이고 재미있는 '어린이 오디오 드라마' 극작가야.
+신나는 부분은 와글와글 신나게, 긴장되는 부분은 손에 땀을 쥐게 생동감 넘치게 써줘!
+
+[장르 연출]
+- 장르: ${genreEl ? genreEl.selectedOptions[0].text : '환상 판타지'}
+- 스타일: ${selectedGenre.storyGuide}
+
+[이야기 설정]
+- 작가 이름: ${author}
+- 등장인물/주인공: ${char}
+- 배경: ${bg}
+- 주제/교훈: ${lesson}
+
+[작성 규칙]
+1. 재미있고 통통 튀는 대사와 해설이 어우러진 대본 형태로 작성해줘.
+2. 각 페이지의 dialogue_list 배열에 문장 단위로 role과 emotion을 반드시 부여해줘:
+   - role: "narrator", "hero", "villain", "elder", "friend"
+   - emotion: "excited", "happy", "urgent", "angry", "curious", "whisper", "calm"
+3. full_text에는 전체 본문을 적어줘.
+4. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘.
+
+[출력 규격: 순수 JSON만 출력]
+{
+  "title": "동화책 제목",
+  "pages": [
+    {
+      "page_num": 1,
+      "full_text": "전체 본문",
+      "dialogue_list": [
+        { "role": "narrator", "emotion": "excited", "text": "문장..." },
+        { "role": "hero", "emotion": "happy", "text": "대사..." }
+      ],
+      "image_prompt": "1페이지 영문 프롬프트, ${selectedGenre.artStyle}"
+    }
+  ]
+}
+`;
+
+      const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: promptText }] }],
+          generationConfig: { responseMimeType: "application/json" }
+        })
+      });
+
+      const geminiData = await geminiRes.json();
+      if (geminiData.error) throw new Error(geminiData.error.message);
+
+      const storyData = JSON.parse(geminiData.candidates[0].content.parts[0].text);
+      
+      currentStoryBookObject = {
+        userId: getUniqueUserIdentifier(),
+        author: author,
+        genre: genreKey,
+        title: storyData.title,
+        createdAt: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        pages: []
+      };
+
+      const titleEl = document.getElementById('story-main-title');
+      if (titleEl) titleEl.innerText = `📖 ${storyData.title}`;
+      if (bookContainer) bookContainer.style.display = 'block';
+
+      for (let i = 0; i < storyData.pages.length; i++) {
+        const page = storyData.pages[i];
+        if (statusLog) statusLog.innerText = `🎨 ${i + 2}/${storyData.pages.length + 1}. ${page.page_num}페이지 삽화를 그리는 중... (${i + 1}/${storyData.pages.length})`;
+
+        let imgBase64 = "";
+        try {
+          imgBase64 = await generateGeminiImage(apiKey, page.image_prompt, childPhotoBase64);
+        } catch (imgErr) {
+          console.error(`Page ${i+1} Image Error:`, imgErr);
+        }
+
+        currentStoryBookObject.pages.push({
+          page_num: page.page_num,
+          full_text: page.full_text || page.text,
+          dialogue_list: page.dialogue_list || [{ role: 'narrator', emotion: 'calm', text: page.full_text || page.text }],
+          imageBase64: imgBase64
+        });
+      }
+
+      renderBookPages(currentStoryBookObject);
+      showPage(0);
+
+      if (statusLog) statusLog.innerText = `🎉 [${author}] 작가님의 동화책이 완성되었어요! [다역 입체 낭독 시작]을 눌러보세요.`;
+      if (controlPanel) controlPanel.style.display = 'flex';
+
+    } catch (err) {
+      const statusLog = document.getElementById('status-log');
+      if (statusLog) statusLog.innerText = `⚠️ 오류: ${err.message}`;
+      alert(`⚠️ 오류가 발생했습니다: ${err.message}`);
+    } finally {
+      const btn = document.getElementById('generateBtn');
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  async function generateGeminiImage(apiKey, prompt, inputImageBase64 = null) {
+    const parts = [];
+
+    if (inputImageBase64) {
+      parts.push({
+        inlineData: {
+          mimeType: childPhotoMime,
+          data: inputImageBase64
+        }
+      });
+      parts.push({
+        text: `Create a children's book illustration where the main character has the exact facial appearance, hairstyle, and likeness of the child in the provided image. Scene description: ${prompt}`
+      });
+    } else {
+      parts.push({
+        text: `Children's storybook illustration: ${prompt}`
+      });
+    }
+
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: parts }] })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const resParts = data.candidates?.[0]?.content?.parts || [];
+    for (const part of resParts) {
+      if (part.inlineData && part.inlineData.data) return part.inlineData.data;
+    }
+    throw new Error('이미지 없음');
+  }
 
   // 음성 엔진
   let availableVoices = [];
   function initVoices() {
-    availableVoices = window.speechSynthesis.getVoices();
+    if (typeof speechSynthesis !== 'undefined') {
+      availableVoices = window.speechSynthesis.getVoices();
+    }
   }
   if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = initVoices;
@@ -619,8 +805,8 @@
   initVoices();
 
   function getUniqueUserIdentifier() {
-    const key = (document.getElementById('apiKey').value || '').trim();
-    const author = (document.getElementById('authorName').value || '').trim();
+    const key = (document.getElementById('apiKey')?.value || '').trim();
+    const author = (document.getElementById('authorName')?.value || '').trim();
     if (key.length >= 8) {
       return (author ? author + "_" : "user_") + key.slice(-8);
     }
@@ -628,18 +814,17 @@
   }
 
   function saveUserSession() {
-    const key = (document.getElementById('apiKey').value || '').trim();
-    const author = (document.getElementById('authorName').value || '').trim();
     try {
+      const key = (document.getElementById('apiKey')?.value || '').trim();
+      const author = (document.getElementById('authorName')?.value || '').trim();
       localStorage.setItem("gemini_fairytale_api_key", key);
       localStorage.setItem("gemini_fairytale_author", author);
+      const status = document.getElementById('apiStatus');
+      if (status) {
+        status.style.display = 'inline';
+        setTimeout(() => { status.style.display = 'none'; }, 1500);
+      }
     } catch(e) {}
-
-    const status = document.getElementById('apiStatus');
-    if (status) {
-      status.style.display = 'inline';
-      setTimeout(() => { status.style.display = 'none'; }, 1500);
-    }
     loadLibraryList();
   }
 
@@ -648,31 +833,39 @@
       localStorage.removeItem("gemini_fairytale_api_key");
       localStorage.removeItem("gemini_fairytale_author");
     } catch(e) {}
-    document.getElementById('apiKey').value = '';
-    document.getElementById('authorName').value = '';
+    const k = document.getElementById('apiKey');
+    const a = document.getElementById('authorName');
+    if (k) k.value = '';
+    if (a) a.value = '';
     loadLibraryList();
     alert('사용자 정보가 초기화되었습니다.');
   }
 
-  // DB 초기화
-  const dbRequest = indexedDB.open("FairytaleAppDB_MultiUser", 3);
-  dbRequest.onupgradeneeded = (e) => {
-    db = e.target.result;
-    if (!db.objectStoreNames.contains("books")) {
-      const store = db.createObjectStore("books", { keyPath: "id", autoIncrement: true });
-      store.createIndex("userId", "userId", { unique: false });
+  // DB 안전 초기화
+  try {
+    if (typeof indexedDB !== 'undefined') {
+      const dbRequest = indexedDB.open("FairytaleAppDB_MultiUser", 3);
+      dbRequest.onupgradeneeded = (e) => {
+        db = e.target.result;
+        if (!db.objectStoreNames.contains("books")) {
+          const store = db.createObjectStore("books", { keyPath: "id", autoIncrement: true });
+          store.createIndex("userId", "userId", { unique: false });
+        }
+      };
+      dbRequest.onsuccess = (e) => {
+        db = e.target.result;
+        try {
+          const savedKey = localStorage.getItem("gemini_fairytale_api_key");
+          const savedAuthor = localStorage.getItem("gemini_fairytale_author");
+          if (savedKey && document.getElementById('apiKey')) document.getElementById('apiKey').value = savedKey;
+          if (savedAuthor && document.getElementById('authorName')) document.getElementById('authorName').value = savedAuthor;
+        } catch(e) {}
+        loadLibraryList();
+      };
     }
-  };
-  dbRequest.onsuccess = (e) => {
-    db = e.target.result;
-    try {
-      const savedKey = localStorage.getItem("gemini_fairytale_api_key");
-      const savedAuthor = localStorage.getItem("gemini_fairytale_author");
-      if (savedKey) document.getElementById('apiKey').value = savedKey;
-      if (savedAuthor) document.getElementById('authorName').value = savedAuthor;
-    } catch(e) {}
-    loadLibraryList();
-  };
+  } catch(e) {
+    console.log("DB Init Notice:", e);
+  }
 
   function handlePhotoUpload(event) {
     const file = event.target.files[0];
@@ -696,9 +889,12 @@
         childPhotoBase64 = dataUrl.split(',')[1];
 
         const preview = document.getElementById('photoPreview');
-        preview.src = dataUrl;
-        preview.style.display = 'block';
-        document.getElementById('photoClearBtn').style.display = 'inline-block';
+        if (preview) {
+          preview.src = dataUrl;
+          preview.style.display = 'block';
+        }
+        const clearBtn = document.getElementById('photoClearBtn');
+        if (clearBtn) clearBtn.style.display = 'inline-block';
       };
       img.src = e.target.result;
     };
@@ -707,9 +903,12 @@
 
   function clearChildPhoto() {
     childPhotoBase64 = null;
-    document.getElementById('childPhotoInput').value = '';
-    document.getElementById('photoPreview').style.display = 'none';
-    document.getElementById('photoClearBtn').style.display = 'none';
+    const input = document.getElementById('childPhotoInput');
+    if (input) input.value = '';
+    const preview = document.getElementById('photoPreview');
+    if (preview) preview.style.display = 'none';
+    const clearBtn = document.getElementById('photoClearBtn');
+    if (clearBtn) clearBtn.style.display = 'none';
   }
 
   const lengthConfig = {
@@ -750,189 +949,9 @@
     }
   };
 
-  // 💡 [동화 제작 핵심 실행 함수]
-  async function generateStoryAndImages() {
-    const apiKey = (document.getElementById('apiKey').value || '').trim();
-    const author = (document.getElementById('authorName').value || '').trim();
-    
-    if (!apiKey || apiKey.length < 5) {
-      alert('🔑 Google AI Studio API Key를 먼저 입력해 주세요.');
-      document.getElementById('apiKey').focus();
-      return;
-    }
-
-    if (!author) {
-      alert('✍️ 나만의 서재에 안전하게 책을 저장하기 위해 [작가 닉네임]을 적어주세요!');
-      document.getElementById('authorName').focus();
-      return;
-    }
-
-    const genreKey = document.getElementById('storyGenre').value;
-    const char = (document.getElementById('character').value || '').trim();
-    const bg = (document.getElementById('background').value || '').trim();
-    const lesson = (document.getElementById('lesson').value || '').trim();
-    const lengthVal = document.getElementById('storyLength').value;
-    const btn = document.getElementById('generateBtn');
-    const statusLog = document.getElementById('status-log');
-    const bookContainer = document.getElementById('book-container');
-    const pagesWrapper = document.getElementById('story-pages-wrapper');
-    const controlPanel = document.getElementById('controlPanel');
-
-    saveUserSession();
-    updateBgmGenrePreview(genreKey);
-
-    const config = lengthConfig[lengthVal] || { pages: 6 };
-    const selectedGenre = genreGuides[genreKey] || genreGuides["custom"];
-
-    btn.disabled = true;
-    controlPanel.style.display = 'none';
-    bookContainer.style.display = 'none';
-    statusLog.innerText = `✨ 1/${config.pages + 1}. [${author}] 작가님의 맞춤 입체 대본을 작성 중입니다...`;
-    pagesWrapper.innerHTML = '';
-    stopVoice();
-
-    const promptText = `
-너는 유명 성우들이 연기할 역동적이고 재미있는 '어린이 오디오 드라마' 극작가야.
-신나는 부분은 와글와글 신나게, 긴장되는 부분은 손에 땀을 쥐게 생동감 넘치게 써줘!
-
-[장르 연출]
-- 장르: ${document.getElementById('storyGenre').selectedOptions[0].text}
-- 스타일: ${selectedGenre.storyGuide}
-
-[이야기 설정]
-- 작가 이름: ${author}
-- 등장인물/주인공: ${char}
-- 배경: ${bg}
-- 주제/교훈: ${lesson}
-
-[작성 규칙]
-1. 재미있고 통통 튀는 대사와 해설이 어우러진 대본 형태로 작성해줘.
-2. 각 페이지의 dialogue_list 배열에 문장 단위로 role과 emotion을 반드시 부여해줘:
-   - role: "narrator", "hero", "villain", "elder", "friend"
-   - emotion: "excited", "happy", "urgent", "angry", "curious", "whisper", "calm"
-3. full_text에는 전체 본문을 적어줘.
-4. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘.
-
-[출력 규격: 순수 JSON만 출력]
-{
-  "title": "동화책 제목",
-  "pages": [
-    {
-      "page_num": 1,
-      "full_text": "전체 본문",
-      "dialogue_list": [
-        { "role": "narrator", "emotion": "excited", "text": "문장..." },
-        { "role": "hero", "emotion": "happy", "text": "대사..." }
-      ],
-      "image_prompt": "1페이지 영문 프롬프트, ${selectedGenre.artStyle}"
-    }
-  ]
-}
-`;
-
-    try {
-      const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: promptText }] }],
-          generationConfig: { responseMimeType: "application/json" }
-        })
-      });
-
-      const geminiData = await geminiRes.json();
-      if (geminiData.error) throw new Error(geminiData.error.message);
-
-      const storyData = JSON.parse(geminiData.candidates[0].content.parts[0].text);
-      
-      currentStoryBookObject = {
-        userId: getUniqueUserIdentifier(),
-        author: author,
-        genre: genreKey,
-        title: storyData.title,
-        createdAt: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        pages: []
-      };
-
-      document.getElementById('story-main-title').innerText = `📖 ${storyData.title}`;
-      bookContainer.style.display = 'block';
-
-      for (let i = 0; i < storyData.pages.length; i++) {
-        const page = storyData.pages[i];
-        statusLog.innerText = `🎨 ${i + 2}/${storyData.pages.length + 1}. ${page.page_num}페이지 삽화를 그리는 중... (${i + 1}/${storyData.pages.length})`;
-
-        let imgBase64 = "";
-        try {
-          imgBase64 = await generateGeminiImage(apiKey, page.image_prompt, childPhotoBase64);
-        } catch (imgErr) {
-          console.error(`Page ${i+1} Image Error:`, imgErr);
-        }
-
-        currentStoryBookObject.pages.push({
-          page_num: page.page_num,
-          full_text: page.full_text || page.text,
-          dialogue_list: page.dialogue_list || [{ role: 'narrator', emotion: 'calm', text: page.full_text || page.text }],
-          imageBase64: imgBase64
-        });
-      }
-
-      renderBookPages(currentStoryBookObject);
-      showPage(0);
-
-      statusLog.innerText = `🎉 [${author}] 작가님의 동화책이 완성되었어요! [다역 입체 낭독 시작]을 눌러보세요.`;
-      controlPanel.style.display = 'flex';
-
-    } catch (err) {
-      statusLog.innerText = `⚠️ 오류: ${err.message}`;
-    } finally {
-      btn.disabled = false;
-    }
-  }
-
-  // 💡 [모바일 이벤트 리스너 바인딩]
-  document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById('generateBtn');
-    if (btn) {
-      btn.addEventListener('click', generateStoryAndImages);
-    }
-  });
-
-  async function generateGeminiImage(apiKey, prompt, inputImageBase64 = null) {
-    const parts = [];
-
-    if (inputImageBase64) {
-      parts.push({
-        inlineData: {
-          mimeType: childPhotoMime,
-          data: inputImageBase64
-        }
-      });
-      parts.push({
-        text: `Create a children's book illustration where the main character has the exact facial appearance, hairstyle, and likeness of the child in the provided image. Scene description: ${prompt}`
-      });
-    } else {
-      parts.push({
-        text: `Children's storybook illustration: ${prompt}`
-      });
-    }
-
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: parts }] })
-    });
-
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    const resParts = data.candidates?.[0]?.content?.parts || [];
-    for (const part of resParts) {
-      if (part.inlineData && part.inlineData.data) return part.inlineData.data;
-    }
-    throw new Error('이미지 없음');
-  }
-
   function renderBookPages(book) {
     const wrapper = document.getElementById('story-pages-wrapper');
+    if (!wrapper) return;
     wrapper.innerHTML = '';
 
     book.pages.forEach((p, i) => {
@@ -977,18 +996,19 @@
       wrapper.appendChild(pageDiv);
     });
 
-    document.getElementById('story-main-title').innerText = `📖 ${book.title}`;
-    document.getElementById('book-container').style.display = 'block';
-    document.getElementById('controlPanel').style.display = 'flex';
+    const titleEl = document.getElementById('story-main-title');
+    if (titleEl) titleEl.innerText = `📖 ${book.title}`;
+    const bookContainer = document.getElementById('book-container');
+    if (bookContainer) bookContainer.style.display = 'block';
+    const controlPanel = document.getElementById('controlPanel');
+    if (controlPanel) controlPanel.style.display = 'flex';
   }
 
   function showPage(index) {
     if (!currentStoryBookObject || !currentStoryBookObject.pages.length) return;
-    
     const total = currentStoryBookObject.pages.length;
     if (index < 0) index = 0;
     if (index >= total) index = total - 1;
-    
     currentPageIndex = index;
 
     document.querySelectorAll('.page-item').forEach((el, i) => {
@@ -996,9 +1016,12 @@
       else el.classList.remove('active');
     });
 
-    document.getElementById('pageIndicator').innerText = `${currentPageIndex + 1} / ${total}`;
-    document.getElementById('prevPageBtn').disabled = (currentPageIndex === 0);
-    document.getElementById('nextPageBtn').disabled = (currentPageIndex === total - 1);
+    const ind = document.getElementById('pageIndicator');
+    if (ind) ind.innerText = `${currentPageIndex + 1} / ${total}`;
+    const prev = document.getElementById('prevPageBtn');
+    if (prev) prev.disabled = (currentPageIndex === 0);
+    const next = document.getElementById('nextPageBtn');
+    if (next) next.disabled = (currentPageIndex === total - 1);
   }
 
   function goToPrevPage() { 
@@ -1015,9 +1038,7 @@
     stopVoice();
     isPlaying = true;
 
-    if (isBgmEnabled) {
-      playBgmForCurrentStory();
-    }
+    if (isBgmEnabled) playBgmForCurrentStory();
 
     showPage(0);
     await speakDynamicLine('narrator', 'excited', `제목: ${currentStoryBookObject.title}`);
@@ -1058,6 +1079,7 @@
 
   function speakDynamicLine(role, emotion, rawText) {
     return new Promise((resolve) => {
+      if (typeof speechSynthesis === 'undefined') return resolve();
       const cleanText = rawText.replace(/[*#"]/g, '').trim();
       if (!cleanText) return resolve();
 
@@ -1066,7 +1088,8 @@
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = 'ko-KR';
 
-      const styleMode = document.getElementById('actingStyle').value;
+      const styleEl = document.getElementById('actingStyle');
+      const styleMode = styleEl ? styleEl.value : 'dynamic_theater';
 
       if (availableVoices.length === 0) initVoices();
       const koVoices = availableVoices.filter(v => v.lang.startsWith('ko'));
@@ -1153,12 +1176,14 @@
   function toggleRepeatMode() {
     isRepeatMode = !isRepeatMode;
     const loopBtn = document.getElementById('loopBtn');
-    if (isRepeatMode) {
-      loopBtn.classList.add('active');
-      loopBtn.innerText = '🔁 반복 재생: ON';
-    } else {
-      loopBtn.classList.remove('active');
-      loopBtn.innerText = '🔁 반복 재생: OFF';
+    if (loopBtn) {
+      if (isRepeatMode) {
+        loopBtn.classList.add('active');
+        loopBtn.innerText = '🔁 반복 재생: ON';
+      } else {
+        loopBtn.classList.remove('active');
+        loopBtn.innerText = '🔁 반복 재생: OFF';
+      }
     }
   }
 
@@ -1202,76 +1227,89 @@
   }
 
   function saveCurrentStoryToDB() {
-    if (!currentStoryBookObject) return;
+    if (!currentStoryBookObject || !db) return;
     
     currentStoryBookObject.userId = getUniqueUserIdentifier();
-    currentStoryBookObject.author = (document.getElementById('authorName').value || '').trim() || "꼬마 작가";
-    currentStoryBookObject.genre = document.getElementById('storyGenre').value;
+    currentStoryBookObject.author = (document.getElementById('authorName')?.value || '').trim() || "꼬마 작가";
+    currentStoryBookObject.genre = document.getElementById('storyGenre')?.value || "fantasy";
 
-    const tx = db.transaction("books", "readwrite");
-    const store = tx.objectStore("books");
-    store.add(currentStoryBookObject);
-    tx.oncomplete = () => {
-      alert(`[${currentStoryBookObject.title}]이(가) [${currentStoryBookObject.author}] 님의 서재에 안전하게 저장되었습니다!`);
-      loadLibraryList();
-    };
+    try {
+      const tx = db.transaction("books", "readwrite");
+      const store = tx.objectStore("books");
+      store.add(currentStoryBookObject);
+      tx.oncomplete = () => {
+        alert(`[${currentStoryBookObject.title}]이(가) [${currentStoryBookObject.author}] 님의 서재에 안전하게 저장되었습니다!`);
+        loadLibraryList();
+      };
+    } catch(e) {
+      alert('서재 저장 중 오류가 발생했습니다.');
+    }
   }
 
   function loadLibraryList() {
     if (!db) return;
-    const currentUserId = getUniqueUserIdentifier();
-    const authorName = (document.getElementById('authorName').value || '').trim() || "나";
-    
-    const titleEl = document.getElementById('libraryTitleLabel');
-    if (titleEl) titleEl.innerText = `📚 [${authorName}] 작가님의 서재`;
+    try {
+      const currentUserId = getUniqueUserIdentifier();
+      const authorName = (document.getElementById('authorName')?.value || '').trim() || "나";
+      
+      const titleEl = document.getElementById('libraryTitleLabel');
+      if (titleEl) titleEl.innerText = `📚 [${authorName}] 작가님의 서재`;
 
-    const tx = db.transaction("books", "readonly");
-    const store = tx.objectStore("books");
-    const req = store.getAll();
-    const listEl = document.getElementById("library-list");
+      const tx = db.transaction("books", "readonly");
+      const store = tx.objectStore("books");
+      const req = store.getAll();
+      const listEl = document.getElementById("library-list");
 
-    req.onsuccess = () => {
-      const allBooks = req.result;
-      myLibraryBooks = allBooks.filter(book => book.userId === currentUserId || !book.userId);
+      req.onsuccess = () => {
+        const allBooks = req.result;
+        myLibraryBooks = allBooks.filter(book => book.userId === currentUserId || !book.userId);
 
-      if (myLibraryBooks.length === 0) {
-        listEl.innerHTML = `<p style="text-align: center; color: #94a3b8; padding: 20px;">[${authorName}] 님의 서재에 보관된 동화책이 없습니다.</p>`;
-        return;
-      }
+        if (!listEl) return;
+        if (myLibraryBooks.length === 0) {
+          listEl.innerHTML = `<p style="text-align: center; color: #94a3b8; padding: 20px;">[${authorName}] 님의 서재에 보관된 동화책이 없습니다.</p>`;
+          return;
+        }
 
-      listEl.innerHTML = myLibraryBooks.map((book) => `
-        <div class="library-item">
-          <div class="library-info">
-            <h4>📖 ${book.title}</h4>
-            <p>작가: <b>${book.author || '익명'}</b> | 저장일: ${book.createdAt} (총 ${book.pages.length}p)</p>
+        listEl.innerHTML = myLibraryBooks.map((book) => `
+          <div class="library-item">
+            <div class="library-info">
+              <h4>📖 ${book.title}</h4>
+              <p>작가: <b>${book.author || '익명'}</b> | 저장일: ${book.createdAt} (총 ${book.pages.length}p)</p>
+            </div>
+            <div class="library-actions">
+              <button type="button" class="btn-load" onclick="loadSingleBook(${book.id})">열기</button>
+              <button type="button" class="btn-delete" onclick="deleteSavedBook(${book.id})">삭제</button>
+            </div>
           </div>
-          <div class="library-actions">
-            <button type="button" class="btn-load" onclick="loadSingleBook(${book.id})">열기</button>
-            <button type="button" class="btn-delete" onclick="deleteSavedBook(${book.id})">삭제</button>
-          </div>
-        </div>
-      `).join('');
-    };
+        `).join('');
+      };
+    } catch(e) {}
   }
 
   function loadSingleBook(id) {
-    const tx = db.transaction("books", "readonly");
-    const req = tx.objectStore("books").get(id);
-    req.onsuccess = () => {
-      const book = req.result;
-      currentStoryBookObject = book;
-      renderBookPages(book);
-      showPage(0);
-      switchTab('create');
-      updateBgmGenrePreview(book.genre || "fantasy");
-    };
+    if (!db) return;
+    try {
+      const tx = db.transaction("books", "readonly");
+      const req = tx.objectStore("books").get(id);
+      req.onsuccess = () => {
+        const book = req.result;
+        currentStoryBookObject = book;
+        renderBookPages(book);
+        showPage(0);
+        switchTab('create');
+        updateBgmGenrePreview(book.genre || "fantasy");
+      };
+    } catch(e) {}
   }
 
   function deleteSavedBook(id) {
+    if (!db) return;
     if (!confirm('이 동화책을 내 서재에서 삭제하시겠습니까?')) return;
-    const tx = db.transaction("books", "readwrite");
-    tx.objectStore("books").delete(id);
-    tx.oncomplete = () => loadLibraryList();
+    try {
+      const tx = db.transaction("books", "readwrite");
+      tx.objectStore("books").delete(id);
+      tx.oncomplete = () => loadLibraryList();
+    } catch(e) {}
   }
 
   function exportToPDF() {
@@ -1308,25 +1346,30 @@
   }
 
   function switchTab(tab) {
-    document.getElementById('create-view').style.display = tab === 'create' ? 'block' : 'none';
-    document.getElementById('library-view').style.display = tab === 'library' ? 'block' : 'none';
-    document.getElementById('tabCreateBtn').className = `tab-btn ${tab === 'create' ? 'active' : ''}`;
-    document.getElementById('tabLibraryBtn').className = `tab-btn ${tab === 'library' ? 'active' : ''}`;
+    const cv = document.getElementById('create-view');
+    const lv = document.getElementById('library-view');
+    const tbC = document.getElementById('tabCreateBtn');
+    const tbL = document.getElementById('tabLibraryBtn');
+
+    if (cv) cv.style.display = tab === 'create' ? 'block' : 'none';
+    if (lv) lv.style.display = tab === 'library' ? 'block' : 'none';
+    if (tbC) tbC.className = `tab-btn ${tab === 'create' ? 'active' : ''}`;
+    if (tbL) tbL.className = `tab-btn ${tab === 'library' ? 'active' : ''}`;
     if (tab === 'library') loadLibraryList();
   }
 
   function pauseVoice() { 
-    window.speechSynthesis.pause(); 
+    if (typeof speechSynthesis !== 'undefined') window.speechSynthesis.pause(); 
     bgmAudio.pause();
   }
   function resumeVoice() { 
-    window.speechSynthesis.resume(); 
+    if (typeof speechSynthesis !== 'undefined') window.speechSynthesis.resume(); 
     if (isBgmEnabled) bgmAudio.play();
   }
   function stopVoice() {
     isPlaying = false;
     isLibraryPlayingMode = false;
-    window.speechSynthesis.cancel();
+    if (typeof speechSynthesis !== 'undefined') window.speechSynthesis.cancel();
     stopBgm();
   }
 </script>

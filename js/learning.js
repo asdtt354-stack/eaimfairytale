@@ -2,10 +2,7 @@
 // Story purpose and learning-topic logic are kept separate from the main genre/style.
 
 const learningGuides = {
-  general: {
-    label: '🌈 이야기동화',
-    prompt: ''
-  },
+  general: { label: '🌈 이야기동화', prompt: '' },
   science: {
     label: '🔬 과학 배움동화',
     prompt: `이 이야기는 '과학 배움동화'야.
@@ -32,12 +29,25 @@ const learningGuides = {
   }
 };
 
+const learningTopicOptions = {
+  science: [
+    '식물의 성장', '동물의 특징', '날씨와 계절', '물의 변화',
+    '태양계와 행성', '우리 몸', '소리와 빛', '직접 입력'
+  ],
+  math: [
+    '수와 계산', '도형과 모양', '규칙 찾기', '길이와 크기',
+    '시간', '분류와 비교', '위치와 방향', '직접 입력'
+  ],
+  music: [
+    '빠르기', '리듬', '높고 낮은 소리', '악기와 음색',
+    '셈여림', '선율', '음악의 느낌', '직접 입력'
+  ]
+};
+
 let currentStoryPurpose = 'story';
 let lastLearningMode = 'science';
 
-function getStoryPurpose() {
-  return currentStoryPurpose;
-}
+function getStoryPurpose() { return currentStoryPurpose; }
 
 function setStoryPurpose(purpose, options = {}) {
   currentStoryPurpose = purpose === 'learning' ? 'learning' : 'story';
@@ -59,12 +69,12 @@ function setStoryPurpose(purpose, options = {}) {
       if (!validModes.includes(learningEl.value)) learningEl.value = lastLearningMode;
       lastLearningMode = learningEl.value;
     }
-    handleLearningModeChange();
+    handleLearningModeChange({ preserveTopic: true });
   }
 
   if (!options.silent) {
     const topicEl = document.getElementById('learningTopic');
-    if (currentStoryPurpose === 'story' && topicEl) topicEl.blur();
+    if (currentStoryPurpose === 'story' && topicEl) topicEl.blur?.();
   }
 }
 
@@ -83,26 +93,102 @@ function getLearningSelection() {
   return { purpose: 'learning', mode, topic, guide: learningGuides[mode] || learningGuides.science };
 }
 
-function handleLearningModeChange() {
+function handleLearningModeChange(options = {}) {
   const modeEl = document.getElementById('learningMode');
   const mode = modeEl && ['science', 'math', 'music'].includes(modeEl.value) ? modeEl.value : 'science';
   lastLearningMode = mode;
 
   const topicEl = document.getElementById('learningTopic');
-  const hintEl = document.getElementById('learningHint');
-  const examples = {
-    science: '예: 씨앗은 어떻게 자랄까? · 그림자는 왜 생길까? · 달은 왜 모양이 달라질까?',
-    math: '예: 반복되는 무늬 찾기 · 더 길고 짧은 것 비교하기 · 모양으로 길 찾기',
-    music: '예: 빠르고 느린 음악 · 악기 음색 찾기 · 리듬으로 친구와 대화하기'
-  };
-  const placeholders = {
-    science: '예: 식물의 성장',
-    math: '예: 규칙 찾기',
-    music: '예: 악기 음색'
-  };
+  const currentTopic = options.preserveTopic && topicEl ? topicEl.value.trim() : '';
+  renderLearningTopicChips(mode, currentTopic);
 
-  if (topicEl) topicEl.placeholder = placeholders[mode] || placeholders.science;
-  if (hintEl) hintEl.textContent = examples[mode] || examples.science;
+  const hintEl = document.getElementById('learningHint');
+  const hints = {
+    science: '과학 주제 중에서 하나를 골라보세요. 직접 입력도 가능해요.',
+    math: '수학 주제 중에서 하나를 골라보세요. 직접 입력도 가능해요.',
+    music: '음악 주제 중에서 하나를 골라보세요. 직접 입력도 가능해요.'
+  };
+  if (hintEl) hintEl.textContent = hints[mode] || hints.science;
+}
+
+function renderLearningTopicChips(mode, preferredTopic = '') {
+  const wrap = document.getElementById('learningTopicChips');
+  const topicEl = document.getElementById('learningTopic');
+  const customRow = document.getElementById('learningCustomRow');
+  const customInput = document.getElementById('learningCustomTopic');
+  if (!wrap || !topicEl) return;
+
+  const options = learningTopicOptions[mode] || learningTopicOptions.science;
+  wrap.innerHTML = '';
+
+  const isPreset = preferredTopic && options.includes(preferredTopic) && preferredTopic !== '직접 입력';
+  const isCustom = preferredTopic && !isPreset;
+
+  options.forEach(topic => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'learning-topic-chip';
+    btn.textContent = topic === '직접 입력' ? '✏️ 직접 입력' : topic;
+    if ((isPreset && topic === preferredTopic) || (isCustom && topic === '직접 입력')) btn.classList.add('active');
+    btn.addEventListener('click', () => selectLearningTopic(topic));
+    wrap.appendChild(btn);
+  });
+
+  if (isPreset) {
+    topicEl.value = preferredTopic;
+    customRow?.classList.remove('show');
+    if (customInput) customInput.value = '';
+  } else if (isCustom) {
+    topicEl.value = preferredTopic;
+    customRow?.classList.add('show');
+    if (customInput) customInput.value = preferredTopic;
+  } else {
+    topicEl.value = '';
+    customRow?.classList.remove('show');
+    if (customInput) customInput.value = '';
+  }
+  updateLearningSelectedNote();
+}
+
+function selectLearningTopic(topic) {
+  const topicEl = document.getElementById('learningTopic');
+  const customRow = document.getElementById('learningCustomRow');
+  const customInput = document.getElementById('learningCustomTopic');
+  const chips = document.querySelectorAll('.learning-topic-chip');
+
+  chips.forEach(chip => chip.classList.remove('active'));
+  const targetLabel = topic === '직접 입력' ? '✏️ 직접 입력' : topic;
+  Array.from(chips).find(chip => chip.textContent === targetLabel)?.classList.add('active');
+
+  if (topic === '직접 입력') {
+    customRow?.classList.add('show');
+    if (topicEl) topicEl.value = (customInput?.value || '').trim();
+    setTimeout(() => customInput?.focus(), 0);
+  } else {
+    customRow?.classList.remove('show');
+    if (customInput) customInput.value = '';
+    if (topicEl) topicEl.value = topic;
+  }
+  updateLearningSelectedNote();
+}
+
+function handleCustomLearningTopicInput(value) {
+  const topicEl = document.getElementById('learningTopic');
+  if (topicEl) topicEl.value = value.trimStart();
+  updateLearningSelectedNote();
+}
+
+function updateLearningSelectedNote() {
+  const note = document.getElementById('learningSelectedNote');
+  const topic = (document.getElementById('learningTopic')?.value || '').trim();
+  if (note) note.textContent = topic ? `선택한 배움: ${topic}` : '추천 주제를 하나 골라주세요.';
+}
+
+function setLearningTopicFromSaved(topic, mode) {
+  const learningEl = document.getElementById('learningMode');
+  if (learningEl && ['science','math','music'].includes(mode)) learningEl.value = mode;
+  handleLearningModeChange();
+  renderLearningTopicChips(mode || 'science', (topic || '').trim());
 }
 
 function buildLearningPromptBlock() {

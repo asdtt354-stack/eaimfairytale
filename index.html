@@ -188,6 +188,22 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
 }
 .install-app-btn.show{display:block}
 
+
+/* --- 배움동화 / 한영 전환 --- */
+.learning-box{margin-top:12px;padding:14px;border:1px solid #e8e2f3;border-radius:14px;background:linear-gradient(135deg,#fffdf8,#faf7ff)}
+.learning-row{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;align-items:end}
+.learning-hint{margin-top:7px;font-size:11.5px;color:#7c879b;line-height:1.45}
+.language-control-box{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 14px;padding:11px 12px;border:1px solid #e7e2f1;border-radius:13px;background:#fbf9ff}
+.language-label{font-size:13px;font-weight:900;color:#4f5870;margin-right:2px}
+.lang-btn{border:1px solid #d9d2ed;background:#fff;color:#5e6475;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:900;cursor:pointer}
+.lang-btn.active{background:#7157e8;color:#fff;border-color:#7157e8}
+.lang-btn:disabled{opacity:.55;cursor:wait}
+.translation-status{flex-basis:100%;font-size:11px;color:#7d8798;margin-top:1px}
+.korean-translation{margin-top:9px;padding-top:9px;border-top:1px dashed rgba(255,255,255,.5);font-size:.92em;opacity:.9}
+.korean-translation strong{display:inline-block;margin-bottom:4px}
+.library-tag{display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:#f0ecff;color:#6552bd;font-size:10px;font-weight:800;margin-left:4px}
+@media(max-width:700px){.learning-row{grid-template-columns:1fr}.language-control-box{gap:6px}.lang-btn{padding:7px 9px}}
+
 </style>
 
 <link rel="manifest" href="./manifest.webmanifest">
@@ -304,6 +320,26 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
               <option value="comic">😂 유쾌하고 웃긴 코믹 모험</option>
               <option value="custom">🌈 기타 / 자유 장르</option>
             </select>
+
+            <div class="learning-box">
+              <div class="learning-row">
+                <div class="input-group">
+                  <label for="learningMode">🌱 배움동화 선택</label>
+                  <select id="learningMode" onchange="handleLearningModeChange()">
+                    <option value="general" selected>🌈 자유 동화 · 배움 주제 없음</option>
+                    <option value="science">🔬 과학 배움동화</option>
+                    <option value="math">🔢 수학 배움동화</option>
+                    <option value="music">🎵 음악 배움동화</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <label for="learningTopic">🔎 배움 주제 (선택)</label>
+                  <input type="text" id="learningTopic" placeholder="선택사항: 이야기에서 특별히 다루고 싶은 주제">
+                </div>
+              </div>
+              <div class="learning-hint" id="learningHint">예: 우정, 용기, 가족, 자연처럼 자유롭게 이야기해요.</div>
+            </div>
+
             <div class="input-grid" style="margin-top:12px">
               <div class="input-group">
                 <label for="character">🐰 등장인물 / 주인공 이름</label>
@@ -334,6 +370,13 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
 
           <div id="book-container">
             <div class="story-title" id="story-main-title"></div>
+            <div class="language-control-box" id="languageControlBox">
+              <span class="language-label">🌐 읽기 언어</span>
+              <button type="button" class="lang-btn active" id="langKoBtn" onclick="switchStoryLanguage('ko')">🇰🇷 한국어</button>
+              <button type="button" class="lang-btn" id="langEnBtn" onclick="switchStoryLanguage('en')">🇺🇸 English</button>
+              <button type="button" class="lang-btn" id="showTranslationBtn" style="display:none" onclick="toggleKoreanTranslationView()">🇰🇷 해석 함께 보기</button>
+              <span class="translation-status" id="translationStatus">한국어 원문</span>
+            </div>
             <div class="book-page-wrapper" id="story-pages-wrapper"></div>
             <div class="page-nav-bar">
               <button type="button" class="page-nav-btn" id="prevPageBtn" onclick="goToPrevPage()">◀ 이전 페이지</button>
@@ -406,6 +449,8 @@ function pickGenre(value){
   if(sel){ sel.value=value; handleGenreChange(value); }
 }
 </script>
+<script src="./js/learning.js"></script>
+<script src="./js/language.js"></script>
 <script>
   let currentStoryBookObject = null;
   let db = null;
@@ -654,6 +699,7 @@ function pickGenre(value){
       const bg = (bgEl ? bgEl.value : '').trim();
       const lesson = (lessonEl ? lessonEl.value : '').trim();
       const lengthVal = lengthEl ? lengthEl.value : "3";
+      const learning = getLearningSelection();
 
       saveUserSession();
       updateBgmGenrePreview(genreKey);
@@ -681,7 +727,7 @@ function pickGenre(value){
 - 등장인물/주인공: ${char ? char : '장르에 맞는 매력적인 주인공 자동 창작'}
 - 배경: ${bg ? bg : '장르에 맞는 아름다운 배경 자동 창작'}
 - 주제/교훈: ${lesson ? lesson : '마음이 따뜻해지는 감동 교훈'}
-
+${buildLearningPromptBlock()}
 [작성 규칙]
 0. 반드시 정확히 ${config.pages}페이지로 작성해줘. pages 배열의 항목 수는 정확히 ${config.pages}개여야 해.
 1. 재미있고 통통 튀는 대사와 해설이 어우러진 대본 형태로 작성해줘.
@@ -690,6 +736,7 @@ function pickGenre(value){
    - emotion: "excited", "happy", "urgent", "angry", "curious", "whisper", "calm"
 3. full_text에는 전체 본문을 적어줘.
 4. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘.
+5. 배움동화가 선택되었다면 '설명하는 수업'처럼 쓰지 말고, 재미있는 사건 속에서 주인공이 관찰·비교·발견·해결하며 자연스럽게 배우게 해줘.
 
 [페이지 수 최종 확인]
 - 선택된 동화 길이: ${lengthVal}분
@@ -740,10 +787,16 @@ currentStoryBookObject = {
         userId: getUniqueUserIdentifier(),
         author: author,
         genre: genreKey,
+        learningMode: learning.mode,
+        learningTopic: learning.topic,
         title: storyData.title,
         createdAt: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         pages: []
       };
+
+      currentStoryLanguage = 'ko';
+      showKoreanAlongsideEnglish = false;
+      updateLanguageButtons();
 
       const titleEl = document.getElementById('story-main-title');
       if (titleEl) titleEl.innerText = `📖 ${storyData.title}`;
@@ -974,13 +1027,16 @@ currentStoryBookObject = {
     if (!wrapper) return;
     wrapper.innerHTML = '';
 
-    book.pages.forEach((p, i) => {
+    const activePages = getActiveStoryPages(book);
+    activePages.forEach((p, i) => {
+      const originalPage = Array.isArray(book.pages) ? book.pages[i] : null;
       const pageDiv = document.createElement('div');
       pageDiv.className = `page-item ${i === 0 ? 'active' : ''}`;
       pageDiv.id = `book-page-${i}`;
       
-      const imgHtml = p.imageBase64 
-        ? `<img src="data:image/png;base64,${p.imageBase64}" class="page-img" alt="삽화 ${p.page_num}">` 
+      const imageBase64 = originalPage?.imageBase64 || p.imageBase64 || '';
+      const imgHtml = imageBase64
+        ? `<img src="data:image/png;base64,${imageBase64}" class="page-img" alt="삽화 ${p.page_num}">` 
         : `<div class="page-loading-text">🎨 (삽화 준비 중)</div>`;
 
       const formattedText = p.dialogue_list 
@@ -1006,18 +1062,27 @@ currentStoryBookObject = {
           }).join('')
         : p.full_text;
 
+      let koreanTranslationHtml = '';
+      if (currentStoryLanguage === 'en' && showKoreanAlongsideEnglish && originalPage) {
+        const originalText = originalPage.dialogue_list
+          ? originalPage.dialogue_list.map(d => d.text || '').join(' ')
+          : (originalPage.full_text || '');
+        koreanTranslationHtml = `<div class="korean-translation"><strong>🇰🇷 한국어 해석</strong><br>${originalText}</div>`;
+      }
+
       pageDiv.innerHTML = `
         ${imgHtml}
         <div class="page-overlay-box">
           <div class="page-num-badge">${p.page_num}페이지</div>
-          <p class="page-text">${formattedText}</p>
+          <p class="page-text">${formattedText}${koreanTranslationHtml}</p>
         </div>
       `;
       wrapper.appendChild(pageDiv);
     });
 
     const titleEl = document.getElementById('story-main-title');
-    if (titleEl) titleEl.innerText = `📖 ${book.title}`;
+    if (titleEl) titleEl.innerText = `📖 ${getActiveStoryTitle(book)}`;
+    updateLanguageButtons();
     const bookContainer = document.getElementById('book-container');
     if (bookContainer) bookContainer.style.display = 'block';
     const controlPanel = document.getElementById('controlPanel');
@@ -1091,7 +1156,7 @@ currentStoryBookObject = {
       const firstOk = await speakDynamicLine(
         'narrator',
         'excited',
-        `제목: ${currentStoryBookObject.title}`,
+        `${currentStoryLanguage === 'en' ? 'Title' : '제목'}: ${getActiveStoryTitle(currentStoryBookObject)}`,
         { sessionId: mySession, startBgmOnStart: false }
       );
       if (!firstOk || !isPlaying || mySession !== speechSessionId) return;
@@ -1099,11 +1164,12 @@ currentStoryBookObject = {
       playBgmForCurrentStory();
     }
 
-    for (let i = safeStartPage; i < currentStoryBookObject.pages.length; i++) {
+    const readingPages = getActiveStoryPages(currentStoryBookObject);
+    for (let i = safeStartPage; i < readingPages.length; i++) {
       if (!isPlaying || mySession !== speechSessionId) break;
       showPage(i);
 
-      const pageData = currentStoryBookObject.pages[i];
+      const pageData = readingPages[i];
 
       if (pageData.dialogue_list && pageData.dialogue_list.length > 0) {
         for (const line of pageData.dialogue_list) {
@@ -1163,23 +1229,37 @@ currentStoryBookObject = {
     return unique;
   }
 
+  function getEnglishVoices() {
+    const all = Array.isArray(availableVoices) ? availableVoices : [];
+    const en = all.filter(v => v.lang && String(v.lang).toLowerCase().startsWith('en'));
+    const unique = [];
+    const seen = new Set();
+    for (const v of en) {
+      const key = v.voiceURI || `${v.name}|${v.lang}`;
+      if (!seen.has(key)) { seen.add(key); unique.push(v); }
+    }
+    return unique;
+  }
+
   function updateVoiceStatus() {
     const el = document.getElementById('voiceStatus');
     if (!el) return;
-    const ko = getKoreanVoices();
-    if (ko.length >= 3) {
-      el.innerHTML = `🎙️ 한국어 음성 <b>${ko.length}개</b>를 찾았어요. 역할별로 다른 음성을 우선 사용합니다.`;
-    } else if (ko.length === 2) {
-      el.innerHTML = `🎙️ 한국어 음성 <b>2개</b>를 찾았어요. 음성 2개와 음높이·속도 연기로 역할을 나눕니다.`;
-    } else if (ko.length === 1) {
-      el.innerHTML = `🎙️ 한국어 음성이 <b>1개</b>라서 음높이·속도를 크게 달리해 역할을 구분합니다.`;
+    const isEnglish = currentStoryLanguage === 'en';
+    const voices = isEnglish ? getEnglishVoices() : getKoreanVoices();
+    const langName = isEnglish ? '영어' : '한국어';
+    if (voices.length >= 3) {
+      el.innerHTML = `🎙️ ${langName} 음성 <b>${voices.length}개</b>를 찾았어요. 역할별로 다른 음성을 우선 사용합니다.`;
+    } else if (voices.length === 2) {
+      el.innerHTML = `🎙️ ${langName} 음성 <b>2개</b>를 찾았어요. 음성 2개와 음높이·속도 연기로 역할을 나눕니다.`;
+    } else if (voices.length === 1) {
+      el.innerHTML = `🎙️ ${langName} 음성이 <b>1개</b>라서 음높이·속도를 달리해 역할을 구분합니다.`;
     } else {
-      el.innerHTML = `🎙️ 한국어 음성을 불러오는 중이에요. 낭독 버튼을 누르면 다시 확인합니다.`;
+      el.innerHTML = `🎙️ ${langName} 음성을 불러오는 중이에요. 낭독 버튼을 누르면 다시 확인합니다.`;
     }
   }
 
-  function getRoleVoiceProfile(role, emotion, styleMode) {
-    const voices = getKoreanVoices();
+  function getRoleVoiceProfile(role, emotion, styleMode, languageCode = 'ko-KR') {
+    const voices = String(languageCode).toLowerCase().startsWith('en') ? getEnglishVoices() : getKoreanVoices();
     const r = String(role || '').toLowerCase();
     const em = String(emotion || '').toLowerCase();
 
@@ -1233,12 +1313,13 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
 
       const utterance = new SpeechSynthesisUtterance(cleanText);
       currentUtterance = utterance;
-      utterance.lang = 'ko-KR';
+      const speechLang = getSpeechLanguageCode();
+      utterance.lang = speechLang;
       utterance.volume = 1;
 
       const styleEl = document.getElementById('actingStyle');
       const styleMode = styleEl ? styleEl.value : 'dynamic_theater';
-      const profile = getRoleVoiceProfile(role, emotion, styleMode);
+      const profile = getRoleVoiceProfile(role, emotion, styleMode, speechLang);
 
       if (profile.voice) utterance.voice = profile.voice;
       utterance.rate = profile.rate;
@@ -1332,6 +1413,8 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
 
     const nextBook = myLibraryBooks[currentLibraryIndex];
     currentStoryBookObject = nextBook;
+    currentStoryLanguage = 'ko';
+    showKoreanAlongsideEnglish = false;
     renderBookPages(nextBook);
     showPage(0);
     switchTab('create');
@@ -1350,11 +1433,14 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
     currentStoryBookObject.userId = getUniqueUserIdentifier();
     currentStoryBookObject.author = (document.getElementById('authorName')?.value || '').trim() || "꼬마 작가";
     currentStoryBookObject.genre = document.getElementById('storyGenre')?.value || "fantasy";
+    currentStoryBookObject.learningMode = document.getElementById('learningMode')?.value || currentStoryBookObject.learningMode || 'general';
+    currentStoryBookObject.learningTopic = (document.getElementById('learningTopic')?.value || currentStoryBookObject.learningTopic || '').trim();
 
     try {
       const tx = db.transaction("books", "readwrite");
       const store = tx.objectStore("books");
-      store.add(currentStoryBookObject);
+      const req = currentStoryBookObject.id ? store.put(currentStoryBookObject) : store.add(currentStoryBookObject);
+      req.onsuccess = () => { if (!currentStoryBookObject.id) currentStoryBookObject.id = req.result; };
       tx.oncomplete = () => {
         alert(`[${currentStoryBookObject.title}]이(가) [${currentStoryBookObject.author}] 님의 서재에 안전하게 저장되었습니다!`);
         loadLibraryList();
@@ -1392,7 +1478,10 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
           <div class="library-item">
             <div class="library-info">
               <h4>📖 ${book.title}</h4>
-              <p>작가: <b>${book.author || '익명'}</b> | 저장일: ${book.createdAt} (총 ${book.pages.length}p)</p>
+              <p>작가: <b>${book.author || '익명'}</b> | 저장일: ${book.createdAt} (총 ${book.pages.length}p)
+                <span class="library-tag">${learningModeLabel(book.learningMode || 'general')}</span>
+                ${book.englishPages?.length ? '<span class="library-tag">🌐 EN</span>' : ''}
+              </p>
             </div>
             <div class="library-actions">
               <button type="button" class="btn-load" onclick="loadSingleBook(${book.id})">열기</button>
@@ -1412,6 +1501,15 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
       req.onsuccess = () => {
         const book = req.result;
         currentStoryBookObject = book;
+        const genreEl = document.getElementById('storyGenre');
+        const learningEl = document.getElementById('learningMode');
+        const learningTopicEl = document.getElementById('learningTopic');
+        if (genreEl) genreEl.value = book.genre || 'fantasy';
+        if (learningEl) learningEl.value = book.learningMode || 'general';
+        if (learningTopicEl) learningTopicEl.value = book.learningTopic || '';
+        handleLearningModeChange();
+        currentStoryLanguage = 'ko';
+        showKoreanAlongsideEnglish = false;
         renderBookPages(book);
         showPage(0);
         switchTab('create');
@@ -1440,14 +1538,16 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
     
     const printContainer = document.createElement('div');
     printContainer.innerHTML = `
-      <h1 style="text-align:center; font-size:24px; margin-bottom:6px; color:#1e293b;">📖 ${currentStoryBookObject.title}</h1>
+      <h1 style="text-align:center; font-size:24px; margin-bottom:6px; color:#1e293b;">📖 ${getActiveStoryTitle(currentStoryBookObject)}</h1>
       <p style="text-align:center; font-size:14px; color:#64748b; margin-bottom:24px;">글/그림: ${currentStoryBookObject.author || '어린이 작가'}</p>
     `;
     
-    currentStoryBookObject.pages.forEach(p => {
+    getActiveStoryPages(currentStoryBookObject).forEach((p, i) => {
+      const originalPage = currentStoryBookObject.pages[i];
       const pDiv = document.createElement('div');
       pDiv.style.cssText = "page-break-inside: avoid; position: relative; width: 100%; max-width: 520px; aspect-ratio: 1/1; margin: 0 auto 30px auto; border-radius: 12px; overflow: hidden;";
-      const imgTag = p.imageBase64 ? `<img src="data:image/png;base64,${p.imageBase64}" style="width: 100%; height: 100%; object-fit: cover;">` : '';
+      const pdfImage = originalPage?.imageBase64 || p.imageBase64 || '';
+      const imgTag = pdfImage ? `<img src="data:image/png;base64,${pdfImage}" style="width: 100%; height: 100%; object-fit: cover;">` : '';
       pDiv.innerHTML = `
         ${imgTag}
         <div style="position: absolute; bottom: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.65); padding: 20px 16px; color: #fff;">
@@ -1460,7 +1560,7 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
 
     const opt = {
       margin: 10,
-      filename: `${currentStoryBookObject.title}_${currentStoryBookObject.author || '동화'}.pdf`,
+      filename: `${getActiveStoryTitle(currentStoryBookObject)}_${currentStoryBookObject.author || '동화'}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -1601,6 +1701,7 @@ window.addEventListener('appinstalled', ()=>{
 });
 
 document.addEventListener('DOMContentLoaded', ()=>{
+  try { handleLearningModeChange(); updateLanguageButtons(); } catch(e) {}
   setTimeout(()=>{ try{initVoices(); updateVoiceStatus();}catch(e){} }, 500);
 
   if (!isStandaloneMode()) {

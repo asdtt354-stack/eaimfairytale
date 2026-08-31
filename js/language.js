@@ -94,6 +94,16 @@ function toggleKoreanTranslationView() {
   showPage(Math.min(currentPageIndex, currentStoryBookObject.pages.length - 1));
 }
 
+function showEnglishTranslationOverlay() {
+  const overlay = document.getElementById('englishTranslationOverlay');
+  if (overlay) overlay.classList.add('show');
+}
+
+function hideEnglishTranslationOverlay() {
+  const overlay = document.getElementById('englishTranslationOverlay');
+  if (overlay) overlay.classList.remove('show');
+}
+
 async function translateCurrentStoryToEnglish() {
   if (!currentStoryBookObject || isTranslatingStory) return false;
   const apiKey = (document.getElementById('apiKey')?.value || '').trim();
@@ -105,6 +115,7 @@ async function translateCurrentStoryToEnglish() {
   const status = document.getElementById('translationStatus');
   const enBtn = document.getElementById('langEnBtn');
   isTranslatingStory = true;
+  showEnglishTranslationOverlay();
   if (enBtn) enBtn.disabled = true;
   if (status) status.textContent = '🌐 어린이가 읽기 좋은 영어로 바꾸는 중...';
 
@@ -186,6 +197,7 @@ ${JSON.stringify({ title: currentStoryBookObject.title, pages: compactPages })}
     alert('영어 번역 중 오류가 발생했습니다: ' + (e.message || e));
     return false;
   } finally {
+    hideEnglishTranslationOverlay();
     isTranslatingStory = false;
     if (enBtn) enBtn.disabled = false;
   }

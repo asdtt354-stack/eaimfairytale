@@ -190,6 +190,14 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
 
 
 /* --- 이야기동화 / 배움동화 / 한영 전환 --- */
+
+/* EAIM Kids cloud library */
+.cloud-auth-box{margin:0 0 14px;padding:13px 14px;border:1px solid #e3ddf4;border-radius:14px;background:linear-gradient(135deg,#f8f6ff,#fffdf8)}
+.cloud-auth-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.cloud-auth-copy{font-size:12px;color:#667085;line-height:1.45}.cloud-auth-copy b{display:block;color:#4d4670;font-size:13px;margin-bottom:2px}
+.cloud-auth-actions{display:flex;gap:7px;flex-wrap:wrap}.cloud-btn{border:0;border-radius:10px;padding:9px 12px;font-weight:900;cursor:pointer;background:#fff;color:#5e51b8;box-shadow:0 2px 9px rgba(60,45,120,.10)}
+.cloud-btn.primary{background:linear-gradient(135deg,#6f57e8,#9b5de5);color:#fff}.cloud-btn.sync{background:#edf8f4;color:#197354}.cloud-btn:disabled{opacity:.55;cursor:default}
+.cloud-user{display:none;align-items:center;gap:8px}.cloud-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;background:#eee}.cloud-status{font-size:11px;color:#7d8698;margin-top:7px}
 .story-purpose-box{margin-bottom:14px;padding:14px;border:1px solid #e8e2f3;border-radius:14px;background:linear-gradient(135deg,#fffdf8,#faf7ff)}
 .story-purpose-title{font-size:13px;font-weight:900;color:#4f5870;margin-bottom:8px}
 .story-purpose-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -316,6 +324,25 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
                 <button type="button" class="btn-clear" onclick="clearUserSession()">초기화</button>
               </div>
             </div>
+            <div class="cloud-auth-box">
+              <div class="cloud-auth-row">
+                <div class="cloud-auth-copy">
+                  <b>☁️ EAIM Kids 클라우드 서재</b>
+                  같은 Google 계정으로 로그인하면 휴대폰과 PC에서 같은 동화책을 볼 수 있어요.
+                </div>
+                <div class="cloud-auth-actions">
+                  <button type="button" id="googleLoginBtn" class="cloud-btn primary" onclick="loginEAIMKids()">Google로 로그인</button>
+                  <div id="cloudUserBox" class="cloud-user">
+                    <img id="cloudUserPhoto" class="cloud-avatar" alt="">
+                    <span id="cloudUserName" style="font-size:12px;font-weight:900;color:#4d4670"></span>
+                  </div>
+                  <button type="button" id="cloudSyncBtn" class="cloud-btn sync" style="display:none" onclick="syncLocalLibraryToCloud()">☁️ 이 기기 서재 동기화</button>
+                  <button type="button" id="googleLogoutBtn" class="cloud-btn" style="display:none" onclick="logoutEAIMKids()">로그아웃</button>
+                </div>
+              </div>
+              <div id="cloudAuthStatus" class="cloud-status">로그인하지 않아도 기기에는 저장됩니다.</div>
+            </div>
+
             <label for="apiKey">API Key</label>
             <input type="password" id="apiKey" placeholder="Google AI Studio API 키를 입력하세요" oninput="saveUserSession()">
             <label for="authorName">✍️ 내 서재 닉네임 (필수)</label>
@@ -498,7 +525,7 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
 
   <footer class="footer">
     <span>🎵 뮤니와 함께 상상력을 키우는 특별한 오디오 동화 시간!</span>
-    <span>EAIM · Muni Story Village</span>
+    <span>EAIM · Muni Story Village · Cloud v19</span>
   </footer>
 </div>
 
@@ -510,6 +537,7 @@ function pickGenre(value){
 </script>
 <script src="./js/learning.js"></script>
 <script src="./js/language.js"></script>
+<script type="module" src="./js/firebase-sync.js"></script>
 <script>
   let currentStoryBookObject = null;
   let db = null;
@@ -940,13 +968,16 @@ currentStoryBookObject = {
     throw new Error('이미지 없음');
   }
 
-  function getUniqueUserIdentifier() {
+  function getLegacyUserIdentifier() {
     const key = (document.getElementById('apiKey')?.value || '').trim();
     const author = (document.getElementById('authorName')?.value || '').trim();
-    if (key.length >= 8) {
-      return (author ? author + "_" : "user_") + key.slice(-8);
-    }
+    if (key.length >= 8) return (author ? author + "_" : "user_") + key.slice(-8);
     return author ? author : "default_guest";
+  }
+
+  function getUniqueUserIdentifier() {
+    const uid = window.EAIMCloud?.getUser?.()?.uid;
+    return uid ? `firebase_${uid}` : getLegacyUserIdentifier();
   }
 
   function saveUserSession() {
@@ -961,7 +992,7 @@ currentStoryBookObject = {
         setTimeout(() => { status.style.display = 'none'; }, 1500);
       }
     } catch(e) {}
-    loadLibraryList();
+    if (!window.EAIMCloud?.getUser?.()) loadLibraryList();
   }
 
   function clearUserSession() {
@@ -1494,9 +1525,10 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
     });
   }
 
-  function saveCurrentStoryToDB() {
+  async function saveCurrentStoryToDB(options = {}) {
     if (!currentStoryBookObject || !db) return;
-    
+
+    const cloudUser = window.EAIMCloud?.getUser?.() || null;
     currentStoryBookObject.userId = getUniqueUserIdentifier();
     currentStoryBookObject.author = (document.getElementById('authorName')?.value || '').trim() || "꼬마 작가";
     currentStoryBookObject.genre = document.getElementById('storyGenre')?.value || "fantasy";
@@ -1504,112 +1536,229 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
     currentStoryBookObject.storyPurpose = currentLearning.purpose;
     currentStoryBookObject.learningMode = currentLearning.mode;
     currentStoryBookObject.learningTopic = currentLearning.topic;
+    currentStoryBookObject.updatedAt = new Date().toISOString();
 
     try {
-      const tx = db.transaction("books", "readwrite");
-      const store = tx.objectStore("books");
-      const req = currentStoryBookObject.id ? store.put(currentStoryBookObject) : store.add(currentStoryBookObject);
-      req.onsuccess = () => { if (!currentStoryBookObject.id) currentStoryBookObject.id = req.result; };
-      tx.oncomplete = () => {
-        alert(`[${currentStoryBookObject.title}]이(가) [${currentStoryBookObject.author}] 님의 서재에 안전하게 저장되었습니다!`);
-        loadLibraryList();
-      };
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction("books", "readwrite");
+        const store = tx.objectStore("books");
+        const req = currentStoryBookObject.id ? store.put(currentStoryBookObject) : store.add(currentStoryBookObject);
+        req.onsuccess = () => { if (!currentStoryBookObject.id) currentStoryBookObject.id = req.result; };
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error || new Error('IndexedDB save failed'));
+      });
+
+      let cloudSaved = false;
+      if (cloudUser && window.EAIMCloud?.saveStory) {
+        try {
+          const result = await window.EAIMCloud.saveStory(currentStoryBookObject);
+          if (result?.cloudId) {
+            currentStoryBookObject.cloudId = result.cloudId;
+            currentStoryBookObject.userId = `firebase_${cloudUser.uid}`;
+            await new Promise((resolve) => {
+              const tx = db.transaction("books", "readwrite");
+              tx.objectStore("books").put(currentStoryBookObject);
+              tx.oncomplete = resolve; tx.onerror = resolve;
+            });
+          }
+          cloudSaved = true;
+        } catch (e) {
+          console.error('Cloud save:', e);
+          setCloudStatus('⚠️ 기기에는 저장됐지만 클라우드 저장에 실패했어요: ' + (e.message || e));
+        }
+      }
+
+      if (!options.silent) {
+        alert(cloudSaved
+          ? `[${currentStoryBookObject.title}]이(가) 기기와 EAIM Kids 클라우드 서재에 저장되었습니다!`
+          : `[${currentStoryBookObject.title}]이(가) 이 기기의 서재에 저장되었습니다.${cloudUser ? '\n클라우드 저장 상태를 확인해 주세요.' : '\nGoogle 로그인하면 다른 기기와 동기화할 수 있어요.'}`);
+      }
+      await loadLibraryList();
     } catch(e) {
-      alert('서재 저장 중 오류가 발생했습니다.');
+      console.error(e);
+      if (!options.silent) alert('서재 저장 중 오류가 발생했습니다.');
     }
   }
 
-  function loadLibraryList() {
-    if (!db) return;
-    try {
-      const currentUserId = getUniqueUserIdentifier();
-      const authorName = (document.getElementById('authorName')?.value || '').trim() || "나";
-      
-      const titleEl = document.getElementById('libraryTitleLabel');
-      if (titleEl) titleEl.innerText = `📚 [${authorName}] 작가님의 서재`;
-
-      const tx = db.transaction("books", "readonly");
-      const store = tx.objectStore("books");
-      const req = store.getAll();
-      const listEl = document.getElementById("library-list");
-
-      req.onsuccess = () => {
-        const allBooks = req.result;
-        myLibraryBooks = allBooks.filter(book => book.userId === currentUserId || !book.userId);
-
-        if (!listEl) return;
-        if (myLibraryBooks.length === 0) {
-          listEl.innerHTML = `<p style="text-align: center; color: #94a3b8; padding: 20px;">[${authorName}] 님의 서재에 보관된 동화책이 없습니다.</p>`;
-          return;
-        }
-
-        listEl.innerHTML = myLibraryBooks.map((book) => `
-          <div class="library-item">
-            <div class="library-info">
-              <h4>📖 ${book.title}</h4>
-              <p>작가: <b>${book.author || '익명'}</b> | 저장일: ${book.createdAt} (총 ${book.pages.length}p)
-                <span class="library-tag">${storyPurposeLabel(book.storyPurpose, book.learningMode)}</span>
-                ${(book.preschoolEnglishPages?.length || book.englishPages?.length) ? '<span class="library-tag">🐣 유아 EN</span>' : ''}
-                ${book.childEnglishPages?.length ? '<span class="library-tag">🌱 어린이 EN</span>' : ''}
-              </p>
-            </div>
-            <div class="library-actions">
-              <button type="button" class="btn-load" onclick="loadSingleBook(${book.id})">열기</button>
-              <button type="button" class="btn-delete" onclick="deleteSavedBook(${book.id})">삭제</button>
-            </div>
-          </div>
-        `).join('');
-      };
-    } catch(e) {}
+  function getLocalBooks() {
+    return new Promise((resolve) => {
+      if (!db) return resolve([]);
+      try {
+        const tx = db.transaction("books", "readonly");
+        const req = tx.objectStore("books").getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => resolve([]);
+      } catch(e) { resolve([]); }
+    });
   }
 
-  function loadSingleBook(id) {
+  async function loadLibraryList() {
     if (!db) return;
-    try {
-      const tx = db.transaction("books", "readonly");
-      const req = tx.objectStore("books").get(id);
-      req.onsuccess = () => {
-        const book = req.result;
-        currentStoryBookObject = book;
-        const genreEl = document.getElementById('storyGenre');
-        const learningEl = document.getElementById('learningMode');
-        const learningTopicEl = document.getElementById('learningTopic');
-        if (genreEl) genreEl.value = book.genre || 'fantasy';
-        const legacyLearningMode = book.learningMode || 'general';
-        const savedPurpose = book.storyPurpose || (legacyLearningMode && legacyLearningMode !== 'general' ? 'learning' : 'story');
-        setStoryPurpose(savedPurpose, { silent: true });
-        if (learningEl && legacyLearningMode !== 'general') learningEl.value = legacyLearningMode;
-        if (typeof setLearningTopicFromSaved === 'function' && savedPurpose === 'learning') {
-          setLearningTopicFromSaved(book.learningTopic || '', legacyLearningMode || 'science');
-        } else if (learningTopicEl) {
-          learningTopicEl.value = book.learningTopic || '';
-        }
-        handleLearningModeChange();
-        currentStoryLanguage = 'ko';
-        showKoreanAlongsideEnglish = false;
-        renderBookPages(book);
-        showPage(0);
-        switchTab('create');
-        updateBgmGenrePreview(book.genre || "fantasy");
-        
-        setTimeout(() => {
-          const bookView = document.getElementById('book-container');
-          if (bookView) bookView.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 200);
-      };
-    } catch(e) {}
+    const currentUserId = getUniqueUserIdentifier();
+    const legacyUserId = getLegacyUserIdentifier();
+    const authorName = (document.getElementById('authorName')?.value || '').trim() || "나";
+    const cloudUser = window.EAIMCloud?.getUser?.() || null;
+    const titleEl = document.getElementById('libraryTitleLabel');
+    if (titleEl) titleEl.innerText = cloudUser ? `📚 ${cloudUser.displayName || authorName}님의 클라우드 서재` : `📚 [${authorName}] 작가님의 기기 서재`;
+
+    const localAll = await getLocalBooks();
+    let localBooks = localAll.filter(book => !book.userId || book.userId === currentUserId || book.userId === legacyUserId);
+    let cloudBooks = [];
+    if (cloudUser && window.EAIMCloud?.loadStories) {
+      try { cloudBooks = await window.EAIMCloud.loadStories(); }
+      catch(e) { console.error('Cloud load:', e); setCloudStatus('⚠️ 클라우드 서재를 불러오지 못했어요: ' + (e.message || e)); }
+    }
+
+    const merged = [];
+    const byCloudId = new Map();
+    for (const b of localBooks) {
+      merged.push(b);
+      if (b.cloudId) byCloudId.set(b.cloudId, merged.length - 1);
+    }
+    for (const cb of cloudBooks) {
+      if (cb.cloudId && byCloudId.has(cb.cloudId)) {
+        const idx = byCloudId.get(cb.cloudId);
+        // 클라우드 데이터가 새 기기에서도 완전한 책을 제공하도록 우선합니다.
+        merged[idx] = { ...merged[idx], ...cb, id: merged[idx].id };
+      } else merged.push(cb);
+    }
+    myLibraryBooks = merged.sort((a,b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')));
+
+    const listEl = document.getElementById("library-list");
+    if (!listEl) return;
+    if (myLibraryBooks.length === 0) {
+      listEl.innerHTML = `<p style="text-align:center;color:#94a3b8;padding:20px">${cloudUser ? '클라우드 서재' : `[${authorName}] 님의 서재`}에 보관된 동화책이 없습니다.</p>`;
+      return;
+    }
+
+    listEl.innerHTML = myLibraryBooks.map((book, index) => `
+      <div class="library-item">
+        <div class="library-info">
+          <h4>📖 ${book.title}</h4>
+          <p>작가: <b>${book.author || '익명'}</b> | 저장일: ${book.createdAt || '-'} (총 ${(book.pages || []).length}p)
+            <span class="library-tag">${storyPurposeLabel(book.storyPurpose, book.learningMode)}</span>
+            ${book.cloudId ? '<span class="library-tag">☁️ Cloud</span>' : '<span class="library-tag">📱 기기</span>'}
+            ${(book.preschoolEnglishPages?.length || book.englishPages?.length) ? '<span class="library-tag">🐣 유아 EN</span>' : ''}
+            ${book.childEnglishPages?.length ? '<span class="library-tag">🌱 어린이 EN</span>' : ''}
+          </p>
+        </div>
+        <div class="library-actions">
+          <button type="button" class="btn-load" onclick="loadSingleBook(${index})">열기</button>
+          <button type="button" class="btn-delete" onclick="deleteSavedBook(${index})">삭제</button>
+        </div>
+      </div>`).join('');
   }
 
-  function deleteSavedBook(id) {
-    if (!db) return;
-    if (!confirm('이 동화책을 내 서재에서 삭제하시겠습니까?')) return;
-    try {
-      const tx = db.transaction("books", "readwrite");
-      tx.objectStore("books").delete(id);
-      tx.oncomplete = () => loadLibraryList();
-    } catch(e) {}
+  async function persistCloudBookLocally(book) {
+    if (!db || !book) return book;
+    const existing = (await getLocalBooks()).find(b => b.cloudId && b.cloudId === book.cloudId);
+    const localBook = { ...book, id: existing?.id };
+    await new Promise((resolve) => {
+      try {
+        const tx = db.transaction('books','readwrite');
+        const req = localBook.id ? tx.objectStore('books').put(localBook) : tx.objectStore('books').add(localBook);
+        req.onsuccess = () => { if (!localBook.id) localBook.id = req.result; };
+        tx.oncomplete = resolve; tx.onerror = resolve;
+      } catch(e) { resolve(); }
+    });
+    return localBook;
   }
 
+  async function loadSingleBook(index) {
+    let book = myLibraryBooks[index];
+    if (!book) return;
+    if (book.cloudId && !book.id) book = await persistCloudBookLocally(book);
+    currentStoryBookObject = book;
+    const genreEl = document.getElementById('storyGenre');
+    const learningEl = document.getElementById('learningMode');
+    const learningTopicEl = document.getElementById('learningTopic');
+    if (genreEl) genreEl.value = book.genre || 'fantasy';
+    const legacyLearningMode = book.learningMode || 'general';
+    const savedPurpose = book.storyPurpose || (legacyLearningMode && legacyLearningMode !== 'general' ? 'learning' : 'story');
+    setStoryPurpose(savedPurpose, { silent: true });
+    if (learningEl && legacyLearningMode !== 'general') learningEl.value = legacyLearningMode;
+    if (typeof setLearningTopicFromSaved === 'function' && savedPurpose === 'learning') setLearningTopicFromSaved(book.learningTopic || '', legacyLearningMode || 'science');
+    else if (learningTopicEl) learningTopicEl.value = book.learningTopic || '';
+    handleLearningModeChange();
+    currentStoryLanguage = 'ko'; showKoreanAlongsideEnglish = false;
+    renderBookPages(book); showPage(0); switchTab('create'); updateBgmGenrePreview(book.genre || 'fantasy');
+    setTimeout(() => document.getElementById('book-container')?.scrollIntoView({ behavior:'smooth', block:'start' }), 200);
+  }
+
+  async function deleteSavedBook(index) {
+    const book = myLibraryBooks[index];
+    if (!book || !confirm('이 동화책을 내 서재에서 삭제하시겠습니까?')) return;
+    if (book.id && db) {
+      await new Promise((resolve) => {
+        try { const tx=db.transaction('books','readwrite'); tx.objectStore('books').delete(book.id); tx.oncomplete=resolve; tx.onerror=resolve; }
+        catch(e){ resolve(); }
+      });
+    }
+    if (book.cloudId && window.EAIMCloud?.getUser?.() && window.EAIMCloud?.deleteStory) {
+      try { await window.EAIMCloud.deleteStory(book.cloudId); }
+      catch(e) { alert('기기에서는 삭제했지만 클라우드 삭제에 실패했어요: ' + (e.message || e)); }
+    }
+    await loadLibraryList();
+  }
+
+  function setCloudStatus(message) {
+    const el = document.getElementById('cloudAuthStatus');
+    if (el) el.textContent = message;
+  }
+
+  async function loginEAIMKids() {
+    if (!window.EAIMCloud?.login) return alert('Firebase 연결을 준비하는 중이에요. 잠시 후 다시 눌러 주세요.');
+    try { setCloudStatus('Google 로그인 중...'); await window.EAIMCloud.login(); }
+    catch(e) { console.error(e); setCloudStatus('로그인 실패: ' + (e.message || e)); }
+  }
+
+  async function logoutEAIMKids() {
+    if (!window.EAIMCloud?.logout) return;
+    try { await window.EAIMCloud.logout(); }
+    catch(e) { console.error(e); }
+  }
+
+  function updateCloudAuthUI(user) {
+    const login=document.getElementById('googleLoginBtn'), logout=document.getElementById('googleLogoutBtn');
+    const sync=document.getElementById('cloudSyncBtn'), box=document.getElementById('cloudUserBox');
+    const name=document.getElementById('cloudUserName'), photo=document.getElementById('cloudUserPhoto');
+    if (user) {
+      if(login) login.style.display='none'; if(logout) logout.style.display='inline-block'; if(sync) sync.style.display='inline-block'; if(box) box.style.display='flex';
+      if(name) name.textContent=user.displayName || user.email || 'Google 사용자';
+      if(photo){ if(user.photoURL){photo.src=user.photoURL;photo.style.display='block';}else photo.style.display='none'; }
+      setCloudStatus('✅ EAIM Kids에 로그인되었습니다. 새로 저장하는 동화는 자동으로 클라우드에도 저장됩니다.');
+    } else {
+      if(login) login.style.display='inline-block'; if(logout) logout.style.display='none'; if(sync) sync.style.display='none'; if(box) box.style.display='none';
+      setCloudStatus('로그인하지 않아도 이 기기에는 저장됩니다. Google 로그인하면 여러 기기에서 같은 서재를 사용할 수 있어요.');
+    }
+    loadLibraryList();
+  }
+
+  async function syncLocalLibraryToCloud() {
+    const user = window.EAIMCloud?.getUser?.();
+    if (!user) return alert('먼저 Google로 로그인해 주세요.');
+    const legacyId = getLegacyUserIdentifier();
+    const currentId = `firebase_${user.uid}`;
+    const books = (await getLocalBooks()).filter(b => !b.userId || b.userId===legacyId || b.userId===currentId);
+    if (!books.length) return alert('이 기기에 동기화할 동화책이 없습니다.');
+    if (!confirm(`이 기기의 동화책 ${books.length}권을 EAIM Kids 클라우드 서재와 동기화할까요?`)) return;
+    let ok=0, fail=0;
+    setCloudStatus(`☁️ ${books.length}권 동기화 중...`);
+    for (const book of books) {
+      try {
+        book.userId=currentId; book.updatedAt=book.updatedAt || new Date().toISOString();
+        const r=await window.EAIMCloud.saveStory(book);
+        if(r?.cloudId) book.cloudId=r.cloudId;
+        await new Promise((resolve)=>{try{const tx=db.transaction('books','readwrite');tx.objectStore('books').put(book);tx.oncomplete=resolve;tx.onerror=resolve;}catch(e){resolve();}});
+        ok++;
+      } catch(e) { console.error(e); fail++; }
+    }
+    setCloudStatus(`✅ 동기화 완료: ${ok}권${fail ? ` / 실패 ${fail}권` : ''}`);
+    await loadLibraryList();
+    alert(`클라우드 동기화가 끝났어요. 성공 ${ok}권${fail ? `, 실패 ${fail}권` : ''}`);
+  }
+
+  window.addEventListener('eaim-auth-changed', (event) => updateCloudAuthUI(event.detail || null));
   function exportToPDF() {
     if (!currentStoryBookObject) return;
     

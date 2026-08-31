@@ -264,6 +264,14 @@ async function translateCurrentStoryToEnglish(level = 'preschool') {
       } catch (e) { console.warn('영어 버전 DB 업데이트:', e); }
     }
 
+    // Google 로그인 상태라면 영어 버전도 같은 클라우드 동화에 즉시 반영합니다.
+    if (window.EAIMCloud?.getUser?.() && window.EAIMCloud?.saveStory) {
+      try {
+        const cloudResult = await window.EAIMCloud.saveStory(currentStoryBookObject);
+        if (cloudResult?.cloudId) currentStoryBookObject.cloudId = cloudResult.cloudId;
+      } catch (e) { console.warn('영어 버전 클라우드 업데이트:', e); }
+    }
+
     if (status) status.textContent = `✅ ${cfg.label} 완성! 이 책에 함께 저장됩니다.`;
     return true;
   } catch (e) {

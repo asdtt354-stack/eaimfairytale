@@ -368,6 +368,7 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
                       <option value="science" selected>🔬 과학</option>
                       <option value="math">🔢 수학</option>
                       <option value="music">🎵 음악</option>
+                      <option value="history">🏛️ 역사</option>
                     </select>
                   </div>
                   <div class="input-group">
@@ -794,6 +795,8 @@ ${buildLearningPromptBlock()}
 3. full_text에는 전체 본문을 적어줘.
 4. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘.
 5. 배움동화가 선택되었다면 '설명하는 수업'처럼 쓰지 말고, 재미있는 사건 속에서 주인공이 관찰·비교·발견·해결하며 자연스럽게 배우게 해줘.
+6. 성경·경전·실존 종교 인물이나 종교적 사건을 중심 소재로 한 동화는 만들지 마. 그런 입력이 있으면 종교와 무관한 창작 소재로 바꿔서 구성해줘.
+7. 역사 배움동화에서는 실제 인물·시대·장소·핵심 사건과 알려진 역사적 사실을 임의로 바꾸거나 만들어내지 마. 시간여행·가상 주인공·상상 대화 같은 창작 장치는 사용할 수 있지만, 창작 장치와 역사적 사실이 혼동되지 않도록 분명하게 구성해줘.
 
 [페이지 수 최종 확인]
 - 선택된 동화 길이: ${lengthVal}분

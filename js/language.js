@@ -1,26 +1,82 @@
-// EAIM Muni Story Village - Bilingual story module
+// EAIM Muni Story Village - Korean + two-level English story module
 // English is a language/view mode, not a story genre.
 
-let currentStoryLanguage = 'ko';
+let currentStoryLanguage = 'ko'; // ko | en-preschool | en-child
 let showKoreanAlongsideEnglish = false;
 let isTranslatingStory = false;
 
+const ENGLISH_LEVELS = {
+  preschool: {
+    mode: 'en-preschool',
+    label: '유아 영어',
+    age: '약 4~7세',
+    version: 'preschool-easy-v2',
+    titleKey: 'preschoolEnglishTitle',
+    pagesKey: 'preschoolEnglishPages',
+    createdAtKey: 'preschoolEnglishCreatedAt',
+    versionKey: 'preschoolEnglishVersion'
+  },
+  child: {
+    mode: 'en-child',
+    label: '어린이 영어',
+    age: '약 7~10세',
+    version: 'child-easy-v1',
+    titleKey: 'childEnglishTitle',
+    pagesKey: 'childEnglishPages',
+    createdAtKey: 'childEnglishCreatedAt',
+    versionKey: 'childEnglishVersion'
+  }
+};
+
+function isEnglishStoryMode(mode = currentStoryLanguage) {
+  return mode === 'en-preschool' || mode === 'en-child';
+}
+
+function getCurrentEnglishLevel(mode = currentStoryLanguage) {
+  return mode === 'en-child' ? 'child' : 'preschool';
+}
+
+function getEnglishConfig(level = getCurrentEnglishLevel()) {
+  return ENGLISH_LEVELS[level] || ENGLISH_LEVELS.preschool;
+}
+
+function getEnglishBundle(book, level = getCurrentEnglishLevel()) {
+  if (!book) return { title: '', pages: [], version: '' };
+  const cfg = getEnglishConfig(level);
+  let title = book[cfg.titleKey] || '';
+  let pages = Array.isArray(book[cfg.pagesKey]) ? book[cfg.pagesKey] : [];
+  let version = book[cfg.versionKey] || '';
+
+  // v17까지의 쉬운 영어는 유아 영어로 자연스럽게 이어받습니다.
+  if (level === 'preschool' && (!pages.length || !title)) {
+    if (Array.isArray(book.englishPages) && book.englishPages.length) {
+      title = title || book.englishTitle || '';
+      pages = pages.length ? pages : book.englishPages;
+      version = version || book.englishAdaptationVersion || '';
+    }
+  }
+  return { title, pages, version };
+}
+
 function getActiveStoryTitle(book = currentStoryBookObject) {
   if (!book) return '';
-  if (currentStoryLanguage === 'en' && book.englishTitle) return book.englishTitle;
+  if (isEnglishStoryMode()) {
+    return getEnglishBundle(book).title || book.title || '';
+  }
   return book.title || '';
 }
 
 function getActiveStoryPages(book = currentStoryBookObject) {
   if (!book) return [];
-  if (currentStoryLanguage === 'en' && Array.isArray(book.englishPages) && book.englishPages.length) {
-    return book.englishPages;
+  if (isEnglishStoryMode()) {
+    const pages = getEnglishBundle(book).pages;
+    if (pages.length) return pages;
   }
   return Array.isArray(book.pages) ? book.pages : [];
 }
 
 function getSpeechLanguageCode() {
-  return currentStoryLanguage === 'en' ? 'en-US' : 'ko-KR';
+  return isEnglishStoryMode() ? 'en-US' : 'ko-KR';
 }
 
 function resetStoryLanguageToKorean(render = true) {
@@ -35,22 +91,29 @@ function resetStoryLanguageToKorean(render = true) {
 
 function updateLanguageButtons() {
   const koBtn = document.getElementById('langKoBtn');
-  const enBtn = document.getElementById('langEnBtn');
+  const preschoolBtn = document.getElementById('langPreschoolBtn');
+  const childBtn = document.getElementById('langChildBtn');
   const transBtn = document.getElementById('showTranslationBtn');
   const status = document.getElementById('translationStatus');
 
   if (koBtn) koBtn.classList.toggle('active', currentStoryLanguage === 'ko');
-  if (enBtn) enBtn.classList.toggle('active', currentStoryLanguage === 'en');
+  if (preschoolBtn) preschoolBtn.classList.toggle('active', currentStoryLanguage === 'en-preschool');
+  if (childBtn) childBtn.classList.toggle('active', currentStoryLanguage === 'en-child');
   if (transBtn) {
-    transBtn.style.display = currentStoryLanguage === 'en' ? 'inline-flex' : 'none';
+    transBtn.style.display = isEnglishStoryMode() ? 'inline-flex' : 'none';
     transBtn.classList.toggle('active', showKoreanAlongsideEnglish);
     transBtn.textContent = showKoreanAlongsideEnglish ? '🇰🇷 해석 숨기기' : '🇰🇷 해석 함께 보기';
   }
+
   if (status && currentStoryBookObject) {
-    if (currentStoryLanguage === 'en') {
-      status.textContent = currentStoryBookObject.englishPages?.length
-        ? '영어 버전이 저장되어 있어 다시 번역하지 않아요.'
-        : '영어 버전을 준비할 수 있어요.';
+    if (isEnglishStoryMode()) {
+      const level = getCurrentEnglishLevel();
+      const cfg = getEnglishConfig(level);
+      const bundle = getEnglishBundle(currentStoryBookObject, level);
+      const valid = bundle.pages.length === currentStoryBookObject.pages.length && bundle.version === cfg.version;
+      status.textContent = valid
+        ? `${cfg.label} 버전이 저장되어 있어 바로 들을 수 있어요.`
+        : `${cfg.label}(${cfg.age}) 버전을 만들 수 있어요.`;
     } else {
       status.textContent = '한국어 원문';
     }
@@ -63,6 +126,7 @@ async function switchStoryLanguage(lang) {
     alert('먼저 동화를 만들어 주세요.');
     return;
   }
+
   if (lang === 'ko') {
     stopVoice();
     currentStoryLanguage = 'ko';
@@ -73,13 +137,21 @@ async function switchStoryLanguage(lang) {
     return;
   }
 
-  if (lang === 'en') {
+  if (lang === 'en-preschool' || lang === 'en-child') {
     stopVoice();
-    if (!Array.isArray(currentStoryBookObject.englishPages) || currentStoryBookObject.englishPages.length !== currentStoryBookObject.pages.length) {
-      const ok = await translateCurrentStoryToEnglish();
+    const level = getCurrentEnglishLevel(lang);
+    const cfg = getEnglishConfig(level);
+    const bundle = getEnglishBundle(currentStoryBookObject, level);
+    const needsEnglish =
+      !Array.isArray(bundle.pages) ||
+      bundle.pages.length !== currentStoryBookObject.pages.length ||
+      bundle.version !== cfg.version;
+
+    if (needsEnglish) {
+      const ok = await translateCurrentStoryToEnglish(level);
       if (!ok) return;
     }
-    currentStoryLanguage = 'en';
+    currentStoryLanguage = lang;
     updateLanguageButtons();
     renderBookPages(currentStoryBookObject);
     showPage(Math.min(currentPageIndex, currentStoryBookObject.pages.length - 1));
@@ -87,15 +159,24 @@ async function switchStoryLanguage(lang) {
 }
 
 function toggleKoreanTranslationView() {
-  if (currentStoryLanguage !== 'en' || !currentStoryBookObject) return;
+  if (!isEnglishStoryMode() || !currentStoryBookObject) return;
   showKoreanAlongsideEnglish = !showKoreanAlongsideEnglish;
   updateLanguageButtons();
   renderBookPages(currentStoryBookObject);
   showPage(Math.min(currentPageIndex, currentStoryBookObject.pages.length - 1));
 }
 
-function showEnglishTranslationOverlay() {
+function showEnglishTranslationOverlay(level = 'preschool') {
   const overlay = document.getElementById('englishTranslationOverlay');
+  const title = document.getElementById('englishOverlayTitle');
+  const message = document.getElementById('englishOverlayMessage');
+  const cfg = getEnglishConfig(level);
+  if (title) title.textContent = `뮤니가 ${cfg.label} 동화를 만들고 있어요!`;
+  if (message) {
+    message.innerHTML = level === 'preschool'
+      ? '아주 짧고 쉬운 영어로 바꾸는 중이에요 ✨<br>천천히 들을 수 있게 준비하고 있어요.'
+      : '조금 더 풍부한 어린이 영어로 바꾸는 중이에요 ✨<br>잠시만 기다려 주세요.';
+  }
   if (overlay) overlay.classList.add('show');
 }
 
@@ -104,20 +185,32 @@ function hideEnglishTranslationOverlay() {
   if (overlay) overlay.classList.remove('show');
 }
 
-async function translateCurrentStoryToEnglish() {
+function buildEnglishPrompt(level, compactPages) {
+  const isPreschool = level === 'preschool';
+  const targetRules = isPreschool
+    ? `[유아 영어 난이도]\n- 대상: 약 4~7세 한국 어린이, 영어 첫걸음.\n- 한 문장은 보통 3~6단어 정도로 매우 짧게 써.\n- 한 문장에 한 가지 뜻만 담아.\n- 아주 자주 쓰는 쉬운 단어와 반복 표현을 중심으로 써.\n- 긴 수식어, 추상어, 어려운 동사, 관용구는 피하고 쉬운 말로 바꿔.\n- 각 페이지 full_text는 가능하면 2~4개의 아주 짧은 문장으로 구성해.\n- 대사는 짧고 리듬감 있게, 소리 내어 따라 하기 쉽게 만들어.\n- 원문의 세부 내용을 모두 옮기지 말고 핵심 사건만 남겨.`
+    : `[어린이 영어 난이도]\n- 대상: 약 7~10세 한국 어린이, 영어 초급~초중급.\n- 한 문장은 보통 5~10단어 정도로 자연스럽고 명확하게 써.\n- 쉬운 기본 어휘를 중심으로 하되, 이야기 이해에 필요한 표현은 조금 더 풍부하게 써도 돼.\n- 문장이 길어지면 두 문장으로 나눠.\n- 각 페이지 full_text는 가능하면 3~6개의 짧은 문장으로 구성해.\n- 대사는 어린이가 듣고 따라 하기 좋은 자연스러운 영어로 만들어.\n- 유아 영어보다 사건과 감정을 조금 더 자세히 살려.`;
+
+  return `다음 한국어 어린이 동화를 **${isPreschool ? '유아용 Easy English' : '어린이용 Easy English'}** 동화로 다시 써줘.\n\n[가장 중요한 목표]\n- 이것은 문장별 직역이 아니라 **같은 이야기를 영어 수준에 맞게 다시 들려주는 adaptation**이야.\n- 한국어 원문의 핵심 사건과 감정은 유지해.\n- 한국 어린이가 그림을 보며 영어 낭독을 듣는 상황을 가정해.\n- 듣는 시간이 지나치게 길지 않게 하고, 소리 내어 읽었을 때 자연스러워야 해.\n\n${targetRules}\n\n[내용 보존 원칙]\n- 원문의 핵심 사건, 인물, 감정, 이야기 순서는 바꾸지 마.\n- 새로운 사건, 인물, 지식, 교훈은 추가하지 마.\n- 과학·수학·음악·역사 내용이 있다면 원문의 의미와 사실 관계를 정확하게 보존해.\n- 역사 인명·지명·핵심 사건은 정확하게 유지해.\n- role과 emotion 값은 절대 번역하거나 바꾸지 마.\n- 페이지 수와 각 페이지의 dialogue_list 항목 수는 원문과 동일하게 유지해.\n- 각 dialogue_list의 text도 해당 연령 수준에 맞는 짧고 쉬운 영어로 바꿔.\n- JSON 이외의 설명은 출력하지 마.\n\n[원문]\n${JSON.stringify({ title: currentStoryBookObject.title, pages: compactPages })}\n\n[출력 JSON]\n{\n  \"title\": \"English title\",\n  \"pages\": [\n    {\n      \"page_num\": 1,\n      \"full_text\": \"English full text\",\n      \"dialogue_list\": [\n        {\"role\":\"narrator\",\"emotion\":\"calm\",\"text\":\"English sentence\"}\n      ]\n    }\n  ]\n}`;
+}
+
+async function translateCurrentStoryToEnglish(level = 'preschool') {
   if (!currentStoryBookObject || isTranslatingStory) return false;
   const apiKey = (document.getElementById('apiKey')?.value || '').trim();
   if (!apiKey) {
-    alert('영어 번역을 위해 Google AI Studio API Key가 필요합니다.');
+    alert('영어 동화를 만들려면 Google AI Studio API Key가 필요합니다.');
     return false;
   }
 
+  const cfg = getEnglishConfig(level);
   const status = document.getElementById('translationStatus');
-  const enBtn = document.getElementById('langEnBtn');
+  const preschoolBtn = document.getElementById('langPreschoolBtn');
+  const childBtn = document.getElementById('langChildBtn');
   isTranslatingStory = true;
-  showEnglishTranslationOverlay();
-  if (enBtn) enBtn.disabled = true;
-  if (status) status.textContent = '🌐 어린이가 읽기 좋은 영어로 바꾸는 중...';
+  showEnglishTranslationOverlay(level);
+  if (preschoolBtn) preschoolBtn.disabled = true;
+  if (childBtn) childBtn.disabled = true;
+  if (status) status.textContent = `🌐 ${cfg.label} 버전을 만드는 중...`;
 
   const compactPages = currentStoryBookObject.pages.map((p, i) => ({
     page_num: p.page_num || i + 1,
@@ -129,33 +222,7 @@ async function translateCurrentStoryToEnglish() {
     }))
   }));
 
-  const prompt = `다음 한국어 어린이 동화를 자연스럽고 쉬운 영어 동화로 바꿔줘.
-
-[중요 원칙]
-- 직역보다 어린이가 듣고 이해하기 쉬운 자연스러운 영어를 사용해.
-- 짧고 명확한 문장을 사용하고, 원문의 사건·의미·감정·대화 순서는 바꾸지 마.
-- 새로운 사건, 인물, 지식, 교훈을 추가하지 마.
-- 과학·수학·음악 내용이 있다면 원문의 의미를 정확하게 보존해.
-- role과 emotion 값은 절대 번역하거나 바꾸지 마.
-- 페이지 수와 각 페이지의 대화 항목 수를 원문과 동일하게 유지해.
-- JSON 이외의 설명은 출력하지 마.
-
-[원문]
-${JSON.stringify({ title: currentStoryBookObject.title, pages: compactPages })}
-
-[출력 JSON]
-{
-  "title": "English title",
-  "pages": [
-    {
-      "page_num": 1,
-      "full_text": "English full text",
-      "dialogue_list": [
-        {"role":"narrator","emotion":"calm","text":"English sentence"}
-      ]
-    }
-  ]
-}`;
+  const prompt = buildEnglishPrompt(level, compactPages);
 
   try {
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
@@ -173,15 +240,23 @@ ${JSON.stringify({ title: currentStoryBookObject.title, pages: compactPages })}
       throw new Error('영어 페이지 수가 원문과 맞지 않습니다.');
     }
 
-    currentStoryBookObject.englishTitle = translated.title;
-    currentStoryBookObject.englishPages = translated.pages.map((p, i) => ({
+    currentStoryBookObject[cfg.titleKey] = translated.title;
+    currentStoryBookObject[cfg.pagesKey] = translated.pages.map((p, i) => ({
       page_num: currentStoryBookObject.pages[i]?.page_num || p.page_num || i + 1,
       full_text: p.full_text || '',
       dialogue_list: Array.isArray(p.dialogue_list) ? p.dialogue_list : [{ role:'narrator', emotion:'calm', text:p.full_text || '' }]
     }));
-    currentStoryBookObject.englishCreatedAt = new Date().toISOString();
+    currentStoryBookObject[cfg.createdAtKey] = new Date().toISOString();
+    currentStoryBookObject[cfg.versionKey] = cfg.version;
 
-    // 이미 서재에 저장된 책이면 같은 책에 영어 버전을 업데이트합니다.
+    // 유아 영어는 이전 버전 필드에도 복사해 기존 저장 구조와의 호환성을 유지합니다.
+    if (level === 'preschool') {
+      currentStoryBookObject.englishTitle = currentStoryBookObject[cfg.titleKey];
+      currentStoryBookObject.englishPages = currentStoryBookObject[cfg.pagesKey];
+      currentStoryBookObject.englishCreatedAt = currentStoryBookObject[cfg.createdAtKey];
+      currentStoryBookObject.englishAdaptationVersion = cfg.version;
+    }
+
     if (currentStoryBookObject.id && db) {
       try {
         const tx = db.transaction('books', 'readwrite');
@@ -189,16 +264,17 @@ ${JSON.stringify({ title: currentStoryBookObject.title, pages: compactPages })}
       } catch (e) { console.warn('영어 버전 DB 업데이트:', e); }
     }
 
-    if (status) status.textContent = '✅ 영어 버전 완성! 이 책에 함께 저장됩니다.';
+    if (status) status.textContent = `✅ ${cfg.label} 완성! 이 책에 함께 저장됩니다.`;
     return true;
   } catch (e) {
     console.error(e);
-    if (status) status.textContent = '❌ 영어 번역에 실패했어요. 다시 눌러 주세요.';
-    alert('영어 번역 중 오류가 발생했습니다: ' + (e.message || e));
+    if (status) status.textContent = `❌ ${cfg.label} 생성에 실패했어요. 다시 눌러 주세요.`;
+    alert(`${cfg.label} 생성 중 오류가 발생했습니다: ` + (e.message || e));
     return false;
   } finally {
     hideEnglishTranslationOverlay();
     isTranslatingStory = false;
-    if (enBtn) enBtn.disabled = false;
+    if (preschoolBtn) preschoolBtn.disabled = false;
+    if (childBtn) childBtn.disabled = false;
   }
 }

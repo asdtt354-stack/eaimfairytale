@@ -26,6 +26,15 @@ const learningGuides = {
 - 리듬, 빠르기, 높낮이, 셈여림, 음색, 선율, 악기 중 주제에 맞는 음악 요소를 활용해줘.
 - 등장인물이 듣고, 느끼고, 비교하고, 표현하는 장면을 넣어줘.
 - 음악 용어는 어린이가 이해하기 쉬운 말과 함께 사용해줘.`
+  },
+  history: {
+    label: '🏛️ 역사 배움동화',
+    prompt: `이 이야기는 '역사 배움동화'야.
+- 실제 역사 인물, 시대, 장소, 핵심 사건과 널리 확인된 사실은 임의로 바꾸거나 만들어내지 마.
+- 어린이가 시대의 생활과 사람들의 선택을 이야기 속에서 자연스럽게 경험하도록 해줘.
+- 시간여행, 가상 어린이 주인공, 상상 대화 같은 창작 장치는 사용할 수 있어. 다만 그것이 역사적 사실인 것처럼 보이지 않게 해줘.
+- 전쟁이나 폭력은 어린이에게 적절한 수준으로 완화해 표현해줘.
+- 역사적 사실이 확실하지 않은 세부 내용은 단정해서 만들지 말고, 이야기 전개에 꼭 필요한 범위만 사용해줘.`
   }
 };
 
@@ -41,6 +50,10 @@ const learningTopicOptions = {
   music: [
     '빠르기', '리듬', '높고 낮은 소리', '악기와 음색',
     '셈여림', '선율', '음악의 느낌', '직접 입력'
+  ],
+  history: [
+    '세종대왕과 훈민정음', '이순신과 거북선', '삼국시대', '고려시대',
+    '조선시대 생활', '독립운동', '우리 문화유산', '직접 입력'
   ]
 };
 
@@ -65,7 +78,7 @@ function setStoryPurpose(purpose, options = {}) {
 
   if (currentStoryPurpose === 'learning') {
     if (learningEl) {
-      const validModes = ['science', 'math', 'music'];
+      const validModes = ['science', 'math', 'music', 'history'];
       if (!validModes.includes(learningEl.value)) learningEl.value = lastLearningMode;
       lastLearningMode = learningEl.value;
     }
@@ -87,7 +100,7 @@ function getLearningSelection() {
     return { purpose: 'story', mode: 'general', topic: '', guide: learningGuides.general };
   }
 
-  const mode = modeEl && ['science', 'math', 'music'].includes(modeEl.value) ? modeEl.value : 'science';
+  const mode = modeEl && ['science', 'math', 'music', 'history'].includes(modeEl.value) ? modeEl.value : 'science';
   const topic = (topicEl ? topicEl.value : '').trim();
   lastLearningMode = mode;
   return { purpose: 'learning', mode, topic, guide: learningGuides[mode] || learningGuides.science };
@@ -95,7 +108,7 @@ function getLearningSelection() {
 
 function handleLearningModeChange(options = {}) {
   const modeEl = document.getElementById('learningMode');
-  const mode = modeEl && ['science', 'math', 'music'].includes(modeEl.value) ? modeEl.value : 'science';
+  const mode = modeEl && ['science', 'math', 'music', 'history'].includes(modeEl.value) ? modeEl.value : 'science';
   lastLearningMode = mode;
 
   const topicEl = document.getElementById('learningTopic');
@@ -106,7 +119,8 @@ function handleLearningModeChange(options = {}) {
   const hints = {
     science: '과학 주제 중에서 하나를 골라보세요. 직접 입력도 가능해요.',
     math: '수학 주제 중에서 하나를 골라보세요. 직접 입력도 가능해요.',
-    music: '음악 주제 중에서 하나를 골라보세요. 직접 입력도 가능해요.'
+    music: '음악 주제 중에서 하나를 골라보세요. 직접 입력도 가능해요.',
+    history: '역사 주제 중에서 하나를 골라보세요. 실제 역사와 상상 이야기를 구분해서 만들어요.'
   };
   if (hintEl) hintEl.textContent = hints[mode] || hints.science;
 }
@@ -186,7 +200,7 @@ function updateLearningSelectedNote() {
 
 function setLearningTopicFromSaved(topic, mode) {
   const learningEl = document.getElementById('learningMode');
-  if (learningEl && ['science','math','music'].includes(mode)) learningEl.value = mode;
+  if (learningEl && ['science','math','music','history'].includes(mode)) learningEl.value = mode;
   handleLearningModeChange();
   renderLearningTopicChips(mode || 'science', (topic || '').trim());
 }

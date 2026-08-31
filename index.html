@@ -189,8 +189,15 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
 .install-app-btn.show{display:block}
 
 
-/* --- 배움동화 / 한영 전환 --- */
-.learning-box{margin-top:12px;padding:14px;border:1px solid #e8e2f3;border-radius:14px;background:linear-gradient(135deg,#fffdf8,#faf7ff)}
+/* --- 이야기동화 / 배움동화 / 한영 전환 --- */
+.story-purpose-box{margin-bottom:14px;padding:14px;border:1px solid #e8e2f3;border-radius:14px;background:linear-gradient(135deg,#fffdf8,#faf7ff)}
+.story-purpose-title{font-size:13px;font-weight:900;color:#4f5870;margin-bottom:8px}
+.story-purpose-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.story-purpose-btn{border:1px solid #ddd5ef;background:#fff;color:#5d6476;border-radius:12px;padding:11px 10px;font-weight:900;cursor:pointer;transition:.18s ease}
+.story-purpose-btn.active{background:linear-gradient(135deg,#7354e7,#d445bd);border-color:transparent;color:#fff;box-shadow:0 6px 16px rgba(113,87,232,.18)}
+.story-topic-box{margin-top:10px}
+.learning-box{margin-top:10px;padding:14px;border:1px solid #e8e2f3;border-radius:14px;background:linear-gradient(135deg,#f7fff9,#faf7ff)}
+.learning-box[hidden],.story-topic-box[hidden]{display:none!important}
 .learning-row{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;align-items:end}
 .learning-hint{margin-top:7px;font-size:11.5px;color:#7c879b;line-height:1.45}
 .language-control-box{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 14px;padding:11px 12px;border:1px solid #e7e2f1;border-radius:13px;background:#fbf9ff}
@@ -301,15 +308,46 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
           </section>
 
           <section class="section-card">
-            <h2 class="section-title"><span class="num">3</span> ⭐ 이야기 주제 선택</h2>
-            <div class="theme-chips">
-              <button class="theme-chip" type="button" onclick="pickGenre('heroic')">🛡️ 용기</button>
-              <button class="theme-chip" type="button" onclick="pickGenre('animal')">👫 우정</button>
-              <button class="theme-chip" type="button" onclick="pickGenre('fantasy')">✨ 꿈</button>
-              <button class="theme-chip" type="button" onclick="pickGenre('custom')">💗 가족</button>
-              <button class="theme-chip" type="button" onclick="pickGenre('animal')">🌿 자연</button>
-              <button class="theme-chip" type="button" onclick="pickGenre('mystery')">🕵️ 비밀 친구</button>
+            <h2 class="section-title"><span class="num">3</span> ✨ 어떤 동화를 만들까요?</h2>
+
+            <div class="story-purpose-box">
+              <div class="story-purpose-title">먼저 동화의 종류를 골라주세요.</div>
+              <div class="story-purpose-buttons">
+                <button id="storyPurposeStoryBtn" class="story-purpose-btn active" type="button" onclick="setStoryPurpose('story')">🌈 이야기동화</button>
+                <button id="storyPurposeLearningBtn" class="story-purpose-btn" type="button" onclick="setStoryPurpose('learning')">🌱 배움동화</button>
+              </div>
+
+              <div id="storyTopicBox" class="story-topic-box">
+                <label>⭐ 이야기 주제</label>
+                <div class="theme-chips">
+                  <button class="theme-chip" type="button" onclick="pickGenre('heroic')">🛡️ 용기</button>
+                  <button class="theme-chip" type="button" onclick="pickGenre('animal')">👫 우정</button>
+                  <button class="theme-chip" type="button" onclick="pickGenre('fantasy')">✨ 꿈</button>
+                  <button class="theme-chip" type="button" onclick="pickGenre('custom')">💗 가족</button>
+                  <button class="theme-chip" type="button" onclick="pickGenre('animal')">🌿 자연</button>
+                  <button class="theme-chip" type="button" onclick="pickGenre('mystery')">🕵️ 비밀 친구</button>
+                </div>
+              </div>
+
+              <div id="learningBox" class="learning-box" hidden>
+                <div class="learning-row">
+                  <div class="input-group">
+                    <label for="learningMode">📚 어떤 배움일까요?</label>
+                    <select id="learningMode" onchange="handleLearningModeChange()">
+                      <option value="science" selected>🔬 과학</option>
+                      <option value="math">🔢 수학</option>
+                      <option value="music">🎵 음악</option>
+                    </select>
+                  </div>
+                  <div class="input-group">
+                    <label for="learningTopic">🔎 무엇을 배워볼까요?</label>
+                    <input type="text" id="learningTopic" placeholder="예: 식물의 성장">
+                  </div>
+                </div>
+                <div class="learning-hint" id="learningHint">예: 씨앗은 어떻게 자랄까? · 그림자는 왜 생길까? · 달은 왜 모양이 달라질까?</div>
+              </div>
             </div>
+
             <label for="storyGenre">🎨 동화 장르 / 이야기 스타일</label>
             <select id="storyGenre" onchange="handleGenreChange(this.value)">
               <option value="fantasy" selected>✨ 환상 판타지 / 요정 이야기</option>
@@ -320,25 +358,6 @@ input:focus,select:focus{border-color:#8067ea;box-shadow:0 0 0 3px rgba(128,103,
               <option value="comic">😂 유쾌하고 웃긴 코믹 모험</option>
               <option value="custom">🌈 기타 / 자유 장르</option>
             </select>
-
-            <div class="learning-box">
-              <div class="learning-row">
-                <div class="input-group">
-                  <label for="learningMode">🌱 배움동화 선택</label>
-                  <select id="learningMode" onchange="handleLearningModeChange()">
-                    <option value="general" selected>🌈 자유 동화 · 배움 주제 없음</option>
-                    <option value="science">🔬 과학 배움동화</option>
-                    <option value="math">🔢 수학 배움동화</option>
-                    <option value="music">🎵 음악 배움동화</option>
-                  </select>
-                </div>
-                <div class="input-group">
-                  <label for="learningTopic">🔎 배움 주제 (선택)</label>
-                  <input type="text" id="learningTopic" placeholder="선택사항: 이야기에서 특별히 다루고 싶은 주제">
-                </div>
-              </div>
-              <div class="learning-hint" id="learningHint">예: 우정, 용기, 가족, 자연처럼 자유롭게 이야기해요.</div>
-            </div>
 
             <div class="input-grid" style="margin-top:12px">
               <div class="input-group">
@@ -787,6 +806,7 @@ currentStoryBookObject = {
         userId: getUniqueUserIdentifier(),
         author: author,
         genre: genreKey,
+        storyPurpose: learning.purpose,
         learningMode: learning.mode,
         learningTopic: learning.topic,
         title: storyData.title,
@@ -1433,8 +1453,10 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
     currentStoryBookObject.userId = getUniqueUserIdentifier();
     currentStoryBookObject.author = (document.getElementById('authorName')?.value || '').trim() || "꼬마 작가";
     currentStoryBookObject.genre = document.getElementById('storyGenre')?.value || "fantasy";
-    currentStoryBookObject.learningMode = document.getElementById('learningMode')?.value || currentStoryBookObject.learningMode || 'general';
-    currentStoryBookObject.learningTopic = (document.getElementById('learningTopic')?.value || currentStoryBookObject.learningTopic || '').trim();
+    const currentLearning = getLearningSelection();
+    currentStoryBookObject.storyPurpose = currentLearning.purpose;
+    currentStoryBookObject.learningMode = currentLearning.mode;
+    currentStoryBookObject.learningTopic = currentLearning.topic;
 
     try {
       const tx = db.transaction("books", "readwrite");
@@ -1479,7 +1501,7 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
             <div class="library-info">
               <h4>📖 ${book.title}</h4>
               <p>작가: <b>${book.author || '익명'}</b> | 저장일: ${book.createdAt} (총 ${book.pages.length}p)
-                <span class="library-tag">${learningModeLabel(book.learningMode || 'general')}</span>
+                <span class="library-tag">${storyPurposeLabel(book.storyPurpose, book.learningMode)}</span>
                 ${book.englishPages?.length ? '<span class="library-tag">🌐 EN</span>' : ''}
               </p>
             </div>
@@ -1505,7 +1527,10 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
         const learningEl = document.getElementById('learningMode');
         const learningTopicEl = document.getElementById('learningTopic');
         if (genreEl) genreEl.value = book.genre || 'fantasy';
-        if (learningEl) learningEl.value = book.learningMode || 'general';
+        const legacyLearningMode = book.learningMode || 'general';
+        const savedPurpose = book.storyPurpose || (legacyLearningMode && legacyLearningMode !== 'general' ? 'learning' : 'story');
+        setStoryPurpose(savedPurpose, { silent: true });
+        if (learningEl && legacyLearningMode !== 'general') learningEl.value = legacyLearningMode;
         if (learningTopicEl) learningTopicEl.value = book.learningTopic || '';
         handleLearningModeChange();
         currentStoryLanguage = 'ko';

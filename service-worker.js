@@ -1,4 +1,4 @@
-const CACHE_NAME='muni-story-v13';
+const CACHE_NAME='muni-story-v14';
 const APP_SHELL=[
   './','./index.html','./manifest.webmanifest',
   './js/learning.js','./js/language.js',

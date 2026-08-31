@@ -1,9 +1,9 @@
 // EAIM Muni Story Village - Learning Story module
-// Keeps learning-topic logic separate from the main story genre/style.
+// Story purpose and learning-topic logic are kept separate from the main genre/style.
 
 const learningGuides = {
   general: {
-    label: '🌈 자유 동화',
+    label: '🌈 이야기동화',
     prompt: ''
   },
   science: {
@@ -32,38 +32,95 @@ const learningGuides = {
   }
 };
 
+let currentStoryPurpose = 'story';
+let lastLearningMode = 'science';
+
+function getStoryPurpose() {
+  return currentStoryPurpose;
+}
+
+function setStoryPurpose(purpose, options = {}) {
+  currentStoryPurpose = purpose === 'learning' ? 'learning' : 'story';
+
+  const storyBtn = document.getElementById('storyPurposeStoryBtn');
+  const learningBtn = document.getElementById('storyPurposeLearningBtn');
+  const storyTopicBox = document.getElementById('storyTopicBox');
+  const learningBox = document.getElementById('learningBox');
+  const learningEl = document.getElementById('learningMode');
+
+  if (storyBtn) storyBtn.classList.toggle('active', currentStoryPurpose === 'story');
+  if (learningBtn) learningBtn.classList.toggle('active', currentStoryPurpose === 'learning');
+  if (storyTopicBox) storyTopicBox.hidden = currentStoryPurpose !== 'story';
+  if (learningBox) learningBox.hidden = currentStoryPurpose !== 'learning';
+
+  if (currentStoryPurpose === 'learning') {
+    if (learningEl) {
+      const validModes = ['science', 'math', 'music'];
+      if (!validModes.includes(learningEl.value)) learningEl.value = lastLearningMode;
+      lastLearningMode = learningEl.value;
+    }
+    handleLearningModeChange();
+  }
+
+  if (!options.silent) {
+    const topicEl = document.getElementById('learningTopic');
+    if (currentStoryPurpose === 'story' && topicEl) topicEl.blur();
+  }
+}
+
 function getLearningSelection() {
+  const purpose = getStoryPurpose();
   const modeEl = document.getElementById('learningMode');
   const topicEl = document.getElementById('learningTopic');
-  const mode = modeEl ? modeEl.value : 'general';
+
+  if (purpose !== 'learning') {
+    return { purpose: 'story', mode: 'general', topic: '', guide: learningGuides.general };
+  }
+
+  const mode = modeEl && ['science', 'math', 'music'].includes(modeEl.value) ? modeEl.value : 'science';
   const topic = (topicEl ? topicEl.value : '').trim();
-  return { mode, topic, guide: learningGuides[mode] || learningGuides.general };
+  lastLearningMode = mode;
+  return { purpose: 'learning', mode, topic, guide: learningGuides[mode] || learningGuides.science };
 }
 
 function handleLearningModeChange() {
-  const { mode } = getLearningSelection();
+  const modeEl = document.getElementById('learningMode');
+  const mode = modeEl && ['science', 'math', 'music'].includes(modeEl.value) ? modeEl.value : 'science';
+  lastLearningMode = mode;
+
   const topicEl = document.getElementById('learningTopic');
   const hintEl = document.getElementById('learningHint');
   const examples = {
-    general: '예: 우정, 용기, 가족, 자연처럼 자유롭게 이야기해요.',
     science: '예: 씨앗은 어떻게 자랄까? · 그림자는 왜 생길까? · 달은 왜 모양이 달라질까?',
     math: '예: 반복되는 무늬 찾기 · 더 길고 짧은 것 비교하기 · 모양으로 길 찾기',
     music: '예: 빠르고 느린 음악 · 악기 음색 찾기 · 리듬으로 친구와 대화하기'
   };
-  if (topicEl) {
-    topicEl.placeholder = mode === 'general'
-      ? '선택사항: 이야기에서 특별히 다루고 싶은 주제'
-      : '예: ' + (mode === 'science' ? '식물의 성장' : mode === 'math' ? '규칙 찾기' : '악기 음색');
-  }
-  if (hintEl) hintEl.textContent = examples[mode] || examples.general;
+  const placeholders = {
+    science: '예: 식물의 성장',
+    math: '예: 규칙 찾기',
+    music: '예: 악기 음색'
+  };
+
+  if (topicEl) topicEl.placeholder = placeholders[mode] || placeholders.science;
+  if (hintEl) hintEl.textContent = examples[mode] || examples.science;
 }
 
 function buildLearningPromptBlock() {
-  const { mode, topic, guide } = getLearningSelection();
-  if (mode === 'general') return '';
-  return `\n[배움동화 설정]\n- 배움 장르: ${guide.label}\n- 배움 주제: ${topic || '장르에 맞는 어린이 수준의 흥미로운 주제를 자연스럽게 선택'}\n${guide.prompt}\n- 가장 중요한 원칙: 재미있는 동화가 먼저이고, 배움은 이야기 속 사건과 발견에 자연스럽게 스며들어야 해.\n`;
+  const { purpose, mode, topic, guide } = getLearningSelection();
+  if (purpose !== 'learning' || mode === 'general') return '';
+  return `\n[배움동화 설정]\n- 배움 영역: ${guide.label}\n- 배움 내용: ${topic || '선택한 배움 영역에 맞는 어린이 수준의 흥미로운 내용을 자연스럽게 선택'}\n${guide.prompt}\n- 가장 중요한 원칙: 재미있는 동화가 먼저이고, 배움은 이야기 속 사건과 발견에 자연스럽게 스며들어야 해.\n`;
 }
 
 function learningModeLabel(mode) {
   return (learningGuides[mode] || learningGuides.general).label;
 }
+
+function storyPurposeLabel(purpose, mode) {
+  const resolvedPurpose = purpose || (mode && mode !== 'general' ? 'learning' : 'story');
+  return resolvedPurpose === 'learning' ? learningModeLabel(mode || 'science') : '🌈 이야기동화';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setStoryPurpose('story', { silent: true });
+  handleLearningModeChange();
+});

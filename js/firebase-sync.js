@@ -1,4 +1,4 @@
-// EAIM Kids Firebase cloud library module - v19
+// EAIM Kids Firebase cloud library module - v20
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js';
 import {
   getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged

@@ -10,7 +10,7 @@ const ENGLISH_LEVELS = {
     mode: 'en-preschool',
     label: '유아 영어',
     age: '약 4~7세',
-    version: 'preschool-easy-v2',
+    version: 'preschool-easy-v3-short',
     titleKey: 'preschoolEnglishTitle',
     pagesKey: 'preschoolEnglishPages',
     createdAtKey: 'preschoolEnglishCreatedAt',
@@ -188,10 +188,10 @@ function hideEnglishTranslationOverlay() {
 function buildEnglishPrompt(level, compactPages) {
   const isPreschool = level === 'preschool';
   const targetRules = isPreschool
-    ? `[유아 영어 난이도]\n- 대상: 약 4~7세 한국 어린이, 영어 첫걸음.\n- 한 문장은 보통 3~6단어 정도로 매우 짧게 써.\n- 한 문장에 한 가지 뜻만 담아.\n- 아주 자주 쓰는 쉬운 단어와 반복 표현을 중심으로 써.\n- 긴 수식어, 추상어, 어려운 동사, 관용구는 피하고 쉬운 말로 바꿔.\n- 각 페이지 full_text는 가능하면 2~4개의 아주 짧은 문장으로 구성해.\n- 대사는 짧고 리듬감 있게, 소리 내어 따라 하기 쉽게 만들어.\n- 원문의 세부 내용을 모두 옮기지 말고 핵심 사건만 남겨.`
+    ? `[유아 영어 난이도 - 아주 짧고 직관적으로]\n- 대상: 약 4~7세 한국 어린이, 영어를 처음 듣고 따라 하는 단계.\n- **한 문장은 2~5단어를 기본으로 하고, 최대 6단어를 넘기지 마.**\n- **각 페이지 full_text는 2~3문장만 써.** 정말 필요한 경우에만 4문장까지 허용해.\n- 그림을 보면서 바로 뜻을 짐작할 수 있는 문장만 써.\n- 주어+동사, 짧은 명령문, 감탄문을 많이 사용해. 예: "Bunny runs.", "Look! A seed!", "Come here!"\n- 아주 쉬운 일상 단어를 반복해서 사용해. 어려운 동사·형용사·추상어·관용구는 사용하지 마.\n- 긴 설명은 버리고 **장면의 핵심 행동·사물·감정 하나만** 말해.\n- 원문의 모든 내용을 번역하려 하지 마. 핵심 사건만 남겨 짧게 다시 들려줘.\n- 같은 핵심 단어를 자연스럽게 2~3번 반복해도 좋아.\n- 대사는 1~5단어 정도로 짧고, 아이가 바로 따라 말할 수 있게 해.\n- 의성어·감탄사(Oh!, Wow!, Tap tap!, Splash!)를 자연스럽게 활용해.\n- 소리 내어 읽었을 때 한 페이지가 아주 짧게 끝나야 해.`
     : `[어린이 영어 난이도]\n- 대상: 약 7~10세 한국 어린이, 영어 초급~초중급.\n- 한 문장은 보통 5~10단어 정도로 자연스럽고 명확하게 써.\n- 쉬운 기본 어휘를 중심으로 하되, 이야기 이해에 필요한 표현은 조금 더 풍부하게 써도 돼.\n- 문장이 길어지면 두 문장으로 나눠.\n- 각 페이지 full_text는 가능하면 3~6개의 짧은 문장으로 구성해.\n- 대사는 어린이가 듣고 따라 하기 좋은 자연스러운 영어로 만들어.\n- 유아 영어보다 사건과 감정을 조금 더 자세히 살려.`;
 
-  return `다음 한국어 어린이 동화를 **${isPreschool ? '유아용 Easy English' : '어린이용 Easy English'}** 동화로 다시 써줘.\n\n[가장 중요한 목표]\n- 이것은 문장별 직역이 아니라 **같은 이야기를 영어 수준에 맞게 다시 들려주는 adaptation**이야.\n- 한국어 원문의 핵심 사건과 감정은 유지해.\n- 한국 어린이가 그림을 보며 영어 낭독을 듣는 상황을 가정해.\n- 듣는 시간이 지나치게 길지 않게 하고, 소리 내어 읽었을 때 자연스러워야 해.\n\n${targetRules}\n\n[내용 보존 원칙]\n- 원문의 핵심 사건, 인물, 감정, 이야기 순서는 바꾸지 마.\n- 새로운 사건, 인물, 지식, 교훈은 추가하지 마.\n- 과학·수학·음악·역사 내용이 있다면 원문의 의미와 사실 관계를 정확하게 보존해.\n- 역사 인명·지명·핵심 사건은 정확하게 유지해.\n- role과 emotion 값은 절대 번역하거나 바꾸지 마.\n- 페이지 수와 각 페이지의 dialogue_list 항목 수는 원문과 동일하게 유지해.\n- 각 dialogue_list의 text도 해당 연령 수준에 맞는 짧고 쉬운 영어로 바꿔.\n- JSON 이외의 설명은 출력하지 마.\n\n[원문]\n${JSON.stringify({ title: currentStoryBookObject.title, pages: compactPages })}\n\n[출력 JSON]\n{\n  \"title\": \"English title\",\n  \"pages\": [\n    {\n      \"page_num\": 1,\n      \"full_text\": \"English full text\",\n      \"dialogue_list\": [\n        {\"role\":\"narrator\",\"emotion\":\"calm\",\"text\":\"English sentence\"}\n      ]\n    }\n  ]\n}`;
+  return `다음 한국어 어린이 동화를 **${isPreschool ? '유아용 Easy English' : '어린이용 Easy English'}** 동화로 다시 써줘.\n\n[가장 중요한 목표]\n- 이것은 문장별 직역이 아니라 **같은 이야기를 영어 수준에 맞게 다시 들려주는 adaptation**이야.\n- 한국어 원문의 핵심 사건과 감정은 유지해.\n- 한국 어린이가 그림을 보며 영어 낭독을 듣는 상황을 가정해.\n- 듣는 시간이 지나치게 길지 않게 하고, 소리 내어 읽었을 때 자연스러워야 해.\n${isPreschool ? '- 유아 영어에서는 **짧음이 가장 중요해. 설명을 줄이고, 그림과 함께 들으면 바로 이해되는 영어만 남겨.**\n- 유아 영어의 목표는 완전한 번역이 아니라 **영어 소리와 핵심 단어에 친숙해지는 것**이야.\n' : ''}\n${targetRules}\n\n[내용 보존 원칙]\n- 원문의 핵심 사건, 인물, 감정, 이야기 순서는 바꾸지 마.\n- 새로운 사건, 인물, 지식, 교훈은 추가하지 마.\n- 과학·수학·음악·역사 내용이 있다면 원문의 의미와 사실 관계를 정확하게 보존해.\n- 역사 인명·지명·핵심 사건은 정확하게 유지해.\n- role과 emotion 값은 절대 번역하거나 바꾸지 마.\n- 페이지 수와 각 페이지의 dialogue_list 항목 수는 원문과 동일하게 유지해.\n- 각 dialogue_list의 text도 해당 연령 수준에 맞는 짧고 쉬운 영어로 바꿔.\n- JSON 이외의 설명은 출력하지 마.\n\n[원문]\n${JSON.stringify({ title: currentStoryBookObject.title, pages: compactPages })}\n\n[출력 JSON]\n{\n  \"title\": \"English title\",\n  \"pages\": [\n    {\n      \"page_num\": 1,\n      \"full_text\": \"English full text\",\n      \"dialogue_list\": [\n        {\"role\":\"narrator\",\"emotion\":\"calm\",\"text\":\"English sentence\"}\n      ]\n    }\n  ]\n}`;
 }
 
 async function translateCurrentStoryToEnglish(level = 'preschool') {

@@ -1,4 +1,4 @@
-const CACHE_NAME='muni-story-v19';
+const CACHE_NAME='muni-story-v20';
 const APP_SHELL=[
   './','./index.html','./manifest.webmanifest',
   './js/learning.js','./js/language.js','./js/firebase-sync.js',

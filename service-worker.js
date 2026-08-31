@@ -1,7 +1,7 @@
-const CACHE_NAME='muni-story-v20';
+const CACHE_NAME='muni-story-v21';
 const APP_SHELL=[
-  './','./index.html','./manifest.webmanifest',
-  './js/learning.js','./js/language.js','./js/firebase-sync.js',
+  './','./index.html','./manifest.webmanifest','./css/styles.css',
+  './js/app.js','./js/pwa.js','./js/learning.js','./js/language.js','./js/firebase-sync.js',
   './icons/icon-192.png','./icons/icon-512.png',
   './assets/bgm/moonlit-forest-path.mp3','./assets/bgm/little-brave-hero.mp3',
   './assets/bgm/the-secret-in-the-box.mp3','./assets/bgm/starry-night-journey.mp3',

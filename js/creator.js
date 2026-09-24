@@ -241,7 +241,11 @@
         const sel = typeof getCurrentBgmSelection === 'function' ? getCurrentBgmSelection() : null;
         if (sel?.data?.url) {
           const res = await fetch(sel.data.url);
-          if (res.ok) zip.file(`배경음악_${sel.data.name}.mp3`, await res.blob());
+          if (res.ok) {
+            const bb = await res.blob();
+            const ext = /wav/.test(bb.type) ? 'wav' : /mp4|m4a|aac/.test(bb.type) ? 'm4a' : /ogg/.test(bb.type) ? 'ogg' : 'mp3';
+            zip.file(`배경음악_${sel.data.name}.${ext}`, bb);
+          }
         }
       } catch (e) { console.log('bgm skip:', e); }
 

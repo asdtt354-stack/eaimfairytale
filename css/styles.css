@@ -411,3 +411,46 @@ body.is-creator .creator-only{display:block !important}
 .cm-make:disabled{opacity:.6}
 .cm-lyria-status{margin:0;font-size:12.5px;color:#6b4a7a;line-height:1.5}
 .cm-down{background:#e6f6ec;color:#1f7a45}
+
+/* 🏛️ 뮤니 도서관 */
+.tab-nav{grid-template-columns:1fr 1fr 1fr}
+.tab-muni-lib:not(.active){background:linear-gradient(100deg,#fff8e6,#fdf4ff);color:#8d3199;border-color:#efc8f7}
+.ml-hero{display:flex;gap:18px;align-items:center;background:linear-gradient(120deg,#fff8e6,#fde7f3 60%,#efe6ff);border-radius:24px;padding:18px 22px;margin-bottom:16px;word-break:keep-all}
+.ml-hero img{width:92px;height:92px;object-fit:contain;flex:none}
+.ml-hero h2{margin:0 0 6px;color:#4a2f8f;font-size:24px}.ml-hero p{margin:0;color:#5b4a78;font-size:14.5px;line-height:1.6}
+.ml-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.ml-card{background:#fff;border:1.5px solid #efe7fb;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 20px rgba(90,60,150,.07)}
+.ml-cover{position:relative;border:0;padding:0;cursor:pointer;background:#f3eefc;aspect-ratio:1/1}
+.ml-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.ml-badge{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.92);color:#8d3199;font-size:11.5px;font-weight:900;padding:4px 9px;border-radius:999px}
+.ml-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1;word-break:keep-all}
+.ml-body h3{margin:0;font-size:17px;color:#38275f}.ml-body p{margin:0;color:#6b7590;font-size:13px;line-height:1.5}
+.ml-tags{display:flex;flex-wrap:wrap;gap:5px}.ml-tags span{font-size:11.5px;font-weight:800;background:#f4f0ff;color:#5b3fd0;border-radius:999px;padding:3px 8px}
+.ml-actions{display:flex;gap:6px;margin-top:auto;padding-top:6px}
+.ml-actions button{flex:1;border:0;border-radius:12px;padding:10px 8px;font-weight:900;cursor:pointer;font-size:13.5px}
+.ml-read{background:linear-gradient(100deg,#7651e8,#9550e8);color:#fff}.ml-video{background:#ffe8ec;color:#c2185b}
+.ml-empty{grid-column:1/-1;text-align:center;color:#94a3b8;padding:30px}
+.library-book-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#fff8e6;border:1.5px solid #f7d58a;border-radius:14px;padding:9px 12px;margin-bottom:10px;font-weight:800;color:#7a5311;font-size:13.5px}
+.library-book-bar span{margin-right:auto}
+.library-book-bar button{border:0;border-radius:10px;padding:8px 12px;font-weight:900;cursor:pointer;background:#fff;color:#5b3fd0}
+.library-book-bar .ml-bar-video{background:#ffe8ec;color:#c2185b}
+body.viewing-library-book .save-btn,body.viewing-library-book #aiVoiceAddBtn,body.viewing-library-book .publish-btn{display:none !important}
+.ml-busy{position:fixed;inset:0;z-index:100007;background:rgba(40,30,70,.45);display:none;place-items:center}
+.ml-busy>div{background:#fff;border-radius:22px;padding:22px 26px;text-align:center}
+.ml-busy img{width:80px;height:80px;object-fit:contain;animation:mlBob 1s ease-in-out infinite alternate}
+.ml-busy p{margin:8px 0 0;color:#4a2f8f;font-weight:800}
+@keyframes mlBob{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+.ml-video-modal{position:fixed;inset:0;z-index:100008;background:rgba(20,15,34,.7);display:grid;place-items:center;padding:14px}
+.ml-video-box{background:#fff;border-radius:20px;padding:14px;width:min(900px,100%)}
+.ml-video-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:#4a2f8f}
+.ml-video-close{border:0;background:#ececf3;border-radius:9px;padding:6px 10px;font-weight:900;cursor:pointer}
+.ml-video-tabs{display:flex;gap:6px;margin-bottom:8px}
+.ml-video-tabs button{border:0;border-radius:10px;padding:7px 12px;font-weight:900;cursor:pointer;background:#f4f0ff;color:#5b3fd0}
+.ml-video-tabs button.on{background:#7651e8;color:#fff}
+.ml-video-frame{aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden}
+.ml-video-frame iframe{width:100%;height:100%;border:0}
+.ml-video-link{display:inline-block;margin-top:8px;font-size:13px;color:#6b7590}
+.ml-form{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.ml-form label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:#4f5870}
+.ml-form input{border:1px solid #e3e6ee;border-radius:9px;padding:8px;font-size:13.5px;font-family:inherit}
+@media (max-width:760px){.tab-nav{grid-template-columns:1fr 1fr 1fr;gap:6px}.tab-btn{font-size:12.5px;padding:10px 4px}.ml-hero{flex-direction:column;text-align:center}}

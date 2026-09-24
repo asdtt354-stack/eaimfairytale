@@ -55,6 +55,10 @@ window.addEventListener('beforeunload', (e) => {
   };
 
   function getCurrentBgmSelection() {
+    // 🎵 제작자가 이 동화에 넣은 곡이 있으면 그 곡을 씁니다
+    const custom = typeof window.getCustomBgmData === 'function' ? window.getCustomBgmData(currentStoryBookObject) : null;
+    if (custom) return { key: 'custom', data: custom, volume: targetBgmVolume };
+
     const actingStyle = document.getElementById('actingStyle')?.value || 'dynamic_theater';
     if (actingStyle === 'bedtime_calm') {
       return { key: 'bedtime', data: bgmPlaylist.bedtime, volume: 0.34 };
@@ -1066,6 +1070,8 @@ currentStoryBookObject = {
     const controlPanel = document.getElementById('controlPanel');
     if (controlPanel) controlPanel.style.display = 'flex';
     if (typeof updateAiVoiceButton === 'function') updateAiVoiceButton();
+    if (typeof window.updateMusicButtonLabel === 'function') window.updateMusicButtonLabel();
+    if (typeof window.updateLibraryBookBar === 'function') window.updateLibraryBookBar();
   }
 
   function showPage(index) {
@@ -1529,6 +1535,9 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
         if (Array.isArray(mergedBook.pages)) {
           mergedBook.pages = mergedBook.pages.map((pg, i) => localPages[i]?.aiVoice && !pg.aiVoice ? { ...pg, aiVoice: localPages[i].aiVoice } : pg);
           mergedBook.hasAiVoice = mergedBook.pages.some(pg => pg.aiVoice?.blob);
+        }
+        if (merged[idx].customBgm && !(mergedBook.customBgm && mergedBook.customBgm.blob)) {
+          mergedBook.customBgm = merged[idx].customBgm; // 🎵 제작자 음악도 이 기기에만 있으므로 다시 붙이기
         }
         merged[idx] = mergedBook;
       } else merged.push(cb);

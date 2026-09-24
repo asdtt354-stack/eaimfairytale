@@ -119,7 +119,7 @@ async function saveStory(book) {
   const cloudId=makeCloudId(book);
   const storyRef=doc(firestore,'users',uid,'stories',cloudId);
 
-  const meta=cleanForFirestore(book);
+  const meta=cleanForFirestore({ ...book, customBgm: undefined }); // 🎵 제작자 음악 파일은 이 기기에만
   delete meta.pages;
   meta.cloudId=cloudId;
   meta.ownerUid=uid;

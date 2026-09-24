@@ -384,3 +384,30 @@ body.is-creator .creator-only{display:block !important}
 .rec-intro.out{opacity:0}
 .rec-intro-opt{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:#fff5d9;color:#7a5311;font-size:13.5px;font-weight:800;text-align:left;cursor:pointer}
 .rec-intro-opt input{margin-right:6px;accent-color:#e84a9b}
+
+/* 🎵 제작자 음악 보관함 */
+.cm-overlay{position:fixed;inset:0;z-index:100006;background:rgba(20,18,35,.55);display:none;place-items:center;padding:16px}
+.cm-box{background:#fff;border-radius:20px;padding:18px 18px 16px;width:min(520px,100%);max-height:88vh;overflow:auto;word-break:keep-all}
+.cm-head{display:flex;justify-content:space-between;align-items:center;font-size:17px;color:#4a2f8f}
+.cm-close{border:0;background:#ececf3;border-radius:9px;padding:6px 10px;cursor:pointer;font-weight:900}
+.cm-current{font-size:13px;color:#7a5311;background:#fff5d9;border-radius:10px;padding:8px 10px;margin:10px 0}
+.cm-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.cm-item{display:flex;align-items:center;gap:8px;border:1.5px solid #ece8f6;border-radius:12px;padding:7px 8px}
+.cm-item.on{border-color:#b44fd0;background:#fdf4ff}
+.cm-name{flex:1;font-weight:800;color:#38425a;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cm-item button{border:0;border-radius:9px;padding:7px 10px;font-weight:900;cursor:pointer;font-size:12.5px}
+.cm-play{background:#f0e9ff;color:#5b3fd0}.cm-use{background:#7651e8;color:#fff}.cm-del{background:#fee2e2;color:#9b1c1c}
+.cm-empty{color:#8a93a8;font-size:13px;text-align:center;padding:14px}
+.cm-upload{display:block;text-align:center;border:1.5px dashed #c9b6f5;background:#faf7ff;color:#6a47de;border-radius:12px;padding:11px;font-weight:900;cursor:pointer;margin-bottom:8px}
+.cm-upload input{display:none}
+.cm-reset{width:100%;border:0;border-radius:12px;padding:10px;background:#ececf3;color:#3e4960;font-weight:800;cursor:pointer}
+.cm-note{font-size:12px;color:#8a93a8;line-height:1.55;margin:10px 0 0}
+
+.cm-lyria{border:1.5px solid #efc8f7;background:#fdf4ff;border-radius:14px;padding:12px;margin:0 0 10px;display:flex;flex-direction:column;gap:8px}
+.cm-lyria b{color:#8d3199}
+.cm-row{display:flex;gap:6px}.cm-row select{flex:1}
+.cm-lyria select,.cm-lyria input,.cm-lyria textarea{border:1px solid #e3d3ee;border-radius:9px;padding:8px;font-size:13px;font-family:inherit}
+.cm-make{border:0;border-radius:11px;padding:10px;font-weight:900;color:#fff;background:linear-gradient(100deg,#b44fd0,#7651e8);cursor:pointer}
+.cm-make:disabled{opacity:.6}
+.cm-lyria-status{margin:0;font-size:12.5px;color:#6b4a7a;line-height:1.5}
+.cm-down{background:#e6f6ec;color:#1f7a45}

@@ -129,8 +129,17 @@
 
   // 🔗 바로 가는 주소: …/?library (도서관) · …/?story=<slug> (그 동화 바로 열기)
   function siteBase() { return `${location.origin}${location.pathname.replace(/index\.html$/, '')}`; }
+  // 인스타 등은 주소의 '?' 뒤를 잘라내므로, 물음표 없는 주소를 우선 복사합니다.
+  //   도서관: …/muni-library/      동화: …/library/<slug>/ (도서관에 올린 동화 폴더의 안내 페이지)
   window.copyLibraryLink = async function (slug, btn) {
-    const url = slug ? `${siteBase()}?story=${encodeURIComponent(slug)}` : `${siteBase()}?library`;
+    let url = `${siteBase()}muni-library/`;
+    if (slug) {
+      url = `${siteBase()}library/${encodeURIComponent(slug)}/`;
+      try {
+        const r = await fetch(`${LIB}/${slug}/index.html`, { method: 'HEAD', cache: 'no-store' });
+        if (!r.ok) url = `${siteBase()}?story=${encodeURIComponent(slug)}`; // 예전에 올린 동화는 다시 올리면 짧은 주소가 생겨요
+      } catch (e) { url = `${siteBase()}?story=${encodeURIComponent(slug)}`; }
+    }
     try { await navigator.clipboard.writeText(url); if (btn) { const o = btn.textContent; btn.textContent = '✅ 복사했어요!'; setTimeout(() => { btn.textContent = o; }, 1800); } }
     catch (e) { prompt('아래 주소를 복사하세요', url); }
   };
@@ -338,6 +347,9 @@
       publishedAt, bgm, pages, english
     };
     dir.file('story.json', JSON.stringify(story, null, 2));
+    // 물음표 없는 동화 주소(…/library/<slug>/)로 들어오면 그 동화를 바로 열어 주는 안내 페이지
+    const safeTitle = String(book.title || '').replace(/[<>&"]/g, '');
+    dir.file('index.html', `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>📖 ${safeTitle} · 뮤니 도서관</title><meta name="description" content="${(info.summary || '뮤니 도서관 무료 동화').replace(/[<>&"]/g, '')}"><meta http-equiv="refresh" content="0; url=../../?story=${slug}"><script>location.replace('../../?story=${slug}');</script></head><body><p>📚 동화책을 펼치는 중이에요… <a href="../../?story=${slug}">바로 가기</a></p></body></html>`);
     say('📚 도서관 목록 합치는 중...');
     const idx = await fetchIndexForPublish();
     const entry = { slug, title: book.title, cover: `${slug}/${pages[0]?.image || 'p01.jpg'}`, summary: info.summary, origin: info.origin,

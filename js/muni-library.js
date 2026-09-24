@@ -69,6 +69,20 @@
       return j && Array.isArray(j.stories) ? j : { version: 1, stories: [] };
     } catch (e) { return { version: 1, stories: [] }; }
   }
+  // 제작자가 만든 도서관 목록을 기기에도 기억 (연달아 여러 편을 묶어도 목록이 빠지지 않게)
+  const PUB_KEY = 'gemini_fairytale_library_published';
+  function localPublished() { try { return JSON.parse(localStorage.getItem(PUB_KEY) || '[]'); } catch (e) { return []; } }
+  function rememberPublished(entry) {
+    const list = [entry, ...localPublished().filter(x => x.slug !== entry.slug)].slice(0, 300);
+    try { localStorage.setItem(PUB_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+  async function fetchIndexForPublish() {
+    const idx = await fetchIndex();
+    const have = new Set(idx.stories.map(x => x.slug));
+    localPublished().forEach(x => { if (!have.has(x.slug)) idx.stories.push(x); });
+    return idx;
+  }
+
   async function loadJSZip() {
     if (window.JSZip) return window.JSZip;
     await new Promise((res, rej) => { const s = document.createElement('script'); s.src = './js/vendor/jszip.min.js'; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
@@ -99,6 +113,7 @@
             <button type="button" class="ml-read" onclick="openLibraryStory('${esc(s.slug)}')">📖 동화 보기</button>
             ${(s.youtube && (s.youtube.ko || s.youtube.en)) ? `<button type="button" class="ml-video" onclick="openLibraryVideo('${esc(s.slug)}')">🎬 영상 보기</button>` : ''}
           </div>
+          <button type="button" class="ml-share" onclick="copyLibraryLink('${esc(s.slug)}', this)">🔗 이 동화 링크 복사</button>
         </div>
       </article>`).join('');
     window.__muniLibraryIndex = list;
@@ -111,6 +126,22 @@
     renderLibrary();
   }
   window.showMuniLibrary = showMuniLibrary;
+
+  // 🔗 바로 가는 주소: …/?library (도서관) · …/?story=<slug> (그 동화 바로 열기)
+  function siteBase() { return `${location.origin}${location.pathname.replace(/index\.html$/, '')}`; }
+  window.copyLibraryLink = async function (slug, btn) {
+    const url = slug ? `${siteBase()}?story=${encodeURIComponent(slug)}` : `${siteBase()}?library`;
+    try { await navigator.clipboard.writeText(url); if (btn) { const o = btn.textContent; btn.textContent = '✅ 복사했어요!'; setTimeout(() => { btn.textContent = o; }, 1800); } }
+    catch (e) { prompt('아래 주소를 복사하세요', url); }
+  };
+  function handleDeepLink() {
+    const q = new URLSearchParams(location.search);
+    const story = q.get('story');
+    if (story) { window.openLibraryStory(story); return; }
+    if (q.has('library') || location.hash === '#library') showMuniLibrary();
+  }
+  if (document.readyState === 'complete') setTimeout(handleDeepLink, 300);
+  else window.addEventListener('load', () => setTimeout(handleDeepLink, 300));
 
   // 기존 탭 전환이 도서관 화면을 닫도록
   const origSwitch = window.switchTab;
@@ -304,12 +335,13 @@
     };
     dir.file('story.json', JSON.stringify(story, null, 2));
     say('📚 도서관 목록 합치는 중...');
-    const idx = await fetchIndex();
+    const idx = await fetchIndexForPublish();
     const entry = { slug, title: book.title, cover: `${slug}/${pages[0]?.image || 'p01.jpg'}`, summary: info.summary, origin: info.origin,
       theme: book.storyTheme || '', genre: book.genre || '', hasVoice, hasEnglish, youtube: info.youtube, author: book.author || '', publishedAt };
     const old = idx.stories.find(s => s.slug === slug);
     if (old && old.publishedAt) entry.publishedAt = old.publishedAt; // 순서 유지
     idx.stories = [entry, ...idx.stories.filter(s => s.slug !== slug)];
+    rememberPublished(entry);
     idx.updatedAt = publishedAt;
     zip.folder('library').file('index.json', JSON.stringify(idx, null, 2));
     zip.file('도서관_올리는법.txt', '\ufeff' + [
@@ -318,7 +350,9 @@
       '2. GitHub 저장소(eaimfairytale) → Add file → Upload files 에 library 폴더를 통째로 끌어다 놓기',
       '3. Commit changes → 1~2분 뒤 앱의 🏛️ 뮤니 도서관에 보여요.', '',
       `※ 이 동화의 도서관 번호(slug): ${slug} — 같은 동화를 다시 올리면 새것으로 바뀌어요.`,
-      '※ index.json 은 지금까지 올린 동화 목록이에요. 꼭 함께 올려주세요.'
+      '※ index.json 은 지금까지 올린 동화 목록이에요(자동으로 합쳐져 있어요). 직접 고치지 말고 library 폴더째 올려주세요.',
+      '※ 저장소 맨 바깥의 index.html(앱 화면)은 건드리지 않아요.',
+      '※ 여러 편을 연달아 묶었다면 마지막에 만든 묶음의 index.json 이 가장 최신이에요.'
     ].join('\r\n'));
     say('📦 압축하는 중...');
     const out = await zip.generateAsync({ type: 'blob' });

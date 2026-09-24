@@ -6,13 +6,13 @@
       "title": "우리는 멋쟁이 브레멘 음악대!",
       "cover": "smufevra8/p01.jpg",
       "summary": "당나귀, 강아지, 고양이, 수탉이 함께 음악대를 만들었어요!",
-      "origin": "그림형",
+      "origin": "그림형제",
       "theme": "우정",
       "genre": "animal",
       "hasVoice": true,
       "hasEnglish": true,
       "youtube": {
-        "ko": "https://youtu.be/MHuEfiTU8w0",
+        "ko": "https://youtu.be/9OpFzkO_wi4",
         "en": ""
       },
       "author": "뮤토책방",
@@ -36,5 +36,5 @@
       "publishedAt": "2026-09-24T10:56:41.835Z"
     }
   ],
-  "updatedAt": "2026-09-24T11:00:35.139Z"
+  "updatedAt": "2026-09-24T11:03:40.661Z"
 }

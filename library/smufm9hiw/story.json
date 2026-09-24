@@ -7,17 +7,17 @@
   "genre": "custom",
   "villagePlace": {
     "name": "달콤 박넝쿨 초가집",
-    "type": "home",
     "emoji": "🏡✨",
-    "description": "다정한 제비가 날아오고 주렁주렁 탐스러운 보물 박이 열리는 따스한 초가집이에요."
+    "description": "다정한 제비가 날아오고 주렁주렁 탐스러운 보물 박이 열리는 따스한 초가집이에요.",
+    "type": "home"
   },
-  "summary": "착한 흥부가 아기 제비를 돌봐 주고 받은 박씨에서 알록달록 보물이 쏟아지는, 나눔과 화해의 옛이야기예요",
-  "origin": "전래동화 (흥부전)",
+  "summary": "박 속에서 무엇이 나왔을까요? 🎃 흥부 놀부의 알록달록 보물 박",
+  "origin": "전래동화",
   "youtube": {
-    "ko": "https://youtu.be/g2PwYvJWoLA",
+    "ko": "https://youtu.be/RaLV0LzpmuY",
     "en": "https://youtu.be/eV3h53TTR3U"
   },
-  "publishedAt": "2026-09-24T14:17:55.771Z",
+  "publishedAt": "2026-09-24T14:55:26.341Z",
   "bgm": null,
   "pages": [
     {
@@ -25,24 +25,24 @@
       "full_text": "옛날 옛적 한 마을에 마음씨 착한 동생 흥부와 욕심 많은 형 놀부가 살고 있었어요. 놀부는 커다란 기와집에서 맛있는 음식을 혼자만 냠냠 먹었지만, 흥부는 낡은 초가집에서 가족들과 오순도순 살았답니다. \"형님, 오늘 날씨가 참 좋습니다!\" 흥부가 밝게 인사해도 놀부는 콧방귀만 뀌었어요. \"흥! 가난뱅이 주제에 아침부터 시끄럽기는! 저리 가거라!\" 비록 가난했지만 흥부네 집은 언제나 사랑으로 가득했어요.",
       "dialogue_list": [
         {
-          "role": "narrator",
+          "text": "옛날 옛적 한 마을에 마음씨 착한 동생 흥부와 욕심 많은 형 놀부가 살고 있었어요.",
           "emotion": "excited",
-          "text": "옛날 옛적 한 마을에 마음씨 착한 동생 흥부와 욕심 많은 형 놀부가 살고 있었어요."
+          "role": "narrator"
         },
         {
           "role": "narrator",
-          "text": "놀부는 커다란 기와집에서 맛있는 음식을 혼자만 냠냠 먹었지만, 흥부는 낡은 초가집에서 가족들과 오순도순 살았답니다.",
-          "emotion": "calm"
+          "emotion": "calm",
+          "text": "놀부는 커다란 기와집에서 맛있는 음식을 혼자만 냠냠 먹었지만, 흥부는 낡은 초가집에서 가족들과 오순도순 살았답니다."
         },
         {
-          "role": "hero",
+          "emotion": "happy",
           "text": "형님, 오늘 날씨가 참 좋습니다!",
-          "emotion": "happy"
+          "role": "hero"
         },
         {
-          "emotion": "angry",
           "text": "흥! 가난뱅이 주제에 아침부터 시끄럽기는! 저리 가거라!",
-          "role": "villain"
+          "role": "villain",
+          "emotion": "angry"
         },
         {
           "text": "비록 가난했지만 흥부네 집은 언제나 사랑으로 가득했어요.",
@@ -87,28 +87,28 @@
       "dialogue_list": [
         {
           "text": "따스한 봄날, 흥부네 초가지붕 처마 밑에서 애처로운 소리가 들렸어요.",
-          "emotion": "urgent",
-          "role": "narrator"
-        },
-        {
-          "text": "둥지에서 아기 제비 한 마리가 땅으로 툭 떨어져 바들바들 떨고 있지 뭐예요!",
           "role": "narrator",
           "emotion": "urgent"
         },
         {
-          "emotion": "curious",
+          "role": "narrator",
+          "emotion": "urgent",
+          "text": "둥지에서 아기 제비 한 마리가 땅으로 툭 떨어져 바들바들 떨고 있지 뭐예요!"
+        },
+        {
           "text": "아이쿠, 가여워라! 다리를 다쳤구나.",
+          "emotion": "curious",
           "role": "hero"
         },
         {
-          "role": "narrator",
+          "emotion": "calm",
           "text": "흥부는 얼른 달려가 아기 제비를 조심스레 두 손으로 감싸 안았어요.",
-          "emotion": "calm"
+          "role": "narrator"
         },
         {
-          "role": "narrator",
+          "text": "헝겊과 약을 가져와 정성껏 부러진 다리를 감싸주었답니다. 아기 제비는 고마운 듯 흥부의 손가락을 콕콕 간질였어요.",
           "emotion": "happy",
-          "text": "헝겊과 약을 가져와 정성껏 부러진 다리를 감싸주었답니다. 아기 제비는 고마운 듯 흥부의 손가락을 콕콕 간질였어요."
+          "role": "narrator"
         }
       ],
       "image": "p02.jpg",
@@ -148,24 +148,24 @@
           "text": "흥부의 정성 어린 보살핌 덕분에 아기 제비는 무럭무럭 자라 푸른 하늘로 날아올랐어요."
         },
         {
-          "emotion": "happy",
-          "text": "그리고 이듬해 봄, 처마 밑으로 날아온 아기 제비가 입에 물고 있던 무언가를 톡 떨어뜨렸어요!",
-          "role": "narrator"
-        },
-        {
-          "text": "어라? 반짝이는 하얀 박씨잖아? 고맙다, 제비야!",
-          "role": "hero",
-          "emotion": "excited"
-        },
-        {
           "role": "narrator",
-          "text": "흥부는 마당 양지바른 곳에 박씨를 심고 매일매일 물을 주었어요.",
-          "emotion": "happy"
+          "emotion": "happy",
+          "text": "그리고 이듬해 봄, 처마 밑으로 날아온 아기 제비가 입에 물고 있던 무언가를 톡 떨어뜨렸어요!"
         },
         {
+          "role": "hero",
           "emotion": "excited",
-          "text": "그러자 쑥쑥 자라 지붕 위로 보름달처럼 커다란 박들이 주렁주렁 열렸답니다!",
+          "text": "어라? 반짝이는 하얀 박씨잖아? 고맙다, 제비야!"
+        },
+        {
+          "emotion": "happy",
+          "text": "흥부는 마당 양지바른 곳에 박씨를 심고 매일매일 물을 주었어요.",
           "role": "narrator"
+        },
+        {
+          "text": "그러자 쑥쑥 자라 지붕 위로 보름달처럼 커다란 박들이 주렁주렁 열렸답니다!",
+          "role": "narrator",
+          "emotion": "excited"
         }
       ],
       "image": "p03.jpg",
@@ -200,14 +200,14 @@
       "full_text": "가을이 오자 흥부네 가족은 잘 익은 박을 타기 시작했어요. \"슬근슬근 톱질하세! 쓱싹쓱싹 톱질하세!\" 온 가족이 힘을 합쳐 노래를 부르며 박을 켜자, 쩍! 하고 박이 두 쪽으로 갈라졌어요. 그런데 이게 웬일일까요? 박 속에서 번쩍번쩍 금은보화와 알록달록 비단, 그리고 하얀 쌀이 쏟아져 나오는 게 아니겠어요! \"만세! 우리 가족 이제 배곯지 않아도 되겠어요!\" 흥부네 마당은 행복한 웃음꽃으로 가득 찼답니다.",
       "dialogue_list": [
         {
-          "text": "가을이 오자 흥부네 가족은 잘 익은 박을 타기 시작했어요.",
           "role": "narrator",
-          "emotion": "excited"
+          "emotion": "excited",
+          "text": "가을이 오자 흥부네 가족은 잘 익은 박을 타기 시작했어요."
         },
         {
+          "text": "슬근슬근 톱질하세! 쓱싹쓱싹 톱질하세!",
           "emotion": "excited",
-          "role": "hero",
-          "text": "슬근슬근 톱질하세! 쓱싹쓱싹 톱질하세!"
+          "role": "hero"
         },
         {
           "emotion": "urgent",
@@ -216,12 +216,12 @@
         },
         {
           "role": "narrator",
-          "emotion": "excited",
-          "text": "그런데 이게 웬일일까요? 박 속에서 번쩍번쩍 금은보화와 알록달록 비단, 그리고 하얀 쌀이 쏟아져 나오는 게 아니겠어요!"
+          "text": "그런데 이게 웬일일까요? 박 속에서 번쩍번쩍 금은보화와 알록달록 비단, 그리고 하얀 쌀이 쏟아져 나오는 게 아니겠어요!",
+          "emotion": "excited"
         },
         {
-          "emotion": "happy",
           "text": "만세! 우리 가족 이제 배곯지 않아도 되겠어요!",
+          "emotion": "happy",
           "role": "hero"
         },
         {
@@ -266,29 +266,29 @@
       "full_text": "소문을 들은 욕심쟁이 놀부는 샘이 나서 배가 아플 지경이었어요. \"흥부 그 녀석이 제비 다리를 고쳐주고 부자가 됐다고? 나도 더 큰 부자가 될 테다!\" 놀부는 눈에 불을 켜고 멀쩡히 날아다니던 제비를 억지로 잡아 다리를 뚝 부러뜨린 뒤 붕대를 감아주었어요. \"자, 어서 날아가서 나한테도 엄청나게 커다란 보물 박씨를 물어오너라!\" 놀부는 낄낄거리며 시커먼 속마음을 드러냈지요.",
       "dialogue_list": [
         {
-          "text": "소문을 들은 욕심쟁이 놀부는 샘이 나서 배가 아플 지경이었어요.",
+          "emotion": "curious",
           "role": "narrator",
-          "emotion": "curious"
+          "text": "소문을 들은 욕심쟁이 놀부는 샘이 나서 배가 아플 지경이었어요."
         },
         {
+          "emotion": "angry",
           "text": "흥부 그 녀석이 제비 다리를 고쳐주고 부자가 됐다고? 나도 더 큰 부자가 될 테다!",
-          "role": "villain",
-          "emotion": "angry"
+          "role": "villain"
         },
         {
           "text": "놀부는 눈에 불을 켜고 멀쩡히 날아다니던 제비를 억지로 잡아 다리를 뚝 부러뜨린 뒤 붕대를 감아주었어요.",
-          "role": "narrator",
-          "emotion": "urgent"
+          "emotion": "urgent",
+          "role": "narrator"
         },
         {
-          "text": "자, 어서 날아가서 나한테도 엄청나게 커다란 보물 박씨를 물어오너라!",
           "role": "villain",
-          "emotion": "excited"
+          "emotion": "excited",
+          "text": "자, 어서 날아가서 나한테도 엄청나게 커다란 보물 박씨를 물어오너라!"
         },
         {
+          "emotion": "calm",
           "role": "narrator",
-          "text": "놀부는 낄낄거리며 시커먼 속마음을 드러냈지요.",
-          "emotion": "calm"
+          "text": "놀부는 낄낄거리며 시커먼 속마음을 드러냈지요."
         }
       ],
       "image": "p05.jpg",
@@ -323,8 +323,8 @@
       "full_text": "놀부가 심은 박씨에서도 이따만 한 박이 주렁주렁 열렸어요. \"얼씨구! 내 박 속에는 황금 덩어리가 산더미처럼 들어있겠지?\" 놀부는 신이 나서 박을 쓱싹쓱싹 톱질했어요. 쩍! 박이 갈라지는 순간, 번쩍이는 금 대신 무시무시한 도깨비들과 도적들이 몽둥이를 휘두르며 우르르 쏟아져 나왔어요! \"욕심쟁이 놀부 녀석, 혼 좀 나봐라!\" 도깨비들은 놀부의 집안 살림을 몽땅 부수고 와다다 도망쳐 버렸답니다.",
       "dialogue_list": [
         {
-          "emotion": "calm",
           "role": "narrator",
+          "emotion": "calm",
           "text": "놀부가 심은 박씨에서도 이따만 한 박이 주렁주렁 열렸어요."
         },
         {
@@ -333,24 +333,24 @@
           "role": "villain"
         },
         {
+          "emotion": "urgent",
           "text": "놀부는 신이 나서 박을 쓱싹쓱싹 톱질했어요.",
-          "role": "narrator",
-          "emotion": "urgent"
+          "role": "narrator"
         },
         {
+          "emotion": "urgent",
           "role": "narrator",
-          "text": "쩍! 박이 갈라지는 순간, 번쩍이는 금 대신 무시무시한 도깨비들과 도적들이 몽둥이를 휘두르며 우르르 쏟아져 나왔어요!",
-          "emotion": "urgent"
+          "text": "쩍! 박이 갈라지는 순간, 번쩍이는 금 대신 무시무시한 도깨비들과 도적들이 몽둥이를 휘두르며 우르르 쏟아져 나왔어요!"
         },
         {
           "text": "욕심쟁이 놀부 녀석, 혼 좀 나봐라!",
-          "role": "villain",
-          "emotion": "angry"
+          "emotion": "angry",
+          "role": "villain"
         },
         {
+          "emotion": "excited",
           "text": "도깨비들은 놀부의 집안 살림을 몽땅 부수고 와다다 도망쳐 버렸답니다.",
-          "role": "narrator",
-          "emotion": "excited"
+          "role": "narrator"
         }
       ],
       "image": "p06.jpg",
@@ -394,9 +394,9 @@
           "role": "narrator"
         },
         {
-          "emotion": "urgent",
+          "role": "villain",
           "text": "아이고, 내 재산! 내가 못된 짓을 해서 큰 벌을 받았구나!",
-          "role": "villain"
+          "emotion": "urgent"
         },
         {
           "role": "narrator",
@@ -409,14 +409,14 @@
           "emotion": "urgent"
         },
         {
+          "text": "흥부는 울고 있는 놀부의 흙 묻은 옷을 털어주며 따뜻하게 안아주었어요.",
           "role": "narrator",
-          "emotion": "happy",
-          "text": "흥부는 울고 있는 놀부의 흙 묻은 옷을 털어주며 따뜻하게 안아주었어요."
+          "emotion": "happy"
         },
         {
-          "emotion": "whisper",
           "role": "villain",
-          "text": "흥부야... 내가 너에게 그렇게 모질게 굴었는데..."
+          "text": "흥부야... 내가 너에게 그렇게 모질게 굴었는데...",
+          "emotion": "whisper"
         }
       ],
       "image": "p07.jpg",
@@ -461,23 +461,23 @@
         },
         {
           "role": "narrator",
-          "text": "흥부는 활짝 웃으며 놀부의 손을 꼭 잡았어요. 놀부는 지난날의 욕심을 진심으로 뉘우치며 눈물을 흘렸답니다.",
-          "emotion": "calm"
+          "emotion": "calm",
+          "text": "흥부는 활짝 웃으며 놀부의 손을 꼭 잡았어요. 놀부는 지난날의 욕심을 진심으로 뉘우치며 눈물을 흘렸답니다."
         },
         {
-          "emotion": "excited",
           "text": "하늘 위에서는 아기 제비가 축하하듯 빙글빙글 기분 좋게 날아다녔어요.",
+          "emotion": "excited",
+          "role": "narrator"
+        },
+        {
+          "text": "두 형제는 모든 것을 다정하게 나누며 오래오래 행복하게 살았답니다.",
+          "emotion": "happy",
           "role": "narrator"
         },
         {
           "role": "narrator",
-          "emotion": "happy",
-          "text": "두 형제는 모든 것을 다정하게 나누며 오래오래 행복하게 살았답니다."
-        },
-        {
-          "emotion": "calm",
-          "role": "narrator",
-          "text": "따뜻한 나눔의 마음은 언제나 더 큰 행복으로 돌아온답니다!"
+          "text": "따뜻한 나눔의 마음은 언제나 더 큰 행복으로 돌아온답니다!",
+          "emotion": "calm"
         }
       ],
       "image": "p08.jpg",
@@ -512,119 +512,119 @@
     "preschoolEnglishTitle": "The Magic Gourds",
     "preschoolEnglishPages": [
       {
-        "full_text": "Good Heungbu is poor. Greedy Nolbu is rich. Heungbu loves his family.",
-        "page_num": 1,
         "dialogue_list": [
           {
-            "emotion": "excited",
             "role": "narrator",
+            "emotion": "excited",
             "text": "Here are two brothers."
           },
           {
+            "emotion": "calm",
             "role": "narrator",
-            "text": "Nolbu has big house.",
-            "emotion": "calm"
+            "text": "Nolbu has big house."
           },
           {
+            "text": "Good morning, brother!",
             "emotion": "happy",
-            "role": "hero",
-            "text": "Good morning, brother!"
+            "role": "hero"
           },
           {
             "text": "Go away, poor boy!",
-            "role": "villain",
-            "emotion": "angry"
+            "emotion": "angry",
+            "role": "villain"
           },
           {
             "emotion": "calm",
-            "text": "Heungbu smiles with love.",
-            "role": "narrator"
+            "role": "narrator",
+            "text": "Heungbu smiles with love."
           }
-        ]
+        ],
+        "full_text": "Good Heungbu is poor. Greedy Nolbu is rich. Heungbu loves his family.",
+        "page_num": 1
       },
       {
         "full_text": "Look! A baby swallow falls. It has a hurt leg. Heungbu helps the bird.",
         "page_num": 2,
         "dialogue_list": [
           {
-            "role": "narrator",
             "text": "Oh no! Hear that?",
+            "emotion": "urgent",
+            "role": "narrator"
+          },
+          {
+            "role": "narrator",
+            "text": "A baby swallow falls down!",
             "emotion": "urgent"
           },
           {
-            "text": "A baby swallow falls down!",
-            "emotion": "urgent",
-            "role": "narrator"
-          },
-          {
+            "text": "Oh, poor little bird!",
             "emotion": "curious",
-            "role": "hero",
-            "text": "Oh, poor little bird!"
-          },
-          {
-            "role": "narrator",
-            "emotion": "calm",
-            "text": "Heungbu holds it gently."
-          },
-          {
-            "text": "He fixes the leg.",
-            "role": "narrator",
-            "emotion": "happy"
-          }
-        ]
-      },
-      {
-        "full_text": "The swallow brings a seed. Heungbu plants it today. Giant gourds grow big!",
-        "page_num": 3,
-        "dialogue_list": [
-          {
-            "emotion": "excited",
-            "role": "narrator",
-            "text": "The bird flies away."
-          },
-          {
-            "emotion": "happy",
-            "role": "narrator",
-            "text": "Spring comes! Look, a seed!"
-          },
-          {
-            "text": "A shiny seed! Thank you!",
-            "emotion": "excited",
             "role": "hero"
           },
           {
-            "text": "He waters the seed.",
-            "role": "narrator",
-            "emotion": "happy"
+            "text": "Heungbu holds it gently.",
+            "emotion": "calm",
+            "role": "narrator"
           },
           {
-            "emotion": "excited",
-            "text": "Big, round gourds grow!",
+            "text": "He fixes the leg.",
+            "emotion": "happy",
             "role": "narrator"
           }
         ]
       },
       {
+        "page_num": 3,
         "dialogue_list": [
           {
             "role": "narrator",
             "emotion": "excited",
-            "text": "Heungbu saws the gourd."
+            "text": "The bird flies away."
           },
           {
-            "emotion": "excited",
+            "role": "narrator",
+            "text": "Spring comes! Look, a seed!",
+            "emotion": "happy"
+          },
+          {
             "role": "hero",
+            "emotion": "excited",
+            "text": "A shiny seed! Thank you!"
+          },
+          {
+            "role": "narrator",
+            "text": "He waters the seed.",
+            "emotion": "happy"
+          },
+          {
+            "role": "narrator",
+            "emotion": "excited",
+            "text": "Big, round gourds grow!"
+          }
+        ],
+        "full_text": "The swallow brings a seed. Heungbu plants it today. Giant gourds grow big!"
+      },
+      {
+        "dialogue_list": [
+          {
+            "emotion": "excited",
+            "text": "Heungbu saws the gourd.",
+            "role": "narrator"
+          },
+          {
+            "role": "hero",
+            "emotion": "excited",
             "text": "Saw, saw, saw!"
           },
           {
-            "emotion": "urgent",
             "text": "Crack! It opens up!",
+            "emotion": "urgent",
             "role": "narrator"
           },
           {
             "text": "Wow! Gold and rice!",
-            "emotion": "excited",
-            "role": "narrator"
+            "role": "narrator",
+            "emotion": "excited"
           },
           {
             "role": "hero",
@@ -632,66 +632,68 @@
             "text": "Hooray! We are happy!"
           },
           {
+            "emotion": "happy",
             "text": "Everyone laughs and dances.",
-            "role": "narrator",
-            "emotion": "happy"
+            "role": "narrator"
           }
         ],
         "page_num": 4,
         "full_text": "Saw, saw, saw! Crack! Shiny gold comes out!"
       },
       {
-        "full_text": "Greedy Nolbu gets angry. He hurts a bird. Nolbu wants big gold!",
         "dialogue_list": [
           {
             "text": "Nolbu is very jealous.",
-            "emotion": "curious",
-            "role": "narrator"
+            "role": "narrator",
+            "emotion": "curious"
           },
           {
-            "role": "villain",
             "text": "I want gold too!",
+            "role": "villain",
             "emotion": "angry"
           },
           {
             "text": "Snap! He hurts a swallow.",
-            "role": "narrator",
-            "emotion": "urgent"
+            "emotion": "urgent",
+            "role": "narrator"
           },
           {
             "text": "Bring me a seed!",
-            "emotion": "excited",
-            "role": "villain"
+            "role": "villain",
+            "emotion": "excited"
           },
           {
-            "text": "He laughs a bad laugh.",
             "emotion": "calm",
-            "role": "narrator"
+            "role": "narrator",
+            "text": "He laughs a bad laugh."
           }
         ],
+        "full_text": "Greedy Nolbu gets angry. He hurts a bird. Nolbu wants big gold!",
         "page_num": 5
       },
       {
+        "full_text": "Nolbu opens his gourd. Monsters jump out! Run, Nolbu, run!",
+        "page_num": 6,
         "dialogue_list": [
           {
-            "emotion": "calm",
             "role": "narrator",
+            "emotion": "calm",
             "text": "Nolbu's gourd is ready."
           },
           {
-            "emotion": "excited",
             "role": "villain",
+            "emotion": "excited",
             "text": "My gold is inside!"
           },
           {
-            "role": "narrator",
             "emotion": "urgent",
+            "role": "narrator",
             "text": "He saws it fast."
           },
           {
             "role": "narrator",
-            "emotion": "urgent",
-            "text": "Crack! Scary monsters pop out!"
+            "text": "Crack! Scary monsters pop out!",
+            "emotion": "urgent"
           },
           {
             "text": "Bad Nolbu, take this!",
@@ -703,54 +705,50 @@
             "text": "They break Nolbu's house.",
             "role": "narrator"
           }
-        ],
-        "page_num": 6,
-        "full_text": "Nolbu opens his gourd. Monsters jump out! Run, Nolbu, run!"
+        ]
       },
       {
+        "full_text": "Poor Nolbu cries loudly. Kind Heungbu runs to him. He gives a hug.",
         "dialogue_list": [
           {
             "emotion": "calm",
-            "role": "narrator",
-            "text": "Nolbu cries on ground."
+            "text": "Nolbu cries on ground.",
+            "role": "narrator"
           },
           {
-            "emotion": "urgent",
+            "text": "Oh, no! I am sorry!",
             "role": "villain",
-            "text": "Oh, no! I am sorry!"
-          },
-          {
-            "emotion": "calm",
-            "role": "narrator",
-            "text": "Heungbu comes running fast."
-          },
-          {
-            "text": "Brother, are you okay?",
-            "role": "hero",
             "emotion": "urgent"
           },
           {
+            "text": "Heungbu comes running fast.",
+            "emotion": "calm",
+            "role": "narrator"
+          },
+          {
+            "text": "Brother, are you okay?",
+            "emotion": "urgent",
+            "role": "hero"
+          },
+          {
+            "text": "He hugs sad Nolbu.",
             "role": "narrator",
-            "emotion": "happy",
-            "text": "He hugs sad Nolbu."
+            "emotion": "happy"
           },
           {
             "role": "villain",
-            "text": "I was so mean...",
-            "emotion": "whisper"
+            "emotion": "whisper",
+            "text": "I was so mean..."
           }
         ],
-        "full_text": "Poor Nolbu cries loudly. Kind Heungbu runs to him. He gives a hug.",
         "page_num": 7
       },
       {
-        "full_text": "\"Let's share!\" says Heungbu. They smile and hug. They live happily now.",
-        "page_num": 8,
         "dialogue_list": [
           {
-            "emotion": "happy",
+            "text": "We are brothers! Let's share!",
             "role": "hero",
-            "text": "We are brothers! Let's share!"
+            "emotion": "happy"
           },
           {
             "role": "narrator",
@@ -758,21 +756,23 @@
             "emotion": "calm"
           },
           {
-            "text": "The little bird flies high.",
             "role": "narrator",
+            "text": "The little bird flies high.",
             "emotion": "excited"
           },
           {
-            "text": "They live happily together.",
             "role": "narrator",
+            "text": "They live happily together.",
             "emotion": "happy"
           },
           {
-            "emotion": "calm",
+            "text": "Sharing brings big joy!",
             "role": "narrator",
-            "text": "Sharing brings big joy!"
+            "emotion": "calm"
           }
-        ]
+        ],
+        "full_text": "\"Let's share!\" says Heungbu. They smile and hug. They live happily now.",
+        "page_num": 8
       }
     ],
     "preschoolEnglishCreatedAt": "2026-09-24T13:41:14.978Z",
@@ -782,9 +782,9 @@
       {
         "dialogue_list": [
           {
+            "text": "Here are two brothers.",
             "emotion": "excited",
-            "role": "narrator",
-            "text": "Here are two brothers."
+            "role": "narrator"
           },
           {
             "text": "Nolbu has big house.",
@@ -798,24 +798,26 @@
           },
           {
             "text": "Go away, poor boy!",
-            "role": "villain",
-            "emotion": "angry"
+            "emotion": "angry",
+            "role": "villain"
           },
           {
+            "text": "Heungbu smiles with love.",
             "emotion": "calm",
-            "role": "narrator",
-            "text": "Heungbu smiles with love."
+            "role": "narrator"
           }
         ],
-        "page_num": 1,
-        "full_text": "Good Heungbu is poor. Greedy Nolbu is rich. Heungbu loves his family."
+        "full_text": "Good Heungbu is poor. Greedy Nolbu is rich. Heungbu loves his family.",
+        "page_num": 1
       },
       {
+        "page_num": 2,
+        "full_text": "Look! A baby swallow falls. It has a hurt leg. Heungbu helps the bird.",
         "dialogue_list": [
           {
+            "text": "Oh no! Hear that?",
             "emotion": "urgent",
-            "role": "narrator",
-            "text": "Oh no! Hear that?"
+            "role": "narrator"
           },
           {
             "text": "A baby swallow falls down!",
@@ -823,13 +825,13 @@
             "emotion": "urgent"
           },
           {
-            "text": "Oh, poor little bird!",
+            "role": "hero",
             "emotion": "curious",
-            "role": "hero"
+            "text": "Oh, poor little bird!"
           },
           {
-            "text": "Heungbu holds it gently.",
             "role": "narrator",
+            "text": "Heungbu holds it gently.",
             "emotion": "calm"
           },
           {
@@ -837,44 +839,42 @@
             "role": "narrator",
             "text": "He fixes the leg."
           }
-        ],
-        "page_num": 2,
-        "full_text": "Look! A baby swallow falls. It has a hurt leg. Heungbu helps the bird."
+        ]
       },
       {
-        "full_text": "The swallow brings a seed. Heungbu plants it today. Giant gourds grow big!",
         "dialogue_list": [
           {
-            "role": "narrator",
             "text": "The bird flies away.",
+            "role": "narrator",
             "emotion": "excited"
           },
           {
-            "role": "narrator",
             "text": "Spring comes! Look, a seed!",
-            "emotion": "happy"
-          },
-          {
-            "text": "A shiny seed! Thank you!",
-            "role": "hero",
-            "emotion": "excited"
-          },
-          {
             "role": "narrator",
-            "text": "He waters the seed.",
             "emotion": "happy"
+          },
+          {
+            "role": "hero",
+            "emotion": "excited",
+            "text": "A shiny seed! Thank you!"
+          },
+          {
+            "text": "He waters the seed.",
+            "emotion": "happy",
+            "role": "narrator"
           },
           {
             "text": "Big, round gourds grow!",
-            "role": "narrator",
-            "emotion": "excited"
+            "emotion": "excited",
+            "role": "narrator"
           }
         ],
+        "full_text": "The swallow brings a seed. Heungbu plants it today. Giant gourds grow big!",
         "page_num": 3
       },
       {
-        "page_num": 4,
         "full_text": "Saw, saw, saw! Crack! Shiny gold comes out!",
+        "page_num": 4,
         "dialogue_list": [
           {
             "role": "narrator",
@@ -882,13 +882,13 @@
             "text": "Heungbu saws the gourd."
           },
           {
-            "role": "hero",
             "text": "Saw, saw, saw!",
+            "role": "hero",
             "emotion": "excited"
           },
           {
-            "emotion": "urgent",
             "role": "narrator",
+            "emotion": "urgent",
             "text": "Crack! It opens up!"
           },
           {
@@ -898,48 +898,50 @@
           },
           {
             "emotion": "happy",
-            "text": "Hooray! We are happy!",
-            "role": "hero"
+            "role": "hero",
+            "text": "Hooray! We are happy!"
           },
           {
-            "role": "narrator",
             "text": "Everyone laughs and dances.",
+            "role": "narrator",
             "emotion": "happy"
           }
         ]
       },
       {
-        "page_num": 5,
         "full_text": "Greedy Nolbu gets angry. He hurts a bird. Nolbu wants big gold!",
+        "page_num": 5,
         "dialogue_list": [
           {
-            "emotion": "curious",
             "text": "Nolbu is very jealous.",
+            "emotion": "curious",
             "role": "narrator"
           },
           {
-            "text": "I want gold too!",
-            "emotion": "angry",
-            "role": "villain"
-          },
-          {
-            "emotion": "urgent",
-            "role": "narrator",
-            "text": "Snap! He hurts a swallow."
-          },
-          {
-            "emotion": "excited",
             "role": "villain",
-            "text": "Bring me a seed!"
+            "emotion": "angry",
+            "text": "I want gold too!"
           },
           {
-            "text": "He laughs a bad laugh.",
-            "emotion": "calm",
+            "text": "Snap! He hurts a swallow.",
+            "emotion": "urgent",
             "role": "narrator"
+          },
+          {
+            "text": "Bring me a seed!",
+            "role": "villain",
+            "emotion": "excited"
+          },
+          {
+            "role": "narrator",
+            "emotion": "calm",
+            "text": "He laughs a bad laugh."
           }
         ]
       },
       {
+        "page_num": 6,
+        "full_text": "Nolbu opens his gourd. Monsters jump out! Run, Nolbu, run!",
         "dialogue_list": [
           {
             "text": "Nolbu's gourd is ready.",
@@ -947,60 +949,59 @@
             "role": "narrator"
           },
           {
-            "emotion": "excited",
+            "text": "My gold is inside!",
             "role": "villain",
-            "text": "My gold is inside!"
+            "emotion": "excited"
           },
           {
-            "emotion": "urgent",
-            "role": "narrator",
-            "text": "He saws it fast."
-          },
-          {
-            "text": "Crack! Scary monsters pop out!",
+            "text": "He saws it fast.",
             "role": "narrator",
             "emotion": "urgent"
           },
           {
-            "emotion": "angry",
-            "role": "villain",
-            "text": "Bad Nolbu, take this!"
+            "emotion": "urgent",
+            "text": "Crack! Scary monsters pop out!",
+            "role": "narrator"
           },
           {
-            "role": "narrator",
+            "text": "Bad Nolbu, take this!",
+            "role": "villain",
+            "emotion": "angry"
+          },
+          {
             "text": "They break Nolbu's house.",
-            "emotion": "excited"
+            "emotion": "excited",
+            "role": "narrator"
           }
-        ],
-        "full_text": "Nolbu opens his gourd. Monsters jump out! Run, Nolbu, run!",
-        "page_num": 6
+        ]
       },
       {
+        "page_num": 7,
         "dialogue_list": [
           {
-            "emotion": "calm",
-            "text": "Nolbu cries on ground.",
-            "role": "narrator"
-          },
-          {
-            "emotion": "urgent",
-            "text": "Oh, no! I am sorry!",
-            "role": "villain"
-          },
-          {
-            "emotion": "calm",
             "role": "narrator",
-            "text": "Heungbu comes running fast."
+            "text": "Nolbu cries on ground.",
+            "emotion": "calm"
           },
           {
-            "text": "Brother, are you okay?",
-            "role": "hero",
+            "text": "Oh, no! I am sorry!",
+            "role": "villain",
             "emotion": "urgent"
           },
           {
-            "text": "He hugs sad Nolbu.",
+            "role": "narrator",
+            "text": "Heungbu comes running fast.",
+            "emotion": "calm"
+          },
+          {
+            "role": "hero",
+            "emotion": "urgent",
+            "text": "Brother, are you okay?"
+          },
+          {
+            "role": "narrator",
             "emotion": "happy",
-            "role": "narrator"
+            "text": "He hugs sad Nolbu."
           },
           {
             "text": "I was so mean...",
@@ -1008,39 +1009,38 @@
             "emotion": "whisper"
           }
         ],
-        "full_text": "Poor Nolbu cries loudly. Kind Heungbu runs to him. He gives a hug.",
-        "page_num": 7
+        "full_text": "Poor Nolbu cries loudly. Kind Heungbu runs to him. He gives a hug."
       },
       {
+        "full_text": "\"Let's share!\" says Heungbu. They smile and hug. They live happily now.",
+        "page_num": 8,
         "dialogue_list": [
           {
-            "text": "We are brothers! Let's share!",
+            "role": "hero",
             "emotion": "happy",
-            "role": "hero"
+            "text": "We are brothers! Let's share!"
           },
           {
+            "text": "Nolbu smiles and cries.",
             "emotion": "calm",
-            "role": "narrator",
-            "text": "Nolbu smiles and cries."
+            "role": "narrator"
           },
           {
-            "text": "The little bird flies high.",
+            "emotion": "excited",
             "role": "narrator",
-            "emotion": "excited"
+            "text": "The little bird flies high."
           },
           {
+            "text": "They live happily together.",
             "emotion": "happy",
-            "role": "narrator",
-            "text": "They live happily together."
+            "role": "narrator"
           },
           {
-            "text": "Sharing brings big joy!",
             "role": "narrator",
-            "emotion": "calm"
+            "emotion": "calm",
+            "text": "Sharing brings big joy!"
           }
-        ],
-        "page_num": 8,
-        "full_text": "\"Let's share!\" says Heungbu. They smile and hug. They live happily now."
+        ]
       }
     ],
     "englishCreatedAt": "2026-09-24T13:41:14.978Z",
@@ -1048,8 +1048,6 @@
     "childEnglishTitle": "Heungbu and Nolbu's Magic Gourds",
     "childEnglishPages": [
       {
-        "full_text": "Long ago, two brothers lived in a village. Kind Heungbu was the younger brother. Greedy Nolbu was the older brother. Nolbu lived in a big house with yummy food. Heungbu lived in a small, old house. But Heungbu's family was always full of love. \"Good morning, Brother! What a sunny day!\" Heungbu said with a smile. Nolbu just frowned and yelled. \"Go away, you poor boy! Stop being noisy!\"",
-        "page_num": 1,
         "dialogue_list": [
           {
             "text": "Long ago, kind Heungbu and greedy Nolbu lived in a village.",
@@ -1057,61 +1055,61 @@
             "emotion": "excited"
           },
           {
-            "text": "Nolbu ate yummy food in a big house, but poor Heungbu lived happily in a small house.",
             "emotion": "calm",
+            "text": "Nolbu ate yummy food in a big house, but poor Heungbu lived happily in a small house.",
             "role": "narrator"
           },
           {
-            "emotion": "happy",
             "role": "hero",
-            "text": "Good morning, Brother! What a sunny day!"
+            "text": "Good morning, Brother! What a sunny day!",
+            "emotion": "happy"
           },
           {
-            "emotion": "angry",
+            "text": "Go away, you poor boy! Stop being noisy!",
             "role": "villain",
-            "text": "Go away, you poor boy! Stop being noisy!"
+            "emotion": "angry"
           },
           {
+            "text": "Even though he was poor, Heungbu's home was always full of love.",
             "emotion": "calm",
-            "role": "narrator",
-            "text": "Even though he was poor, Heungbu's home was always full of love."
+            "role": "narrator"
           }
-        ]
+        ],
+        "page_num": 1,
+        "full_text": "Long ago, two brothers lived in a village. Kind Heungbu was the younger brother. Greedy Nolbu was the older brother. Nolbu lived in a big house with yummy food. Heungbu lived in a small, old house. But Heungbu's family was always full of love. \"Good morning, Brother! What a sunny day!\" Heungbu said with a smile. Nolbu just frowned and yelled. \"Go away, you poor boy! Stop being noisy!\""
       },
       {
         "dialogue_list": [
           {
-            "text": "One warm spring day, Heungbu heard a sad cry under his roof.",
+            "emotion": "urgent",
+            "role": "narrator",
+            "text": "One warm spring day, Heungbu heard a sad cry under his roof."
+          },
+          {
+            "text": "A baby swallow fell from its nest and was shaking on the ground!",
             "role": "narrator",
             "emotion": "urgent"
           },
           {
-            "role": "narrator",
-            "emotion": "urgent",
-            "text": "A baby swallow fell from its nest and was shaking on the ground!"
-          },
-          {
-            "emotion": "curious",
             "role": "hero",
-            "text": "Oh no, poor little bird! Your leg is broken!"
+            "text": "Oh no, poor little bird! Your leg is broken!",
+            "emotion": "curious"
           },
           {
+            "text": "Heungbu ran quickly and held the baby bird gently in his hands.",
             "emotion": "calm",
-            "role": "narrator",
-            "text": "Heungbu ran quickly and held the baby bird gently in his hands."
+            "role": "narrator"
           },
           {
-            "role": "narrator",
             "text": "He wrapped the leg with soft cloth and medicine, and the bird tapped his finger happily.",
-            "emotion": "happy"
+            "emotion": "happy",
+            "role": "narrator"
           }
         ],
-        "page_num": 2,
-        "full_text": "One warm spring day, Heungbu heard a sad sound. \"Cheep, cheep!\" under his roof! A baby swallow fell from its nest to the ground. The poor little bird was shaking. \"Oh no, poor little bird! Your leg is broken!\" Heungbu hurried over and held it gently. He wrapped the broken leg with soft cloth and medicine. The baby swallow tapped Heungbu's finger to say thank you."
+        "full_text": "One warm spring day, Heungbu heard a sad sound. \"Cheep, cheep!\" under his roof! A baby swallow fell from its nest to the ground. The poor little bird was shaking. \"Oh no, poor little bird! Your leg is broken!\" Heungbu hurried over and held it gently. He wrapped the broken leg with soft cloth and medicine. The baby swallow tapped Heungbu's finger to say thank you.",
+        "page_num": 2
       },
       {
-        "page_num": 3,
-        "full_text": "With Heungbu's loving care, the swallow grew big and strong. It flew high into the blue sky. Next spring, the swallow flew back to Heungbu's roof. Plop! It dropped a tiny seed. \"Look! It is a shiny gourd seed! Thank you, little bird!\" Heungbu planted the seed in his sunny yard. He watered it every single day. Soon, giant gourds grew on the roof like big full moons!",
         "dialogue_list": [
           {
             "emotion": "excited",
@@ -1119,57 +1117,59 @@
             "role": "narrator"
           },
           {
+            "role": "narrator",
             "emotion": "happy",
-            "text": "Next spring, the swallow flew back and dropped something from its beak!",
-            "role": "narrator"
+            "text": "Next spring, the swallow flew back and dropped something from its beak!"
           },
           {
-            "role": "hero",
             "text": "Look! It is a shiny gourd seed! Thank you, little bird!",
-            "emotion": "excited"
-          },
-          {
-            "text": "Heungbu planted the seed and watered it every day.",
-            "role": "narrator",
-            "emotion": "happy"
-          },
-          {
-            "role": "narrator",
-            "emotion": "excited",
-            "text": "Soon, giant gourds grew big like full moons on the roof!"
-          }
-        ]
-      },
-      {
-        "dialogue_list": [
-          {
-            "emotion": "excited",
-            "text": "In the fall, Heungbu's family began to saw the ripe gourds.",
-            "role": "narrator"
-          },
-          {
-            "text": "Saw, saw, pull and push! Saw the big gourd!",
             "emotion": "excited",
             "role": "hero"
           },
           {
-            "emotion": "urgent",
-            "text": "They sang together, and crack! The gourd split open!",
+            "role": "narrator",
+            "emotion": "happy",
+            "text": "Heungbu planted the seed and watered it every day."
+          },
+          {
+            "text": "Soon, giant gourds grew big like full moons on the roof!",
+            "emotion": "excited",
             "role": "narrator"
+          }
+        ],
+        "page_num": 3,
+        "full_text": "With Heungbu's loving care, the swallow grew big and strong. It flew high into the blue sky. Next spring, the swallow flew back to Heungbu's roof. Plop! It dropped a tiny seed. \"Look! It is a shiny gourd seed! Thank you, little bird!\" Heungbu planted the seed in his sunny yard. He watered it every single day. Soon, giant gourds grew on the roof like big full moons!"
+      },
+      {
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "emotion": "excited",
+            "text": "In the fall, Heungbu's family began to saw the ripe gourds."
+          },
+          {
+            "role": "hero",
+            "emotion": "excited",
+            "text": "Saw, saw, pull and push! Saw the big gourd!"
           },
           {
             "role": "narrator",
+            "emotion": "urgent",
+            "text": "They sang together, and crack! The gourd split open!"
+          },
+          {
             "text": "Gold, silver, colorful silk, and white rice poured out of the gourd!",
-            "emotion": "excited"
+            "emotion": "excited",
+            "role": "narrator"
           },
           {
-            "emotion": "happy",
             "role": "hero",
-            "text": "Hooray! We will never be hungry again!"
+            "text": "Hooray! We will never be hungry again!",
+            "emotion": "happy"
           },
           {
-            "emotion": "happy",
             "text": "Heungbu's yard was filled with happy smiles and laughter.",
+            "emotion": "happy",
             "role": "narrator"
           }
         ],
@@ -1177,26 +1177,27 @@
         "full_text": "In the fall, the gourds were ripe. Heungbu's family began to saw a big gourd. \"Saw, saw, pull and push! Saw the big gourd!\" Crack! The gourd split open in two. Then, something amazing happened! Gold, silver, colorful silk, and white rice poured out! \"Hooray! We will never be hungry again!\" Heungbu shouted. The whole yard was filled with happy laughter."
       },
       {
+        "full_text": "Greedy Nolbu heard the big news. He was so jealous! \"Heungbu fixed a bird and got rich? I want to be even richer!\" Nolbu caught an innocent swallow flying in the air. Snap! He broke the poor bird's leg and tied a bandage on it. \"Now fly away! Bring me a huge treasure seed right now!\" Nolbu laughed an evil laugh with a greedy heart.",
         "page_num": 5,
         "dialogue_list": [
           {
+            "emotion": "curious",
             "role": "narrator",
-            "text": "Greedy Nolbu heard the news and became very jealous.",
-            "emotion": "curious"
+            "text": "Greedy Nolbu heard the news and became very jealous."
           },
           {
-            "role": "villain",
+            "text": "Heungbu got rich from a bird? I will be even richer!",
             "emotion": "angry",
-            "text": "Heungbu got rich from a bird? I will be even richer!"
+            "role": "villain"
           },
           {
-            "text": "Nolbu caught an innocent swallow, broke its leg, and wrapped it up.",
+            "emotion": "urgent",
             "role": "narrator",
-            "emotion": "urgent"
+            "text": "Nolbu caught an innocent swallow, broke its leg, and wrapped it up."
           },
           {
-            "emotion": "excited",
             "text": "Now fly away! Bring me a giant treasure seed right now!",
+            "emotion": "excited",
             "role": "villain"
           },
           {
@@ -1204,111 +1205,110 @@
             "role": "narrator",
             "emotion": "calm"
           }
-        ],
-        "full_text": "Greedy Nolbu heard the big news. He was so jealous! \"Heungbu fixed a bird and got rich? I want to be even richer!\" Nolbu caught an innocent swallow flying in the air. Snap! He broke the poor bird's leg and tied a bandage on it. \"Now fly away! Bring me a huge treasure seed right now!\" Nolbu laughed an evil laugh with a greedy heart."
+        ]
       },
       {
+        "full_text": "Nolbu also planted his seed, and giant gourds grew up. \"Aha! My gourd must be full of shiny gold!\" Nolbu sawed the gourd as fast as he could. Crack! The gourd opened wide. But there was no gold inside! Instead, scary goblins and robbers rushed out with big clubs! \"You greedy man, take this!\" The goblins smashed everything in Nolbu's house and ran away.",
         "dialogue_list": [
           {
             "emotion": "calm",
-            "role": "narrator",
-            "text": "Huge gourds grew from Nolbu's seed, too."
+            "text": "Huge gourds grew from Nolbu's seed, too.",
+            "role": "narrator"
           },
           {
-            "emotion": "excited",
             "text": "Aha! My gourd must be full of shiny gold!",
-            "role": "villain"
+            "role": "villain",
+            "emotion": "excited"
           },
           {
-            "role": "narrator",
             "text": "Nolbu sawed the gourd with excitement.",
+            "role": "narrator",
             "emotion": "urgent"
           },
           {
             "emotion": "urgent",
-            "text": "Crack! Scary goblins and robbers jumped out with clubs instead of gold!",
-            "role": "narrator"
+            "role": "narrator",
+            "text": "Crack! Scary goblins and robbers jumped out with clubs instead of gold!"
           },
           {
             "emotion": "angry",
-            "text": "You greedy man, take this!",
-            "role": "villain"
+            "role": "villain",
+            "text": "You greedy man, take this!"
           },
           {
+            "role": "narrator",
             "emotion": "excited",
-            "text": "The goblins broke everything in Nolbu's house and ran away.",
-            "role": "narrator"
+            "text": "The goblins broke everything in Nolbu's house and ran away."
           }
         ],
-        "full_text": "Nolbu also planted his seed, and giant gourds grew up. \"Aha! My gourd must be full of shiny gold!\" Nolbu sawed the gourd as fast as he could. Crack! The gourd opened wide. But there was no gold inside! Instead, scary goblins and robbers rushed out with big clubs! \"You greedy man, take this!\" The goblins smashed everything in Nolbu's house and ran away.",
         "page_num": 6
       },
       {
         "dialogue_list": [
           {
-            "text": "Nolbu lost everything and sat on the ground crying loudly.",
             "role": "narrator",
-            "emotion": "calm"
+            "emotion": "calm",
+            "text": "Nolbu lost everything and sat on the ground crying loudly."
           },
           {
             "emotion": "urgent",
-            "role": "villain",
-            "text": "Oh no, my treasures! I was bad, and now I am punished!"
+            "text": "Oh no, my treasures! I was bad, and now I am punished!",
+            "role": "villain"
           },
           {
-            "text": "Just then, Heungbu came running fast to his brother.",
             "role": "narrator",
-            "emotion": "calm"
+            "emotion": "calm",
+            "text": "Just then, Heungbu came running fast to his brother."
           },
           {
-            "emotion": "urgent",
             "text": "Brother! Are you hurt? Please stand up!",
+            "role": "hero",
+            "emotion": "urgent"
+          },
+          {
+            "text": "Heungbu dusted off Nolbu's clothes and hugged him warmly.",
+            "emotion": "happy",
+            "role": "narrator"
+          },
+          {
+            "text": "Heungbu... I was so mean to you...",
+            "role": "villain",
+            "emotion": "whisper"
+          }
+        ],
+        "full_text": "Nolbu lost everything in one day. He sat on the ground and cried loudly. \"Oh no, all my treasures! I was so bad, and now I am punished!\" Just then, Heungbu came running to his brother. \"Brother! Are you hurt? Please stand up!\" Heungbu dusted off Nolbu's dirty clothes and gave him a warm hug. Nolbu felt so ashamed. \"Heungbu... I was so mean to you...\"",
+        "page_num": 7
+      },
+      {
+        "full_text": "\"Brother, we are family! We can share everything together!\" Heungbu smiled brightly and held Nolbu's hand. Nolbu cried and truly said sorry for his greedy ways. High in the sky, the swallow flew around in happy circles. The two brothers shared everything and lived happily ever after. A kind and sharing heart always brings the biggest happiness!",
+        "page_num": 8,
+        "dialogue_list": [
+          {
+            "text": "Brother, we are family! We can share everything together!",
+            "emotion": "happy",
             "role": "hero"
           },
           {
             "role": "narrator",
-            "text": "Heungbu dusted off Nolbu's clothes and hugged him warmly.",
-            "emotion": "happy"
-          },
-          {
-            "emotion": "whisper",
-            "text": "Heungbu... I was so mean to you...",
-            "role": "villain"
-          }
-        ],
-        "page_num": 7,
-        "full_text": "Nolbu lost everything in one day. He sat on the ground and cried loudly. \"Oh no, all my treasures! I was so bad, and now I am punished!\" Just then, Heungbu came running to his brother. \"Brother! Are you hurt? Please stand up!\" Heungbu dusted off Nolbu's dirty clothes and gave him a warm hug. Nolbu felt so ashamed. \"Heungbu... I was so mean to you...\""
-      },
-      {
-        "dialogue_list": [
-          {
-            "text": "Brother, we are family! We can share everything together!",
-            "role": "hero",
-            "emotion": "happy"
-          },
-          {
-            "emotion": "calm",
             "text": "Heungbu held Nolbu's hand, and Nolbu truly said sorry for his greedy past.",
-            "role": "narrator"
+            "emotion": "calm"
           },
           {
             "emotion": "excited",
+            "text": "High in the sky, the little swallow flew in happy circles.",
+            "role": "narrator"
+          },
+          {
+            "text": "The two brothers shared everything and lived happily ever after.",
             "role": "narrator",
-            "text": "High in the sky, the little swallow flew in happy circles."
+            "emotion": "happy"
           },
           {
             "role": "narrator",
-            "emotion": "happy",
-            "text": "The two brothers shared everything and lived happily ever after."
-          },
-          {
             "emotion": "calm",
-            "role": "narrator",
             "text": "A kind and sharing heart always brings great happiness!"
           }
-        ],
-        "full_text": "\"Brother, we are family! We can share everything together!\" Heungbu smiled brightly and held Nolbu's hand. Nolbu cried and truly said sorry for his greedy ways. High in the sky, the swallow flew around in happy circles. The two brothers shared everything and lived happily ever after. A kind and sharing heart always brings the biggest happiness!",
-        "page_num": 8
+        ]
       }
     ],
     "childEnglishCreatedAt": "2026-09-24T13:41:30.298Z",

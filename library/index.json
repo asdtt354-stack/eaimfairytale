@@ -2,6 +2,23 @@
   "version": 1,
   "stories": [
     {
+      "slug": "smufm9hiw",
+      "title": "흥부 놀부의 알록달록 보물 박",
+      "cover": "smufm9hiw/p01.jpg",
+      "summary": "박 속에서 무엇이 나왔을까요? 🎃 흥부 놀부의 알록달록 보물 박",
+      "origin": "전래동화",
+      "theme": "가족",
+      "genre": "custom",
+      "hasVoice": true,
+      "hasEnglish": true,
+      "youtube": {
+        "ko": "https://youtu.be/RaLV0LzpmuY",
+        "en": "https://youtu.be/eV3h53TTR3U"
+      },
+      "author": "뮤토책방",
+      "publishedAt": "2026-09-24T14:17:55.771Z"
+    },
+    {
       "slug": "smufmoe0z",
       "title": "도토리 한 알의 마법 선물",
       "cover": "smufmoe0z/p01.jpg",
@@ -17,23 +34,6 @@
       },
       "author": "뮤토의 책방",
       "publishedAt": "2026-09-24T14:29:22.519Z"
-    },
-    {
-      "slug": "smufm9hiw",
-      "title": "흥부 놀부의 알록달록 보물 박",
-      "cover": "smufm9hiw/p01.jpg",
-      "summary": "착한 흥부가 아기 제비를 돌봐 주고 받은 박씨에서 알록달록 보물이 쏟아지는, 나눔과 화해의 옛이야기예요",
-      "origin": "전래동화 (흥부전)",
-      "theme": "가족",
-      "genre": "custom",
-      "hasVoice": true,
-      "hasEnglish": true,
-      "youtube": {
-        "ko": "https://youtu.be/g2PwYvJWoLA",
-        "en": "https://youtu.be/eV3h53TTR3U"
-      },
-      "author": "뮤토책방",
-      "publishedAt": "2026-09-24T14:17:55.771Z"
     },
     {
       "slug": "smufevra8",
@@ -70,5 +70,5 @@
       "publishedAt": "2026-09-24T11:32:27.972Z"
     }
   ],
-  "updatedAt": "2026-09-24T14:42:09.280Z"
+  "updatedAt": "2026-09-24T14:55:26.341Z"
 }

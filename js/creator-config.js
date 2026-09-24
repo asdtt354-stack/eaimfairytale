@@ -9,5 +9,5 @@
 // ※ UID는 비밀번호가 아니라서 공개 저장소에 있어도 괜찮습니다.
 // ※ 동화마을은 eaim-kids Firebase 프로젝트를 쓰므로, 교실 플랫폼(eaim-classroom)의 UID와 다릅니다.
 window.EAIM_FAIRYTALE_CREATORS = [
-  // 'PASTE-YOUR-UID-HERE',
+      'PrqkPEqDGOQyzEhhydqAsvDxHwN2',
 ];

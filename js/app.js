@@ -12,6 +12,15 @@ function pickStoryTheme(btn){
 }
 
 let currentStoryBookObject = null;
+
+// 💾 저장하지 않은 동화가 있는지 (자동 저장 실패·저장 전 이동 대비)
+let storyUnsaved = false;
+window.addEventListener('beforeunload', (e) => {
+  if (!storyUnsaved) return;
+  e.preventDefault();
+  e.returnValue = '저장하지 않은 동화가 있어요!';
+  return e.returnValue;
+});
   let db = null;
   let isPlaying = false;
   let isRepeatMode = false;
@@ -313,11 +322,14 @@ ${buildLearningPromptBlock()}
 3. full_text에는 전체 본문을 적어줘.
 4. character_sheet에는 두 페이지 이상 나오는 주요 등장인물을 모두 적고, look에는 그림으로 그릴 때 매번 똑같이 쓸 영문 외모 설명(종류·나이·색·털/머리·옷·소품)을 구체적으로 적어줘. 예: "an old gray-brown donkey with a red plaid scarf and a small wooden flute".
 4-1. image_prompt에는 그 장면에 나오는 등장인물을 "the animal friends", "four friends"처럼 뭉뚱그리지 말고 character_sheet의 이름으로 한 명씩 모두 적어줘(예: "Donkey, Dog, Cat and Rooster peek through the window"). character_sheet에 없는 새 인물은 그 장면에 꼭 필요할 때만 넣어줘.
-4-2. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘. 사진이 있는 등장인물이 그 장면에 나오면 image_prompt 안에 그 인물의 이름을 입력된 글자 그대로(한글이면 한글 그대로, 예: "민우", "지아") 꼭 적어서 누가 나오는지 알 수 있게 해줘.
+4-2. image_prompt는 그 페이지 글에서 **가장 중요한 한 순간**을 그려줘. 그 순간에 실제로 그 자리에 있는 인물만 적고, 아직 이야기에 나오지 않은 인물(나중에 만날 친구)이나 이미 떠난 인물은 절대 넣지 마. 이야기의 절정(가장 놀랍고 유명한 장면)은 반드시 그 장면이 보이도록 적어줘.
+4-3. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘. 사진이 있는 등장인물이 그 장면에 나오면 image_prompt 안에 그 인물의 이름을 입력된 글자 그대로(한글이면 한글 그대로, 예: "민우", "지아") 꼭 적어서 누가 나오는지 알 수 있게 해줘.
 5. 배움동화가 선택되었다면 '설명하는 수업'처럼 쓰지 말고, 재미있는 사건 속에서 주인공이 관찰·비교·발견·해결하며 자연스럽게 배우게 해줘.
 6. 성경·경전·실존 종교 인물이나 종교적 사건을 중심 소재로 한 동화는 만들지 마. 그런 입력이 있으면 종교와 무관한 창작 소재로 바꿔서 구성해줘.
 7. 역사 배움동화에서는 실제 인물·시대·장소·핵심 사건과 알려진 역사적 사실을 임의로 바꾸거나 만들어내지 마. 시간여행·가상 주인공·상상 대화 같은 창작 장치는 사용할 수 있지만, 창작 장치와 역사적 사실이 혼동되지 않도록 분명하게 구성해줘.
 8. village_place에는 이 동화의 대표 장소를 적어줘. 나중에 아이의 '뮤니마을'에 건물·장소로 들어가. name은 아이가 좋아할 짧고 예쁜 한국어 이름(예: "별빛 호수", "무지개 빵집"), emoji는 그 장소를 나타내는 이모지 1~2개, type은 forest, sea, sky, space, castle, town, school, farm, mountain, cave, shop, home, other 중 하나, description은 한 문장 소개야.
+9. 한국어 어감을 꼭 지켜줘. 유아가 듣기에 욕이나 속어처럼 들릴 수 있는 말은 쓰지 마. 예: 개를 부를 때 "개 친구", "개야"처럼 쓰지 말고 "강아지", "멍멍이", "사냥개 아저씨"처럼 불러줘.
+10. 잘 알려진 고전·명작 동화를 바탕으로 할 때는 원작의 **유명한 장면(명장면)을 빠뜨리지 말고** 한 페이지를 따로 줘서 그림과 함께 보여줘. (예: 브레멘 음악대의 당나귀-개-고양이-수탉이 차례로 올라탄 모습과, 그 그림자를 보고 도둑들이 괴물인 줄 알고 도망가는 장면) 무서운 장면은 유아에 맞게 우습고 부드럽게 바꿔줘.
 
 [페이지 수 최종 확인]
 - 선택된 동화 길이: ${lengthVal}분
@@ -409,12 +421,21 @@ currentStoryBookObject = {
         });
       }
 
+      // 💾 그림까지 완성되면 바로 자동 저장 (저장 버튼을 깜빡해도 사라지지 않게)
+      storyUnsaved = true;
+      if (statusLog) statusLog.innerText = '💾 동화를 내 서재에 자동으로 저장하는 중...';
+      await saveCurrentStoryToDB({ silent: true });
+
       // 🎙️ AI 성우 목소리 (무료체험은 항상 포함)
       if (aiRoute.mode === 'trial' || aiVoiceEnabledByUser()) {
         const vr = await generateVoiceForStory(aiRoute, currentStoryBookObject, (i, n) => {
           if (statusLog) statusLog.innerText = `🎙️ AI 성우가 ${i + 1}/${n}페이지를 녹음하는 중...`;
         });
         if (vr.failed && statusLog) console.log(`voice failed pages: ${vr.failed}`);
+        if (vr.done) {
+          storyUnsaved = true;
+          await saveCurrentStoryToDB({ silent: true, localOnly: true }); // 목소리는 이 기기에만 저장
+        }
       }
 
       renderBookPages(currentStoryBookObject);
@@ -423,7 +444,11 @@ currentStoryBookObject = {
       if (statusLog) {
         const vp = currentStoryBookObject.villagePlace;
         statusLog.innerText = `🎉 [${author}] 작가님의 동화책이 완성되었어요! 아래에서 바로 읽어보세요!`
-          + (vp ? `\n💾 서재에 저장하면 ${vp.emoji} '${vp.name}'이(가) 뮤니마을 재료가 돼요!` : '');
+          + (storyUnsaved
+            ? '\n⚠️ 자동 저장에 실패했어요. 아래 [💾 내 서재에 저장]을 꼭 눌러주세요!'
+            : `\n💾 내 서재에 자동으로 저장했어요.${vp ? (window.EAIMCloud?.getUser?.()
+                ? ` ${vp.emoji} '${vp.name}'이(가) 뮤니마을 재료가 됐어요!`
+                : ` Google 로그인하면 ${vp.emoji} '${vp.name}'이(가) 뮤니마을 재료가 돼요!`) : ''}`);
       }
       if (aiRoute.mode === 'trial') refreshTrialStatus();
       if (controlPanel) controlPanel.style.display = 'flex';
@@ -674,7 +699,9 @@ currentStoryBookObject = {
 
   async function generateGeminiImage(aiRoute, prompt, cast = [], extra = {}) {
     const parts = [];
-    const sheet = Array.isArray(extra.sheet) ? extra.sheet : [];
+    const promptLower = String(prompt || '').toLowerCase();
+    // 이 장면에 이름이 나온 인물의 설명만 보냅니다(나오지 않는 인물이 끼어들지 않게)
+    const sheet = (Array.isArray(extra.sheet) ? extra.sheet : []).filter(c => promptLower.includes(String(c.name).toLowerCase()));
     const refs = Array.isArray(extra.refs) ? extra.refs : [];
 
     // 앞 페이지 그림 = 같은 동화 속 인물·화풍 기준
@@ -684,12 +711,12 @@ currentStoryBookObject = {
     });
 
     const sheetText = sheet.length
-      ? `Recurring characters — every time one of them appears, draw them exactly like this and exactly like in the earlier pages: ${sheet.map(c => `${c.name}: ${c.look}`).join('; ')}. Never replace these characters with different animals or people.`
+      ? `Characters in this scene — draw them exactly like this and exactly like in the earlier pages: ${sheet.map(c => `${c.name}: ${c.look}`).join('; ')}. Never replace them with different animals or people.`
       : '';
     const rules = [
-      refs.length ? 'Keep the same characters, faces, colors, clothing and the same art style as the earlier pages of this storybook.' : '',
+      refs.length ? 'Keep the same character designs, faces, colors, clothing and the same art style as the earlier pages of this storybook.' : '',
       sheetText,
-      'Show exactly the characters named in the scene description, no substitutes.',
+      'Draw ONLY the characters named in the scene description. Anyone not named must not appear anywhere in the image, not even small in the background — even if they appear in the earlier pages.',
       'Do not put any text, letters, words, sound effects or speech bubbles in the image.'
     ].filter(Boolean).join(' ');
 
@@ -1419,8 +1446,9 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
         tx.onerror = () => reject(tx.error || new Error('IndexedDB save failed'));
       });
 
+      storyUnsaved = false;
       let cloudSaved = false;
-      if (cloudUser && window.EAIMCloud?.saveStory) {
+      if (cloudUser && !options.localOnly && window.EAIMCloud?.saveStory) {
         try {
           const result = await window.EAIMCloud.saveStory(currentStoryBookObject);
           if (result?.cloudId) {

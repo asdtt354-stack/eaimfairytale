@@ -480,3 +480,9 @@ body.viewing-library-book .save-btn,body.viewing-library-book #aiVoiceAddBtn,bod
 
 .ml-share{border:1px dashed #d9cdf3;background:#fff;color:#6a47de;border-radius:10px;padding:7px 10px;font-weight:800;font-size:12.5px;cursor:pointer;margin-top:4px}
 .ml-share-lib{margin-top:10px}
+
+/* 📱 세로 릴스 */
+.controls .reels-btn{grid-column:1/-1;background:linear-gradient(100deg,#f58529,#dd2a7b,#8134af);color:#fff;font-size:15px}
+.rl-hint{font-weight:600 !important;color:#8a6a3a !important}
+.rl-preview{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px}
+.rl-preview video{max-height:52vh;border-radius:14px;background:#000}

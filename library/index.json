@@ -2,6 +2,23 @@
   "version": 1,
   "stories": [
     {
+      "slug": "smufevra8",
+      "title": "우리는 멋쟁이 브레멘 음악대!",
+      "cover": "smufevra8/p01.jpg",
+      "summary": "당나귀, 강아지, 고양이, 수탉이 함께 음악대를 만들었어요!",
+      "origin": "그림형",
+      "theme": "우정",
+      "genre": "animal",
+      "hasVoice": true,
+      "hasEnglish": true,
+      "youtube": {
+        "ko": "https://youtu.be/MHuEfiTU8w0",
+        "en": ""
+      },
+      "author": "뮤토책방",
+      "publishedAt": "2026-09-24T10:51:10.359Z"
+    },
+    {
       "slug": "smufetr6l",
       "title": "여름 햇살과 바이올린: 개미와 베짱이의 따뜻한 겨울",
       "cover": "smufetr6l/p01.jpg",
@@ -17,24 +34,7 @@
       },
       "author": "뮤토책방",
       "publishedAt": "2026-09-24T10:56:41.835Z"
-    },
-    {
-      "slug": "smufevra8",
-      "title": "우리는 멋쟁이 브레멘 음악대!",
-      "cover": "smufevra8/p01.jpg",
-      "summary": "당나귀, 강아지, 고양이, 수탉이 함께 음악대를 만들었어요!",
-      "origin": "이솝우화",
-      "theme": "우정",
-      "genre": "animal",
-      "hasVoice": true,
-      "hasEnglish": true,
-      "youtube": {
-        "ko": "https://youtu.be/MHuEfiTU8w0",
-        "en": ""
-      },
-      "author": "뮤토책방",
-      "publishedAt": "2026-09-24T10:51:10.359Z"
     }
   ],
-  "updatedAt": "2026-09-24T10:56:41.835Z"
+  "updatedAt": "2026-09-24T11:00:35.139Z"
 }

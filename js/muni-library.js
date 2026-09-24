@@ -138,7 +138,11 @@
     const q = new URLSearchParams(location.search);
     const story = q.get('story');
     if (story) { window.openLibraryStory(story); return; }
-    if (q.has('library') || location.hash === '#library') showMuniLibrary();
+    if (q.has('library') || location.hash === '#library') {
+      showMuniLibrary();
+      // 휴대폰에서 도서관 카드가 바로 보이도록 도서관 쪽으로 내려가기
+      setTimeout(() => document.getElementById('muni-library-view')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 600);
+    }
   }
   if (document.readyState === 'complete') setTimeout(handleDeepLink, 300);
   else window.addEventListener('load', () => setTimeout(handleDeepLink, 300));

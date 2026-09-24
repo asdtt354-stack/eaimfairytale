@@ -1,0 +1,717 @@
+{
+  "version": 1,
+  "slug": "smufetr6l",
+  "title": "여름 햇살과 바이올린: 개미와 베짱이의 따뜻한 겨울",
+  "author": "뮤토책방",
+  "theme": "우정",
+  "genre": "animal",
+  "villagePlace": {
+    "emoji": "🎻🐜",
+    "description": "달콤한 음악 소리와 맛있는 먹이가 가득한 정다운 숲속 언덕이에요.",
+    "name": "도토리 음악 언덕",
+    "type": "forest"
+  },
+  "summary": "여름 내내 노래한 베짱이와 부지런한 개미들의 따뜻한 겨울 이야기예요.",
+  "origin": "이솝우화",
+  "youtube": {
+    "ko": "https://youtu.be/MHuEfiTU8w0",
+    "en": "https://youtu.be/cqaSrHRqhVA"
+  },
+  "publishedAt": "2026-09-24T10:49:36.453Z",
+  "bgm": null,
+  "pages": [
+    {
+      "page_num": 1,
+      "full_text": "햇살이 눈부시게 쏟아지는 여름날, 초록빛 풀밭에 즐거운 음악 소리가 울려 퍼졌어요. 랄랄라~ 깡충! 초록 옷을 입은 베짱이가 풀잎 위에서 신나게 바이올린을 켜고 있었지요. \"안녕, 친구들! 오늘 날씨 정말 최고지? 음악에 맞춰 춤추자!\"",
+      "dialogue_list": [
+        {
+          "emotion": "excited",
+          "role": "narrator",
+          "text": "햇살이 눈부시게 쏟아지는 여름날, 초록빛 풀밭에 즐거운 음악 소리가 울려 퍼졌어요."
+        },
+        {
+          "role": "hero",
+          "text": "안녕, 친구들! 오늘 날씨 정말 최고지? 음악에 맞춰 춤추자!",
+          "emotion": "happy"
+        }
+      ],
+      "image": "p01.jpg",
+      "voice": {
+        "file": "v01.wav",
+        "lines": [
+          {
+            "role": "narrator",
+            "text": "제목: 여름 햇살과 바이올린: 개미와 베짱이의 따뜻한 겨울"
+          },
+          {
+            "role": "narrator",
+            "text": "햇살이 눈부시게 쏟아지는 여름날, 초록빛 풀밭에 즐거운 음악 소리가 울려 퍼졌어요."
+          },
+          {
+            "role": "hero",
+            "text": "안녕, 친구들! 오늘 날씨 정말 최고지? 음악에 맞춰 춤추자!"
+          }
+        ]
+      }
+    },
+    {
+      "page_num": 2,
+      "full_text": "그때 땅 밑을 부지런히 오가는 작은 친구가 있었어요. 바로 멜빵바지를 입은 개미였지요! 끙차, 끙차! 자기 몸보다 두 배나 큰 달콤한 곡식 낟알을 지고 있었어요. \"휴, 땀이 뻘뻘 나네. 그래도 겨울을 준비하려면 부지런히 날라야 해!\"",
+      "dialogue_list": [
+        {
+          "text": "그때 땅 밑을 부지런히 오가는 작은 친구가 있었어요. 바로 멜빵바지를 입은 개미였지요!",
+          "emotion": "calm",
+          "role": "narrator"
+        },
+        {
+          "emotion": "urgent",
+          "role": "friend",
+          "text": "끙차, 끙차! 휴, 땀이 뻘뻘 나네. 그래도 겨울을 준비하려면 부지런히 날라야 해!"
+        }
+      ],
+      "image": "p02.jpg",
+      "voice": {
+        "file": "v02.wav",
+        "lines": [
+          {
+            "role": "narrator",
+            "text": "그때 땅 밑을 부지런히 오가는 작은 친구가 있었어요. 바로 멜빵바지를 입은 개미였지요!"
+          },
+          {
+            "role": "friend",
+            "text": "끙차, 끙차! 휴, 땀이 뻘뻘 나네. 그래도 겨울을 준비하려면 부지런히 날라야 해!"
+          }
+        ]
+      }
+    },
+    {
+      "page_num": 3,
+      "full_text": "베짱이가 땀 흘리는 개미를 보고 깜짝 놀라 다가왔어요. \"개미야, 이렇게 좋은 여름날 왜 그렇게 힘들게 일만 해? 쉬면서 내 노래를 들어봐!\" 하지만 개미는 이마의 땀을 닦으며 고개를 저었어요. \"지금 모아두지 않으면 눈보라 치는 추운 겨울에 배가 고플 거야. 너도 먹이를 모으는 게 어때?\"",
+      "dialogue_list": [
+        {
+          "emotion": "curious",
+          "role": "hero",
+          "text": "개미야, 이렇게 좋은 여름날 왜 그렇게 힘들게 일만 해? 쉬면서 내 노래를 들어봐!"
+        },
+        {
+          "text": "지금 모아두지 않으면 눈보라 치는 추운 겨울에 배가 고플 거야. 너도 먹이를 모으는 게 어때?",
+          "emotion": "calm",
+          "role": "friend"
+        }
+      ],
+      "image": "p03.jpg",
+      "voice": {
+        "file": "v03.wav",
+        "lines": [
+          {
+            "role": "hero",
+            "text": "개미야, 이렇게 좋은 여름날 왜 그렇게 힘들게 일만 해? 쉬면서 내 노래를 들어봐!"
+          },
+          {
+            "role": "friend",
+            "text": "지금 모아두지 않으면 눈보라 치는 추운 겨울에 배가 고플 거야. 너도 먹이를 모으는 게 어때?"
+          }
+        ]
+      }
+    },
+    {
+      "page_num": 4,
+      "full_text": "베짱이는 고개를 갸웃했어요. \"겨울은 아직 멀었는걸! 그리고 내 음악은 숲속 친구들의 지친 마음을 퐁퐁 달래준다고!\" 베짱이는 다시 경쾌한 곡을 켰어요. 신기하게도 그 음악을 듣자 개미의 발걸음이 한결 가벼워졌어요. \"어라? 네 노래를 들으니 힘이 불끈 솟는걸? 고마워, 베짱이야!\"",
+      "dialogue_list": [
+        {
+          "role": "hero",
+          "emotion": "happy",
+          "text": "겨울은 아직 멀었는걸! 그리고 내 음악은 숲속 친구들의 지친 마음을 퐁퐁 달래준다고!"
+        },
+        {
+          "emotion": "calm",
+          "text": "베짱이는 다시 경쾌한 곡을 켰어요. 신기하게도 그 음악을 듣자 개미의 발걸음이 한결 가벼워졌어요.",
+          "role": "narrator"
+        },
+        {
+          "text": "어라? 네 노래를 들으니 힘이 불끈 솟는걸? 고마워, 베짱이야!",
+          "role": "friend",
+          "emotion": "excited"
+        }
+      ],
+      "image": "p04.jpg",
+      "voice": {
+        "file": "v04.wav",
+        "lines": [
+          {
+            "role": "hero",
+            "text": "겨울은 아직 멀었는걸! 그리고 내 음악은 숲속 친구들의 지친 마음을 퐁퐁 달래준다고!"
+          },
+          {
+            "role": "narrator",
+            "text": "베짱이는 다시 경쾌한 곡을 켰어요. 신기하게도 그 음악을 듣자 개미의 발걸음이 한결 가벼워졌어요."
+          },
+          {
+            "role": "friend",
+            "text": "어라? 네 노래를 들으니 힘이 불끈 솟는걸? 고마워, 베짱이야!"
+          }
+        ]
+      }
+    },
+    {
+      "page_num": 5,
+      "full_text": "시간이 흘러 숲에 하얀 첫눈이 펑펑 내렸어요. 쌩쌩~ 차가운 바람이 불어와 풀밭이 꽁꽁 얼어붙었지요. 온 세상이 하얗게 덮이자 먹을 것은 하나도 보이지 않았어요. 덜덜덜! 베짱이는 바이올린을 꼭 쥔 채 온몸을 떨었어요. \"아, 너무 춥고 배고파... 개미의 말이 맞았어. 어떡하지?\"",
+      "dialogue_list": [
+        {
+          "text": "시간이 흘러 숲에 하얀 첫눈이 펑펑 내렸어요. 쌩쌩, 차가운 바람이 불어와 풀밭이 꽁꽁 얼어붙었지요.",
+          "role": "narrator",
+          "emotion": "urgent"
+        },
+        {
+          "emotion": "whisper",
+          "text": "덜덜덜! 아, 너무 춥고 배고파... 개미의 말이 맞았어. 어떡하지?",
+          "role": "hero"
+        }
+      ],
+      "image": "p05.jpg",
+      "voice": {
+        "file": "v05.wav",
+        "lines": [
+          {
+            "role": "narrator",
+            "text": "시간이 흘러 숲에 하얀 첫눈이 펑펑 내렸어요. 쌩쌩, 차가운 바람이 불어와 풀밭이 꽁꽁 얼어붙었지요."
+          },
+          {
+            "role": "hero",
+            "text": "덜덜덜! 아, 너무 춥고 배고파... 개미의 말이 맞았어. 어떡하지?"
+          }
+        ]
+      }
+    },
+    {
+      "page_num": 6,
+      "full_text": "베짱이는 용기를 내어 언덕 아래 개미네 집 문을 똑똑 두드렸어요. 끼익- 문이 열리자 따스한 김과 함께 맛있는 냄새가 솔솔 풍겨 나왔어요. \"개미야... 안녕? 밖이 너무 춥고 먹을 게 없어서... 조금만 도와줄 수 있을까? 염치없지만 부탁해.\" 베짱이는 고개를 푹 숙였어요.",
+      "dialogue_list": [
+        {
+          "role": "narrator",
+          "text": "베짱이는 용기를 내어 언덕 아래 개미네 집 문을 똑똑 두드렸어요.",
+          "emotion": "calm"
+        },
+        {
+          "text": "개미야... 안녕? 밖이 너무 춥고 먹을 게 없어서... 조금만 도와줄 수 있을까? 염치없지만 부탁해.",
+          "role": "hero",
+          "emotion": "whisper"
+        }
+      ],
+      "image": "p06.jpg",
+      "voice": {
+        "file": "v06.wav",
+        "lines": [
+          {
+            "role": "narrator",
+            "text": "베짱이는 용기를 내어 언덕 아래 개미네 집 문을 똑똑 두드렸어요."
+          },
+          {
+            "role": "hero",
+            "text": "개미야... 안녕? 밖이 너무 춥고 먹을 게 없어서... 조금만 도와줄 수 있을까? 염치없지만 부탁해."
+          }
+        ]
+      }
+    },
+    {
+      "page_num": 7,
+      "full_text": "개미는 얼른 베짱이의 손을 꼭 잡고 안으로 이끌었어요. \"베짱이야, 어서 들어와! 난 널 기다리고 있었어!\" 개미는 따뜻한 곡식 수프와 부드러운 빵을 베짱이에게 건넸어요. \"지난여름, 네가 들려준 아름다운 바이올린 소리 덕분에 내가 힘을 내서 이 많은 먹이를 모을 수 있었잖아!\"",
+      "dialogue_list": [
+        {
+          "text": "베짱이야, 어서 들어와! 난 널 기다리고 있었어!",
+          "role": "friend",
+          "emotion": "happy"
+        },
+        {
+          "role": "narrator",
+          "text": "개미는 따뜻한 곡식 수프와 부드러운 빵을 베짱이에게 건넸어요.",
+          "emotion": "calm"
+        },
+        {
+          "role": "friend",
+          "emotion": "happy",
+          "text": "지난여름, 네가 들려준 아름다운 바이올린 소리 덕분에 내가 힘을 내서 이 많은 먹이를 모을 수 있었잖아!"
+        }
+      ],
+      "image": "p07.jpg",
+      "voice": {
+        "file": "v07.wav",
+        "lines": [
+          {
+            "role": "friend",
+            "text": "베짱이야, 어서 들어와! 난 널 기다리고 있었어!"
+          },
+          {
+            "role": "narrator",
+            "text": "개미는 따뜻한 곡식 수프와 부드러운 빵을 베짱이에게 건넸어요."
+          },
+          {
+            "role": "friend",
+            "text": "지난여름, 네가 들려준 아름다운 바이올린 소리 덕분에 내가 힘을 내서 이 많은 먹이를 모을 수 있었잖아!"
+          }
+        ]
+      }
+    },
+    {
+      "page_num": 8,
+      "full_text": "몸을 녹인 베짱이는 눈물을 글썽이며 미소 지었어요. \"고마워, 개미야! 다음 해에는 나도 너와 함께 부지런히 먹이를 모을게. 그리고 지금은 너를 위해 겨울 음악을 선물할게!\" 베짱이의 따뜻한 선율이 아늑한 개미집에 울려 퍼졌어요. 땀 흘려 일하는 손길도, 마음을 감싸주는 고운 음악도 모두 소중한 선물이었답니다.",
+      "dialogue_list": [
+        {
+          "emotion": "excited",
+          "role": "hero",
+          "text": "고마워, 개미야! 다음 해에는 나도 너와 함께 부지런히 먹이를 모을게. 그리고 지금은 너를 위해 겨울 음악을 선물할게!"
+        },
+        {
+          "emotion": "happy",
+          "text": "베짱이의 따뜻한 선율이 아늑한 개미집에 울려 퍼졌어요. 땀 흘려 일하는 손길도, 마음을 감싸주는 고운 음악도 모두 소중한 선물이었답니다.",
+          "role": "narrator"
+        }
+      ],
+      "image": "p08.jpg",
+      "voice": {
+        "file": "v08.wav",
+        "lines": [
+          {
+            "role": "hero",
+            "text": "고마워, 개미야! 다음 해에는 나도 너와 함께 부지런히 먹이를 모을게. 그리고 지금은 너를 위해 겨울 음악을 선물할게!"
+          },
+          {
+            "role": "narrator",
+            "text": "베짱이의 따뜻한 선율이 아늑한 개미집에 울려 퍼졌어요. 땀 흘려 일하는 손길도, 마음을 감싸주는 고운 음악도 모두 소중한 선물이었답니다."
+          }
+        ]
+      }
+    }
+  ],
+  "english": {
+    "preschoolEnglishTitle": "Grasshopper and Ant",
+    "preschoolEnglishPages": [
+      {
+        "page_num": 1,
+        "dialogue_list": [
+          {
+            "emotion": "excited",
+            "role": "narrator",
+            "text": "Sunny day! Grasshopper plays music."
+          },
+          {
+            "text": "Let's dance, friends!",
+            "role": "hero",
+            "emotion": "happy"
+          }
+        ],
+        "full_text": "Sunny day! Grasshopper plays music. \"Let's dance, friends!\""
+      },
+      {
+        "page_num": 2,
+        "dialogue_list": [
+          {
+            "emotion": "calm",
+            "role": "narrator",
+            "text": "Look at Ant."
+          },
+          {
+            "emotion": "urgent",
+            "text": "Work, work for winter!",
+            "role": "friend"
+          }
+        ],
+        "full_text": "Look at Ant. Ant carries big food. \"Work, work for winter!\""
+      },
+      {
+        "dialogue_list": [
+          {
+            "emotion": "curious",
+            "role": "hero",
+            "text": "Stop and sing!"
+          },
+          {
+            "emotion": "calm",
+            "role": "friend",
+            "text": "Get food for winter!"
+          }
+        ],
+        "page_num": 3,
+        "full_text": "\"Stop and sing!\" says Grasshopper. \"No, get food now!\" says Ant."
+      },
+      {
+        "dialogue_list": [
+          {
+            "emotion": "happy",
+            "role": "hero",
+            "text": "Winter is far away!"
+          },
+          {
+            "text": "Ant smiles and walks fast.",
+            "role": "narrator",
+            "emotion": "calm"
+          },
+          {
+            "emotion": "excited",
+            "text": "Your music helps me!",
+            "role": "friend"
+          }
+        ],
+        "page_num": 4,
+        "full_text": "\"Winter is far away!\" Grasshopper plays. Ant smiles and walks fast. \"Your music helps me!\""
+      },
+      {
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "text": "Cold winter comes.",
+            "emotion": "urgent"
+          },
+          {
+            "role": "hero",
+            "emotion": "whisper",
+            "text": "I am cold and hungry."
+          }
+        ],
+        "full_text": "Cold winter comes. White snow falls. Grasshopper shivers. \"I am cold and hungry.\"",
+        "page_num": 5
+      },
+      {
+        "page_num": 6,
+        "full_text": "Knock, knock! Grasshopper knocks on Ant's door. \"Please help me, Ant.\"",
+        "dialogue_list": [
+          {
+            "emotion": "calm",
+            "role": "narrator",
+            "text": "Knock, knock on the door."
+          },
+          {
+            "text": "Please help me, Ant.",
+            "emotion": "whisper",
+            "role": "hero"
+          }
+        ]
+      },
+      {
+        "dialogue_list": [
+          {
+            "emotion": "happy",
+            "role": "friend",
+            "text": "Come in, my friend!"
+          },
+          {
+            "role": "narrator",
+            "text": "Ant gives warm soup.",
+            "emotion": "calm"
+          },
+          {
+            "role": "friend",
+            "text": "Your music helped me!",
+            "emotion": "happy"
+          }
+        ],
+        "page_num": 7,
+        "full_text": "\"Come in, my friend!\" Ant gives warm soup. \"Your summer song helped me!\""
+      },
+      {
+        "full_text": "\"Thank you, Ant! I will play for you!\" Grasshopper plays lovely music. They are happy together.",
+        "page_num": 8,
+        "dialogue_list": [
+          {
+            "emotion": "excited",
+            "text": "I will play music!",
+            "role": "hero"
+          },
+          {
+            "role": "narrator",
+            "emotion": "happy",
+            "text": "They are happy together."
+          }
+        ]
+      }
+    ],
+    "preschoolEnglishCreatedAt": "2026-09-24T10:13:44.414Z",
+    "preschoolEnglishVersion": "preschool-easy-v3-short",
+    "englishTitle": "Grasshopper and Ant",
+    "englishPages": [
+      {
+        "dialogue_list": [
+          {
+            "emotion": "excited",
+            "text": "Sunny day! Grasshopper plays music.",
+            "role": "narrator"
+          },
+          {
+            "text": "Let's dance, friends!",
+            "emotion": "happy",
+            "role": "hero"
+          }
+        ],
+        "page_num": 1,
+        "full_text": "Sunny day! Grasshopper plays music. \"Let's dance, friends!\""
+      },
+      {
+        "full_text": "Look at Ant. Ant carries big food. \"Work, work for winter!\"",
+        "page_num": 2,
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "text": "Look at Ant.",
+            "emotion": "calm"
+          },
+          {
+            "text": "Work, work for winter!",
+            "role": "friend",
+            "emotion": "urgent"
+          }
+        ]
+      },
+      {
+        "dialogue_list": [
+          {
+            "text": "Stop and sing!",
+            "role": "hero",
+            "emotion": "curious"
+          },
+          {
+            "emotion": "calm",
+            "text": "Get food for winter!",
+            "role": "friend"
+          }
+        ],
+        "page_num": 3,
+        "full_text": "\"Stop and sing!\" says Grasshopper. \"No, get food now!\" says Ant."
+      },
+      {
+        "full_text": "\"Winter is far away!\" Grasshopper plays. Ant smiles and walks fast. \"Your music helps me!\"",
+        "page_num": 4,
+        "dialogue_list": [
+          {
+            "role": "hero",
+            "text": "Winter is far away!",
+            "emotion": "happy"
+          },
+          {
+            "emotion": "calm",
+            "role": "narrator",
+            "text": "Ant smiles and walks fast."
+          },
+          {
+            "emotion": "excited",
+            "role": "friend",
+            "text": "Your music helps me!"
+          }
+        ]
+      },
+      {
+        "page_num": 5,
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "text": "Cold winter comes.",
+            "emotion": "urgent"
+          },
+          {
+            "role": "hero",
+            "text": "I am cold and hungry.",
+            "emotion": "whisper"
+          }
+        ],
+        "full_text": "Cold winter comes. White snow falls. Grasshopper shivers. \"I am cold and hungry.\""
+      },
+      {
+        "full_text": "Knock, knock! Grasshopper knocks on Ant's door. \"Please help me, Ant.\"",
+        "page_num": 6,
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "text": "Knock, knock on the door.",
+            "emotion": "calm"
+          },
+          {
+            "emotion": "whisper",
+            "text": "Please help me, Ant.",
+            "role": "hero"
+          }
+        ]
+      },
+      {
+        "full_text": "\"Come in, my friend!\" Ant gives warm soup. \"Your summer song helped me!\"",
+        "page_num": 7,
+        "dialogue_list": [
+          {
+            "emotion": "happy",
+            "role": "friend",
+            "text": "Come in, my friend!"
+          },
+          {
+            "text": "Ant gives warm soup.",
+            "role": "narrator",
+            "emotion": "calm"
+          },
+          {
+            "emotion": "happy",
+            "role": "friend",
+            "text": "Your music helped me!"
+          }
+        ]
+      },
+      {
+        "full_text": "\"Thank you, Ant! I will play for you!\" Grasshopper plays lovely music. They are happy together.",
+        "dialogue_list": [
+          {
+            "emotion": "excited",
+            "role": "hero",
+            "text": "I will play music!"
+          },
+          {
+            "text": "They are happy together.",
+            "role": "narrator",
+            "emotion": "happy"
+          }
+        ],
+        "page_num": 8
+      }
+    ],
+    "englishCreatedAt": "2026-09-24T10:13:44.414Z",
+    "englishAdaptationVersion": "preschool-easy-v3-short",
+    "childEnglishTitle": "Summer Sunshine and the Violin: The Warm Winter of the Ant and the Grasshopper",
+    "childEnglishPages": [
+      {
+        "full_text": "It was a bright, sunny summer day. Joyful music filled the green grass. La-la-la, hop! A grasshopper in green clothes was playing his violin. He was having so much fun. \"Hello, friends! The weather is great today! Let's dance to the music!\"",
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "text": "On a bright summer day, joyful music filled the green grass.",
+            "emotion": "excited"
+          },
+          {
+            "text": "Hello, friends! The weather is great today! Let's dance to the music!",
+            "role": "hero",
+            "emotion": "happy"
+          }
+        ],
+        "page_num": 1
+      },
+      {
+        "page_num": 2,
+        "full_text": "Just then, a little friend walked by. It was an ant in blue overalls! He carried a sweet grain of corn. The grain was twice as big as him! \"Phew, I am sweating so much. But I must get ready for winter!\"",
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "text": "Just then, a busy little friend walked by. It was an ant in blue overalls!",
+            "emotion": "calm"
+          },
+          {
+            "emotion": "urgent",
+            "text": "Heave-ho! Phew, I am sweating! But I must get ready for winter!",
+            "role": "friend"
+          }
+        ]
+      },
+      {
+        "dialogue_list": [
+          {
+            "emotion": "curious",
+            "role": "hero",
+            "text": "Ant, why are you working so hard on a nice day? Take a rest and listen to my song!"
+          },
+          {
+            "emotion": "calm",
+            "role": "friend",
+            "text": "We will be hungry in the cold winter. Why don't you collect some food, too?"
+          }
+        ],
+        "full_text": "The grasshopper saw the ant sweating. He came close and asked, \"Ant, why are you working so hard? It is such a nice day! Take a rest and listen to my song!\" But the ant shook his head. \"If we do not save food now, we will be hungry in winter. Why don't you collect some food, too?\"",
+        "page_num": 3
+      },
+      {
+        "dialogue_list": [
+          {
+            "emotion": "happy",
+            "text": "Winter is far away! My music cheers up tired friends!",
+            "role": "hero"
+          },
+          {
+            "emotion": "calm",
+            "text": "The grasshopper played a cheerful tune. Amazingly, the ant felt light and happy.",
+            "role": "narrator"
+          },
+          {
+            "text": "Oh! Your song gives me energy! Thank you, Grasshopper!",
+            "role": "friend",
+            "emotion": "excited"
+          }
+        ],
+        "page_num": 4,
+        "full_text": "The grasshopper tilted his head. \"Winter is far away! My music cheers up tired friends!\" He played a cheerful tune again. Suddenly, the ant felt light and happy. \"Oh! Your song gives me energy! Thank you, Grasshopper!\""
+      },
+      {
+        "page_num": 5,
+        "full_text": "Time passed, and white snow began to fall. The cold wind blew, whoosh! The whole meadow froze. Everything was covered in white, and there was no food left. Brrr! The grasshopper was shivering. \"I am so cold and hungry... The ant was right. What should I do?\"",
+        "dialogue_list": [
+          {
+            "emotion": "urgent",
+            "role": "narrator",
+            "text": "Time passed, and white snow began to fall. The cold wind blew and froze the grass."
+          },
+          {
+            "emotion": "whisper",
+            "text": "Brrr! I am so cold and hungry... The ant was right. What should I do?",
+            "role": "hero"
+          }
+        ]
+      },
+      {
+        "dialogue_list": [
+          {
+            "emotion": "calm",
+            "text": "The grasshopper was brave and knocked on the ant's door.",
+            "role": "narrator"
+          },
+          {
+            "emotion": "whisper",
+            "role": "hero",
+            "text": "Hello, Ant... It is so cold outside, and I have no food. Can you help me, please?"
+          }
+        ],
+        "full_text": "The grasshopper walked down the hill. He knocked on the ant's door. Knock, knock! The door opened, and warm, delicious smells came out. \"Hello, Ant... It is so cold outside, and I have no food. Can you help me, please?\" The grasshopper looked down.",
+        "page_num": 6
+      },
+      {
+        "full_text": "The ant held the grasshopper's hands. He led him inside quickly. \"Come in, Grasshopper! I was waiting for you!\" The ant gave him warm soup and soft bread. \"In the summer, your beautiful violin gave me strength. That is how I collected all this food!\"",
+        "dialogue_list": [
+          {
+            "emotion": "happy",
+            "text": "Come in, Grasshopper! I was waiting for you!",
+            "role": "friend"
+          },
+          {
+            "text": "The ant gave him warm soup and soft bread.",
+            "role": "narrator",
+            "emotion": "calm"
+          },
+          {
+            "role": "friend",
+            "text": "Your beautiful violin gave me strength. That is how I collected all this food!",
+            "emotion": "happy"
+          }
+        ],
+        "page_num": 7
+      },
+      {
+        "dialogue_list": [
+          {
+            "role": "hero",
+            "text": "Thank you, Ant! Next year, I will work hard with you. Now, I will play winter music for you!",
+            "emotion": "excited"
+          },
+          {
+            "text": "Warm music filled the cozy house. Hard work and sweet music were both wonderful gifts.",
+            "role": "narrator",
+            "emotion": "happy"
+          }
+        ],
+        "full_text": "The grasshopper was warm now. He smiled with tears in his eyes. \"Thank you, Ant! Next year, I will work hard with you. Now, I will play winter music for you!\" Warm music filled the cozy house. Hard work and sweet music were both wonderful gifts.",
+        "page_num": 8
+      }
+    ],
+    "childEnglishCreatedAt": "2026-09-24T10:13:56.512Z",
+    "childEnglishVersion": "child-easy-v1"
+  }
+}

@@ -1,1 +1,23 @@
-{ "version": 1, "stories": [] }
+{
+  "version": 1,
+  "stories": [
+    {
+      "slug": "smufetr6l",
+      "title": "여름 햇살과 바이올린: 개미와 베짱이의 따뜻한 겨울",
+      "cover": "smufetr6l/p01.jpg",
+      "summary": "여름 내내 노래한 베짱이와 부지런한 개미들의 따뜻한 겨울 이야기예요.",
+      "origin": "이솝우화",
+      "theme": "우정",
+      "genre": "animal",
+      "hasVoice": true,
+      "hasEnglish": true,
+      "youtube": {
+        "ko": "https://youtu.be/MHuEfiTU8w0",
+        "en": "https://youtu.be/cqaSrHRqhVA"
+      },
+      "author": "뮤토책방",
+      "publishedAt": "2026-09-24T10:49:36.453Z"
+    }
+  ],
+  "updatedAt": "2026-09-24T10:49:36.453Z"
+}

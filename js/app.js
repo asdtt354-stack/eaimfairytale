@@ -1620,6 +1620,7 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
       catch(e) { alert('기기에서는 삭제했지만 클라우드 삭제에 실패했어요: ' + (e.message || e)); }
     }
     await loadLibraryList();
+    if (typeof refreshVillageProgress === 'function') refreshVillageProgress(); // 🏡 지운 동화는 마을에서도 빠져요
   }
 
   function setCloudStatus(message) {

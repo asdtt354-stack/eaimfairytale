@@ -4,7 +4,7 @@ import {
   getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js';
 import {
-  getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc, writeBatch, increment, arrayUnion
+  getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc, writeBatch
 } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -73,9 +73,10 @@ async function clearStoryPages(uid, cloudId) {
   }
 }
 
-// 🏡 뮤니마을 — 계정 기준 동화 수
-// users/{uid}/village/progress : { storyCount, places:[{storyId,title,name,emoji,type,madeAt}], updatedAt }
-// - 서재(클라우드)에 "처음" 저장된 4페이지 이상 동화만 셉니다. 동화를 지워도 마을은 줄어들지 않아요.
+// 🏡 뮤니마을 — 계정 기준 동화 수 (2026-09-24 변경: "내 서재 = 우리 마을")
+// 지금 클라우드 서재에 있는 4페이지 이상 동화만 셉니다. 서재에서 지우면 마을에서도 빠져요.
+// (다시 만들기·연습용으로 만들었다 지운 동화가 쌓이지 않게)
+// 계산 결과는 users/{uid}/village/progress 에도 적어 둡니다(나중 마을 화면용).
 const VILLAGE_MIN_PAGES = 4;
 const GENRE_PLACES = {
   fantasy:{name:'마법의 숲',emoji:'🌳',type:'forest'}, heroic:{name:'용기의 성',emoji:'🏰',type:'castle'},
@@ -91,25 +92,22 @@ function placeEntry(cloudId, meta){
   return { storyId:cloudId, title:String(meta.title||'').slice(0,40), name:vp.name, emoji:vp.emoji, type:vp.type, madeAt:String(meta.updatedAt || meta.createdAt || '') };
 }
 
-// 진행 문서가 없으면 지금까지 클라우드에 있는 동화로 한 번 만들어 둡니다(기존 사용자 이어받기).
-async function ensureVillageProgress(uid){
-  const ref=doc(firestore,'users',uid,'village','progress');
-  const snap=await getDoc(ref);
-  if (snap.exists()) return { created:false, data:snap.data() };
+async function computeVillageProgress(uid){
   const stories=await getDocs(collection(firestore,'users',uid,'stories'));
   const places=[];
   for (const d of stories.docs){
     const m=d.data()||{};
     if ((m.pageCount||0) >= VILLAGE_MIN_PAGES) places.push(placeEntry(d.id, m));
   }
-  const data={ storyCount:places.length, places, updatedAt:new Date().toISOString() };
-  await setDoc(ref, data);
-  return { created:true, data };
+  places.sort((a,b)=>String(a.madeAt).localeCompare(String(b.madeAt)));
+  const data={ storyCount:places.length, places, updatedAt:new Date().toISOString(), rule:'library-only' };
+  try { await setDoc(doc(firestore,'users',uid,'village','progress'), data); } catch(e){ console.log('village cache notice:', e); }
+  return data;
 }
 
 async function getVillageProgress(){
   if (!currentUser) return { storyCount:0, places:[] };
-  return (await ensureVillageProgress(currentUser.uid)).data;
+  return computeVillageProgress(currentUser.uid);
 }
 
 async function saveStory(book) {
@@ -150,19 +148,7 @@ async function saveStory(book) {
   }
   book.cloudId=cloudId;
 
-  // 🏡 새 동화면 마을 진행에 더하기
-  if (isNewStory && pages.length >= VILLAGE_MIN_PAGES) {
-    try {
-      const r=await ensureVillageProgress(uid);   // 처음 만들면 이 동화까지 이미 포함해서 셉니다
-      if (!r.created) {
-        await setDoc(doc(firestore,'users',uid,'village','progress'), {
-          storyCount: increment(1),
-          places: arrayUnion(placeEntry(cloudId, meta)),
-          updatedAt: new Date().toISOString()
-        }, { merge:true });
-      }
-    } catch(e){ console.log('village progress notice:', e); }
-  }
+  // 🏡 마을 수는 getVillageProgress()가 서재를 보고 다시 셉니다.
   return { cloudId };
 }
 

@@ -311,7 +311,9 @@ ${buildLearningPromptBlock()}
    - role: "narrator", "hero", "villain", "elder", "friend"
    - emotion: "excited", "happy", "urgent", "angry", "curious", "whisper", "calm"
 3. full_text에는 전체 본문을 적어줘.
-4. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘. 사진이 있는 등장인물이 그 장면에 나오면 image_prompt 안에 그 인물의 이름을 입력된 글자 그대로(한글이면 한글 그대로, 예: "민우", "지아") 꼭 적어서 누가 나오는지 알 수 있게 해줘.
+4. character_sheet에는 두 페이지 이상 나오는 주요 등장인물을 모두 적고, look에는 그림으로 그릴 때 매번 똑같이 쓸 영문 외모 설명(종류·나이·색·털/머리·옷·소품)을 구체적으로 적어줘. 예: "an old gray-brown donkey with a red plaid scarf and a small wooden flute".
+4-1. image_prompt에는 그 장면에 나오는 등장인물을 "the animal friends", "four friends"처럼 뭉뚱그리지 말고 character_sheet의 이름으로 한 명씩 모두 적어줘(예: "Donkey, Dog, Cat and Rooster peek through the window"). character_sheet에 없는 새 인물은 그 장면에 꼭 필요할 때만 넣어줘.
+4-2. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘. 사진이 있는 등장인물이 그 장면에 나오면 image_prompt 안에 그 인물의 이름을 입력된 글자 그대로(한글이면 한글 그대로, 예: "민우", "지아") 꼭 적어서 누가 나오는지 알 수 있게 해줘.
 5. 배움동화가 선택되었다면 '설명하는 수업'처럼 쓰지 말고, 재미있는 사건 속에서 주인공이 관찰·비교·발견·해결하며 자연스럽게 배우게 해줘.
 6. 성경·경전·실존 종교 인물이나 종교적 사건을 중심 소재로 한 동화는 만들지 마. 그런 입력이 있으면 종교와 무관한 창작 소재로 바꿔서 구성해줘.
 7. 역사 배움동화에서는 실제 인물·시대·장소·핵심 사건과 알려진 역사적 사실을 임의로 바꾸거나 만들어내지 마. 시간여행·가상 주인공·상상 대화 같은 창작 장치는 사용할 수 있지만, 창작 장치와 역사적 사실이 혼동되지 않도록 분명하게 구성해줘.
@@ -326,6 +328,7 @@ ${buildLearningPromptBlock()}
 {
   "title": "동화책 제목",
   "village_place": { "name": "장소 이름", "emoji": "🏡", "type": "town", "description": "한 문장 소개" },
+  "character_sheet": [ { "name": "Donkey", "look": "an old gray-brown donkey with a red plaid scarf" } ],
   "pages": [
     {
       "page_num": 1,
@@ -364,6 +367,7 @@ currentStoryBookObject = {
         title: storyData.title,
         villagePlace: normalizeVillagePlace(storyData.village_place, genreKey),
         storyTheme: selectedStoryTheme || '',
+        characterSheet: normalizeCharacterSheet(storyData.character_sheet),
         createdAt: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         pages: []
       };
@@ -376,13 +380,23 @@ currentStoryBookObject = {
       if (titleEl) titleEl.innerText = `📖 ${storyData.title}`;
       if (bookContainer) bookContainer.style.display = 'block';
 
+      const characterSheet = normalizeCharacterSheet(storyData.character_sheet);
+      let firstPageRef = null, lastPageRef = null;
       for (let i = 0; i < storyData.pages.length; i++) {
         const page = storyData.pages[i];
         if (statusLog) statusLog.innerText = `🎨 ${i + 2}/${storyData.pages.length + 1}. ${page.page_num}페이지 삽화를 그리는 중... (${i + 1}/${storyData.pages.length})`;
 
         let imgBase64 = "";
         try {
-          imgBase64 = await generateGeminiImage(aiRoute, page.image_prompt, getActiveCast());
+          imgBase64 = await generateGeminiImage(aiRoute, page.image_prompt, getActiveCast(), {
+            sheet: characterSheet,
+            refs: [firstPageRef, lastPageRef].filter((r, k, arr) => r && arr.indexOf(r) === k)
+          });
+          // 🎨 다음 페이지가 같은 모습으로 그려지도록 앞 페이지 그림을 작게 줄여 기준으로 넘깁니다
+          if (imgBase64) {
+            const small = await shrinkImageForRef(imgBase64);
+            if (small) { if (!firstPageRef) firstPageRef = small; lastPageRef = small; }
+          }
         } catch (imgErr) {
           console.error(`Page ${i+1} Image Error:`, imgErr);
         }
@@ -633,14 +647,57 @@ currentStoryBookObject = {
 
   window.addEventListener('eaim-auth-changed', () => refreshTrialStatus());
 
-  async function generateGeminiImage(aiRoute, prompt, cast = []) {
+  // 🎨 등장인물 모습 고정용 도우미
+  function normalizeCharacterSheet(raw) {
+    if (!Array.isArray(raw)) return [];
+    return raw.filter(c => c && c.name && c.look).slice(0, 8)
+      .map(c => ({ name: String(c.name).slice(0, 30), look: String(c.look).slice(0, 220) }));
+  }
+
+  // 앞 페이지 그림을 기준 그림으로 보낼 때 용량을 줄입니다(512px JPEG)
+  function shrinkImageForRef(base64) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const s = Math.min(1, 512 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        resolve({ mime: 'image/jpeg', data: c.toDataURL('image/jpeg', 0.82).split(',')[1] });
+      };
+      img.onerror = () => resolve(null);
+      img.src = `data:image/png;base64,${base64}`;
+    });
+  }
+
+  async function generateGeminiImage(aiRoute, prompt, cast = [], extra = {}) {
     const parts = [];
+    const sheet = Array.isArray(extra.sheet) ? extra.sheet : [];
+    const refs = Array.isArray(extra.refs) ? extra.refs : [];
+
+    // 앞 페이지 그림 = 같은 동화 속 인물·화풍 기준
+    refs.forEach((r, idx) => {
+      parts.push({ text: `Earlier page ${idx + 1} of this same storybook (reference for character designs and art style):` });
+      parts.push({ inlineData: { mimeType: r.mime, data: r.data } });
+    });
+
+    const sheetText = sheet.length
+      ? `Recurring characters — every time one of them appears, draw them exactly like this and exactly like in the earlier pages: ${sheet.map(c => `${c.name}: ${c.look}`).join('; ')}. Never replace these characters with different animals or people.`
+      : '';
+    const rules = [
+      refs.length ? 'Keep the same characters, faces, colors, clothing and the same art style as the earlier pages of this storybook.' : '',
+      sheetText,
+      'Show exactly the characters named in the scene description, no substitutes.',
+      'Do not put any text, letters, words, sound effects or speech bubbles in the image.'
+    ].filter(Boolean).join(' ');
 
     if (cast && cast.length === 1) {
       const m = cast[0];
       parts.push({ inlineData: { mimeType: m.mime, data: m.base64 } });
       parts.push({
-        text: `Create a children's book illustration where ${m.name ? `the character "${m.name}"` : 'the main character'} has the exact facial appearance, hairstyle, and likeness of the child in the provided image. Scene description: ${prompt}`
+        text: `Create a children's book illustration where ${m.name ? `the character "${m.name}"` : 'the main character'} has the exact facial appearance, hairstyle, and likeness of the child in the provided image. ${rules} Scene description: ${prompt}`
       });
     } else if (cast && cast.length > 1) {
       const labels = [];
@@ -651,11 +708,11 @@ currentStoryBookObject = {
         parts.push({ inlineData: { mimeType: m.mime, data: m.base64 } });
       });
       parts.push({
-        text: `Create a children's book illustration. The reference photos above show different people: ${labels.join(', ')}. Whenever one of these characters appears in the scene, draw them with the exact facial appearance, hairstyle, and likeness of their own reference photo. Keep each person clearly distinct — never mix or swap faces between them. Only include the characters that the scene calls for. Scene description: ${prompt}`
+        text: `Create a children's book illustration. The reference photos above show different people: ${labels.join(', ')}. Whenever one of these characters appears in the scene, draw them with the exact facial appearance, hairstyle, and likeness of their own reference photo. Keep each person clearly distinct — never mix or swap faces between them. Only include the characters that the scene calls for. ${rules} Scene description: ${prompt}`
       });
     } else {
       parts.push({
-        text: `Children's storybook illustration: ${prompt}`
+        text: `Children's storybook illustration. ${rules} Scene description: ${prompt}`
       });
     }
 
@@ -1588,35 +1645,42 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
   window.addEventListener('eaim-auth-changed', (event) => updateCloudAuthUI(event.detail || null));
   function exportToPDF() {
     if (!currentStoryBookObject) return;
-    
+    const esc = (t) => String(t || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const title = getActiveStoryTitle(currentStoryBookObject);
+    const author = currentStoryBookObject.author || '어린이 작가';
+    const pages = getActiveStoryPages(currentStoryBookObject);
+    const firstImg = currentStoryBookObject.pages[0]?.imageBase64 || '';
+
+    // A4 한 장 = 794×1123px. 한 장에 동화 한 페이지(그림 위, 글 아래)만 들어가게 만듭니다.
+    const PAGE = 'width:794px;height:1110px;box-sizing:border-box;padding:56px 60px;display:flex;flex-direction:column;align-items:center;background:#fff;overflow:hidden;font-family:"Noto Sans KR","Malgun Gothic",sans-serif;';
     const printContainer = document.createElement('div');
-    printContainer.innerHTML = `
-      <h1 style="text-align:center; font-size:24px; margin-bottom:6px; color:#1e293b;">📖 ${getActiveStoryTitle(currentStoryBookObject)}</h1>
-      <p style="text-align:center; font-size:14px; color:#64748b; margin-bottom:24px;">글/그림: ${currentStoryBookObject.author || '어린이 작가'}</p>
-    `;
-    
-    getActiveStoryPages(currentStoryBookObject).forEach((p, i) => {
-      const originalPage = currentStoryBookObject.pages[i];
-      const pDiv = document.createElement('div');
-      pDiv.style.cssText = "page-break-inside: avoid; position: relative; width: 100%; max-width: 520px; aspect-ratio: 1/1; margin: 0 auto 30px auto; border-radius: 12px; overflow: hidden;";
-      const pdfImage = originalPage?.imageBase64 || p.imageBase64 || '';
-      const imgTag = pdfImage ? `<img src="data:image/png;base64,${pdfImage}" style="width: 100%; height: 100%; object-fit: cover;">` : '';
-      pDiv.innerHTML = `
-        ${imgTag}
-        <div style="position: absolute; bottom: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.65); padding: 20px 16px; color: #fff;">
-          <b style="color: #fbbf24;">[${p.page_num}페이지]</b>
-          <p style="font-size: 14px; line-height: 1.6; margin: 4px 0 0 0; color: #fff;">${p.full_text || p.text}</p>
-        </div>
-      `;
-      printContainer.appendChild(pDiv);
+    printContainer.style.cssText = 'width:794px;background:#fff;';
+
+    let html = `
+      <div class="pdf-page${pages.length ? ' pdf-break' : ''}" style="${PAGE}justify-content:center;gap:26px;">
+        ${firstImg ? `<img src="data:image/png;base64,${firstImg}" style="width:560px;height:560px;object-fit:cover;border-radius:22px;">` : ''}
+        <div style="font-size:34px;font-weight:900;color:#3b2a78;text-align:center;line-height:1.3;word-break:keep-all;">${esc(title)}</div>
+        <div style="font-size:18px;color:#6b7280;">글·그림 ${esc(author)}</div>
+        <div style="font-size:14px;color:#a78bfa;font-weight:800;">뮤니의 동화마을</div>
+      </div>`;
+    pages.forEach((p, i) => {
+      const img = currentStoryBookObject.pages[i]?.imageBase64 || p.imageBase64 || '';
+      html += `
+      <div class="pdf-page${i < pages.length - 1 ? ' pdf-break' : ''}" style="${PAGE}gap:28px;">
+        ${img ? `<img src="data:image/png;base64,${img}" style="width:620px;height:620px;object-fit:cover;border-radius:20px;flex:none;">` : '<div style="height:620px"></div>'}
+        <div style="width:620px;font-size:21px;line-height:1.75;color:#1f2937;word-break:keep-all;">${esc(p.full_text || p.text)}</div>
+        <div style="margin-top:auto;font-size:13px;color:#9ca3af;">— ${i + 1} —</div>
+      </div>`;
     });
+    printContainer.innerHTML = html;
 
     const opt = {
-      margin: 10,
-      filename: `${getActiveStoryTitle(currentStoryBookObject)}_${currentStoryBookObject.author || '동화'}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      margin: 0,
+      filename: `${title}_${author}.pdf`,
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css'], after: '.pdf-break' }
     };
     html2pdf().set(opt).from(printContainer).save();
   }

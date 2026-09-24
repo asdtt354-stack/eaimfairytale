@@ -1,4 +1,4 @@
-const CACHE_NAME='muni-story-v32';
+const CACHE_NAME='muni-story-v33';
 const APP_SHELL=[
   './','./index.html','./manifest.webmanifest','./css/styles.css',
   './js/app.js','./js/ai-voice.js','./js/recorder.js','./js/creator-config.js','./js/creator.js','./js/village-studio.js','./js/vendor/jszip.min.js','./js/pwa.js','./js/learning.js','./js/language.js','./js/firebase-sync.js',

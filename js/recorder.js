@@ -9,6 +9,38 @@
   let recordedChunks = [];
   let recordedMime = '';
   let isFinishing = false;
+  const INTRO_SRC = './assets/intro/mutoniz-intro.mp4';
+  const INTRO_PREF_KEY = 'gemini_fairytale_intro_pref';
+
+  function wantIntro() {
+    const box = stageEl && stageEl.querySelector('.rec-intro-check');
+    return !!(box && box.checked && document.body.classList.contains('is-creator'));
+  }
+
+  // 🎁 뮤토니즈 인트로(로고송) 재생 — 끝나면(또는 문제가 생기면) 다음으로
+  function playIntro() {
+    return new Promise((resolve) => {
+      const frame = $('.rec-frame');
+      if (!frame) { resolve(); return; }
+      const v = document.createElement('video');
+      v.className = 'rec-intro';
+      v.src = INTRO_SRC;
+      v.playsInline = true;
+      v.preload = 'auto';
+      frame.appendChild(v);
+      let done = false;
+      const finish = () => {
+        if (done) return; done = true;
+        v.classList.add('out');
+        setTimeout(() => { v.remove(); resolve(); }, 450);
+      };
+      v.onended = finish;
+      v.onerror = finish;
+      setTimeout(finish, 9000); // 혹시 멈춰도 9초 뒤에는 넘어가기
+      const p = v.play();
+      if (p && p.catch) p.catch(finish);
+    });
+  }
 
   const $ = (sel) => stageEl && stageEl.querySelector(sel);
   const esc = (s) => String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -70,6 +102,7 @@
           <div class="rec-ready-box">
             <div class="rec-ready-title">🎬 녹화 준비 완료</div>
             <p class="rec-ready-desc"></p>
+            <label class="rec-intro-opt creator-only"><input type="checkbox" class="rec-intro-check"> 🎁 뮤토니즈 인트로(로고송 5초) 먼저 넣기</label>
             <button type="button" class="rec-start-btn">▶ 시작하기</button>
             <button type="button" class="rec-cancel-btn">취소</button>
           </div>
@@ -78,6 +111,13 @@
       <button type="button" class="rec-close" title="끝내기">✕ 끝내기</button>
     `;
     document.body.appendChild(stageEl);
+    const introCheck = $('.rec-intro-check');
+    if (introCheck) {
+      let saved = null;
+      try { saved = localStorage.getItem(INTRO_PREF_KEY); } catch (e) {}
+      introCheck.checked = saved !== 'off';
+      introCheck.onchange = () => { try { localStorage.setItem(INTRO_PREF_KEY, introCheck.checked ? 'on' : 'off'); } catch (e) {} };
+    }
     $('.rec-start-btn').onclick = beginPlayback;
     $('.rec-cancel-btn').onclick = () => finishRecording(true);
     $('.rec-close').onclick = () => finishRecording(false);
@@ -216,7 +256,7 @@
       recordedChunks = [];
       recordedMime = pickMimeType();
       try {
-        mediaRecorder = new MediaRecorder(captureStream, recordedMime ? { mimeType: recordedMime, videoBitsPerSecond: 5000000 } : undefined);
+        mediaRecorder = new MediaRecorder(captureStream, recordedMime ? { mimeType: recordedMime, videoBitsPerSecond: 8000000 } : undefined);
       } catch (e) {
         mediaRecorder = new MediaRecorder(captureStream);
         recordedMime = mediaRecorder.mimeType || 'video/webm';
@@ -226,12 +266,17 @@
       mediaRecorder.start(1000);
     }
 
-    // 전체화면 전환이 끝난 뒤 제목 카드부터 낭독 시작
-    setTimeout(() => {
+    const withIntro = wantIntro();
+    // 전체화면 전환이 끝난 뒤 (인트로 →) 제목 카드부터 낭독 시작
+    setTimeout(async () => {
       if (!stageEl) return;
+      if (withIntro) {
+        await playIntro();
+        if (!stageEl) return;
+      }
       showCard('title');
       startContinuousReading(onStoryDone, 0);
-    }, 900);
+    }, withIntro ? 500 : 900);
   }
 
   function onStoryDone() {

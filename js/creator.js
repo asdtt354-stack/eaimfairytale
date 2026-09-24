@@ -204,6 +204,12 @@
       const title = getActiveStoryTitle(book) || '동화';
       const author = book.author || '';
 
+      say('🎁 인트로 담는 중...');
+      try {
+        const ir = await fetch('./assets/intro/mutoniz-intro.mp4');
+        if (ir.ok) zip.file('000_인트로_뮤토니즈.mp4', await ir.blob());
+      } catch (e) { console.log('intro skip:', e); }
+
       say('🎨 제목·끝 카드 그리는 중...');
       zip.file('00_제목카드.png', await makeCard({
         kicker: isEn ? "Muni's Fairytale Village" : '뮤니의 동화마을',
@@ -242,7 +248,7 @@
       zip.file('사용법.txt', '\ufeff' + [
         '🎞️ 캡컷에서 이렇게 쓰세요',
         '',
-        '1. 00_제목카드 → 01.png, 02.png ... → 99_끝카드 순서로 타임라인에 올리기',
+        '1. 000_인트로_뮤토니즈.mp4 → 00_제목카드 → 01.png, 02.png ... → 99_끝카드 순서로 타임라인에 올리기',
         '2. 대본.txt를 보면서 페이지마다 목소리 녹음 (캡컷 [오디오] → [녹음])',
         '   🎙️ AI 성우 목소리가 있는 동화는 01.wav, 02.wav ... 를 그대로 쓰면 돼요 (1페이지 소리에 제목 포함)',
         '3. 이미지 길이를 목소리 길이에 맞게 늘리기',

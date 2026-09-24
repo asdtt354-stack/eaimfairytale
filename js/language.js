@@ -271,6 +271,7 @@ async function translateCurrentStoryToEnglish(level = 'preschool') {
       } catch (e) { console.warn('영어 버전 클라우드 업데이트:', e); }
     }
 
+    if (!currentStoryBookObject.id) storyUnsaved = true; // 서재에 없는 동화면 나갈 때 알려주기
     if (status) status.textContent = `✅ ${cfg.label} 완성! 이 책에 함께 저장됩니다.`;
     return true;
   } catch (e) {

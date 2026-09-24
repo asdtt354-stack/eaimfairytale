@@ -147,7 +147,10 @@ async function addAiVoiceToCurrentStory(btn) {
   if (btn) { btn.disabled = false; btn.textContent = old; }
   updateAiVoiceButton();
   if (aiRoute.mode === 'trial') refreshTrialStatus();
-  if (r.done && currentStoryBookObject.id) saveCurrentStoryToDB({ silent: true });
+  if (r.done) {
+    if (currentStoryBookObject.id) await saveCurrentStoryToDB({ silent: true, localOnly: true });
+    else storyUnsaved = true;
+  }
   alert(r.done ? `🎉 ${r.done}페이지에 AI 성우 목소리를 입혔어요!${r.failed ? `\n(${r.failed}페이지는 실패해서 기본 음성으로 읽어요)` : ''}${currentStoryBookObject.id ? '' : '\n💾 서재에 저장하면 목소리도 함께 보관돼요.'}` : '⚠️ 목소리를 만들지 못했어요. 잠시 후 다시 시도해 주세요.');
 }
 

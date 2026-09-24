@@ -3,6 +3,14 @@ function pickGenre(value){
   if(sel){ sel.value=value; handleGenreChange(value); }
 }
 
+// ⭐ 이야기 주제 — 장르와 따로 고릅니다(주제: 무엇에 관한 이야기 / 장르: 어떤 분위기의 이야기)
+let selectedStoryTheme = '';
+function pickStoryTheme(btn){
+  const key = btn?.dataset?.theme || '';
+  selectedStoryTheme = selectedStoryTheme === key ? '' : key;
+  document.querySelectorAll('.theme-chip[data-theme]').forEach(b => b.classList.toggle('active', b.dataset.theme === selectedStoryTheme));
+}
+
 let currentStoryBookObject = null;
   let db = null;
   let isPlaying = false;
@@ -293,6 +301,7 @@ let currentStoryBookObject = null;
 - 작가 이름: ${author}
 - 등장인물/주인공: ${char ? char : '장르에 맞는 매력적인 주인공 자동 창작'}
 ${buildCastPromptBlock()}- 배경: ${bg ? bg : '장르에 맞는 아름다운 배경 자동 창작'}
+- 이야기 주제: ${selectedStoryTheme ? `${selectedStoryTheme} (이 주제가 이야기 전체를 이끌게 해줘)` : '자유롭게'}
 - 주제/교훈: ${lesson ? lesson : '마음이 따뜻해지는 감동 교훈'}
 ${buildLearningPromptBlock()}
 [작성 규칙]
@@ -354,6 +363,7 @@ currentStoryBookObject = {
         learningTopic: learning.topic,
         title: storyData.title,
         villagePlace: normalizeVillagePlace(storyData.village_place, genreKey),
+        storyTheme: selectedStoryTheme || '',
         createdAt: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         pages: []
       };

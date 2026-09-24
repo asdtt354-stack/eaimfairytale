@@ -142,14 +142,14 @@
               </div>
 
               <div id="storyTopicBox" class="story-topic-box">
-                <label>⭐ 이야기 주제</label>
+                <label>⭐ 이야기 주제 <small class="theme-hint">(하나 고르면 이야기의 중심이 돼요 · 다시 누르면 해제)</small></label>
                 <div class="theme-chips">
-                  <button class="theme-chip" type="button" onclick="pickGenre('heroic')">🛡️ 용기</button>
-                  <button class="theme-chip" type="button" onclick="pickGenre('animal')">👫 우정</button>
-                  <button class="theme-chip" type="button" onclick="pickGenre('fantasy')">✨ 꿈</button>
-                  <button class="theme-chip" type="button" onclick="pickGenre('custom')">💗 가족</button>
-                  <button class="theme-chip" type="button" onclick="pickGenre('animal')">🌿 자연</button>
-                  <button class="theme-chip" type="button" onclick="pickGenre('mystery')">🕵️ 비밀 친구</button>
+                  <button class="theme-chip" type="button" data-theme="용기" onclick="pickStoryTheme(this)">🛡️ 용기</button>
+                  <button class="theme-chip" type="button" data-theme="우정" onclick="pickStoryTheme(this)">👫 우정</button>
+                  <button class="theme-chip" type="button" data-theme="꿈" onclick="pickStoryTheme(this)">✨ 꿈</button>
+                  <button class="theme-chip" type="button" data-theme="가족" onclick="pickStoryTheme(this)">💗 가족</button>
+                  <button class="theme-chip" type="button" data-theme="자연" onclick="pickStoryTheme(this)">🌿 자연</button>
+                  <button class="theme-chip" type="button" data-theme="비밀 친구" onclick="pickStoryTheme(this)">🕵️ 비밀 친구</button>
                 </div>
               </div>
 

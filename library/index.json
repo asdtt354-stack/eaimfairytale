@@ -2,6 +2,23 @@
   "version": 1,
   "stories": [
     {
+      "slug": "smufmoe0z",
+      "title": "도토리 한 알의 마법 선물",
+      "cover": "smufmoe0z/p01.jpg",
+      "summary": "혼자일 때보다 함께일 때 더 큰 기쁨을 찾는 다람이의 이야기",
+      "origin": "창작동화",
+      "theme": "",
+      "genre": "animal",
+      "hasVoice": false,
+      "hasEnglish": true,
+      "youtube": {
+        "ko": "",
+        "en": ""
+      },
+      "author": "뮤토의 책방",
+      "publishedAt": "2026-09-24T14:29:22.519Z"
+    },
+    {
       "slug": "smufmjzxr",
       "title": "도토리 한 알의 마법 선물",
       "cover": "smufmjzxr/p01.jpg",
@@ -70,5 +87,5 @@
       "publishedAt": "2026-09-24T11:32:27.972Z"
     }
   ],
-  "updatedAt": "2026-09-24T14:25:58.611Z"
+  "updatedAt": "2026-09-24T14:29:22.519Z"
 }

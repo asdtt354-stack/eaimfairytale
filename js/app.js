@@ -12,8 +12,11 @@ let currentStoryBookObject = null;
   let currentLibraryIndex = 0;
   let currentPageIndex = 0;
 
-  let childPhotoBase64 = null;
-  let childPhotoMime = "image/jpeg";
+  // 👨‍👩‍👧 등장인물 사진 목록 (최대 4명) — { id, name, base64, mime, previewUrl }
+  const MAX_CAST = 4;
+  let castMembers = [];
+  let castIdSeq = 0;
+  let pendingCastPhotoId = null;
 
   // 🎵 --- BGM 오디오 엔진 ---
   let bgmAudio = new Audio();
@@ -233,9 +236,8 @@ let currentStoryBookObject = null;
       const apiKey = (apiKeyEl ? apiKeyEl.value : '').trim();
       const author = (authorEl ? authorEl.value : '').trim();
       
-      if (!apiKey || apiKey.length < 5) {
-        alert('🔑 Google AI Studio API Key를 먼저 입력해 주세요.');
-        if (apiKeyEl) apiKeyEl.focus();
+      if (!isGuardianConfirmed()) {
+        showGuardianGate();
         return;
       }
 
@@ -245,11 +247,25 @@ let currentStoryBookObject = null;
         return;
       }
 
+      // 🔑 내 키가 있으면 내 키로, 없으면 무료체험(서버 중계)으로
+      let aiRoute;
+      if (apiKey && apiKey.length >= 5) {
+        aiRoute = { mode: 'key', apiKey };
+      } else {
+        const trial = await checkTrialReady();
+        if (!trial.ok) {
+          alert(trial.message);
+          if (apiKeyEl) apiKeyEl.focus();
+          return;
+        }
+        aiRoute = { mode: 'trial' };
+      }
+
       const genreKey = genreEl ? genreEl.value : "fantasy";
       const char = (charEl ? charEl.value : '').trim();
       const bg = (bgEl ? bgEl.value : '').trim();
       const lesson = (lessonEl ? lessonEl.value : '').trim();
-      const lengthVal = lengthEl ? lengthEl.value : "3";
+      const lengthVal = aiRoute.mode === 'trial' ? "2" : (lengthEl ? lengthEl.value : "3");
       const learning = getLearningSelection();
 
       saveUserSession();
@@ -261,7 +277,7 @@ let currentStoryBookObject = null;
       if (btn) btn.disabled = true;
       if (controlPanel) controlPanel.style.display = 'none';
       if (bookContainer) bookContainer.style.display = 'none';
-      if (statusLog) statusLog.innerText = `✨ [${lengthVal}분 · ${config.pages}페이지] ${author} 작가님의 맞춤 동화를 만드는 중입니다...`;
+      if (statusLog) statusLog.innerText = `✨ [${lengthVal}분 · ${config.pages}페이지] ${author} 작가님의 맞춤 동화를 만드는 중입니다...${aiRoute.mode === 'trial' ? ' (🎁 무료체험)' : ''}`;
       if (pagesWrapper) pagesWrapper.innerHTML = '';
       stopVoice();
 
@@ -276,7 +292,7 @@ let currentStoryBookObject = null;
 [이야기 설정]
 - 작가 이름: ${author}
 - 등장인물/주인공: ${char ? char : '장르에 맞는 매력적인 주인공 자동 창작'}
-- 배경: ${bg ? bg : '장르에 맞는 아름다운 배경 자동 창작'}
+${buildCastPromptBlock()}- 배경: ${bg ? bg : '장르에 맞는 아름다운 배경 자동 창작'}
 - 주제/교훈: ${lesson ? lesson : '마음이 따뜻해지는 감동 교훈'}
 ${buildLearningPromptBlock()}
 [작성 규칙]
@@ -286,10 +302,11 @@ ${buildLearningPromptBlock()}
    - role: "narrator", "hero", "villain", "elder", "friend"
    - emotion: "excited", "happy", "urgent", "angry", "curious", "whisper", "calm"
 3. full_text에는 전체 본문을 적어줘.
-4. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘.
+4. image_prompt에는 장르 화풍('${selectedGenre.artStyle}')을 반영한 영문 프롬프트를 작성해줘. 사진이 있는 등장인물이 그 장면에 나오면 image_prompt 안에 그 인물의 이름을 입력된 글자 그대로(한글이면 한글 그대로, 예: "민우", "지아") 꼭 적어서 누가 나오는지 알 수 있게 해줘.
 5. 배움동화가 선택되었다면 '설명하는 수업'처럼 쓰지 말고, 재미있는 사건 속에서 주인공이 관찰·비교·발견·해결하며 자연스럽게 배우게 해줘.
 6. 성경·경전·실존 종교 인물이나 종교적 사건을 중심 소재로 한 동화는 만들지 마. 그런 입력이 있으면 종교와 무관한 창작 소재로 바꿔서 구성해줘.
 7. 역사 배움동화에서는 실제 인물·시대·장소·핵심 사건과 알려진 역사적 사실을 임의로 바꾸거나 만들어내지 마. 시간여행·가상 주인공·상상 대화 같은 창작 장치는 사용할 수 있지만, 창작 장치와 역사적 사실이 혼동되지 않도록 분명하게 구성해줘.
+8. village_place에는 이 동화의 대표 장소를 적어줘. 나중에 아이의 '뮤니마을'에 건물·장소로 들어가. name은 아이가 좋아할 짧고 예쁜 한국어 이름(예: "별빛 호수", "무지개 빵집"), emoji는 그 장소를 나타내는 이모지 1~2개, type은 forest, sea, sky, space, castle, town, school, farm, mountain, cave, shop, home, other 중 하나, description은 한 문장 소개야.
 
 [페이지 수 최종 확인]
 - 선택된 동화 길이: ${lengthVal}분
@@ -299,6 +316,7 @@ ${buildLearningPromptBlock()}
 [출력 규격: 순수 JSON만 출력]
 {
   "title": "동화책 제목",
+  "village_place": { "name": "장소 이름", "emoji": "🏡", "type": "town", "description": "한 문장 소개" },
   "pages": [
     {
       "page_num": 1,
@@ -313,16 +331,7 @@ ${buildLearningPromptBlock()}
 }
 `;
 
-      const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: promptText }] }],
-          generationConfig: { responseMimeType: "application/json" }
-        })
-      });
-
-      const geminiData = await geminiRes.json();
+      const geminiData = await callStoryText(aiRoute, promptText);
       if (geminiData.error) throw new Error(geminiData.error.message);
 
       const storyData = JSON.parse(geminiData.candidates[0].content.parts[0].text);
@@ -344,6 +353,7 @@ currentStoryBookObject = {
         learningMode: learning.mode,
         learningTopic: learning.topic,
         title: storyData.title,
+        villagePlace: normalizeVillagePlace(storyData.village_place, genreKey),
         createdAt: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         pages: []
       };
@@ -362,7 +372,7 @@ currentStoryBookObject = {
 
         let imgBase64 = "";
         try {
-          imgBase64 = await generateGeminiImage(apiKey, page.image_prompt, childPhotoBase64);
+          imgBase64 = await generateGeminiImage(aiRoute, page.image_prompt, getActiveCast());
         } catch (imgErr) {
           console.error(`Page ${i+1} Image Error:`, imgErr);
         }
@@ -375,10 +385,23 @@ currentStoryBookObject = {
         });
       }
 
+      // 🎙️ AI 성우 목소리 (무료체험은 항상 포함)
+      if (aiRoute.mode === 'trial' || aiVoiceEnabledByUser()) {
+        const vr = await generateVoiceForStory(aiRoute, currentStoryBookObject, (i, n) => {
+          if (statusLog) statusLog.innerText = `🎙️ AI 성우가 ${i + 1}/${n}페이지를 녹음하는 중...`;
+        });
+        if (vr.failed && statusLog) console.log(`voice failed pages: ${vr.failed}`);
+      }
+
       renderBookPages(currentStoryBookObject);
       showPage(0);
 
-      if (statusLog) statusLog.innerText = `🎉 [${author}] 작가님의 동화책이 완성되었어요! 아래에서 바로 읽어보세요!`;
+      if (statusLog) {
+        const vp = currentStoryBookObject.villagePlace;
+        statusLog.innerText = `🎉 [${author}] 작가님의 동화책이 완성되었어요! 아래에서 바로 읽어보세요!`
+          + (vp ? `\n💾 서재에 저장하면 ${vp.emoji} '${vp.name}'이(가) 뮤니마을 재료가 돼요!` : '');
+      }
+      if (aiRoute.mode === 'trial') refreshTrialStatus();
       if (controlPanel) controlPanel.style.display = 'flex';
 
       setTimeout(() => {
@@ -398,18 +421,227 @@ currentStoryBookObject = {
     }
   }
 
-  async function generateGeminiImage(apiKey, prompt, inputImageBase64 = null) {
+  // 🏡 --- 뮤니마을 재료 ---
+  const VILLAGE_TYPES = ['forest','sea','sky','space','castle','town','school','farm','mountain','cave','shop','home','other'];
+  const VILLAGE_GOAL = 10;
+
+  function normalizeVillagePlace(raw, genreKey) {
+    const p = raw && typeof raw === 'object' ? raw : {};
+    const fb = (window.villageFallbackPlace ? window.villageFallbackPlace(genreKey) : { name: '이야기 언덕', emoji: '📖', type: 'town' });
+    return {
+      name: String(p.name || fb.name).slice(0, 20),
+      emoji: String(p.emoji || fb.emoji).slice(0, 8),
+      type: VILLAGE_TYPES.includes(p.type) ? p.type : fb.type,
+      description: String(p.description || '').slice(0, 80)
+    };
+  }
+
+  async function refreshVillageProgress() {
+    const box = document.getElementById('villageProgress');
+    if (!box) return;
+    const user = window.EAIMCloud?.getUser?.();
+    if (!user) {
+      box.innerHTML = `<p class="side-note">Google 로그인 후 서재에 저장한 동화가 <b>계정에 쌓여요.</b> ${VILLAGE_GOAL}편을 모으면 뮤니마을이 열려요!</p>`;
+      return;
+    }
+    try {
+      const prog = await window.EAIMCloud.getVillageProgress();
+      lastVillageProgress = prog;
+      const n = prog.storyCount || 0;
+      const pct = Math.min(100, Math.round(n / VILLAGE_GOAL * 100));
+      const places = (prog.places || []).slice(-6).map(pl => `<span class="village-chip" title="${escapeCastText(pl.title || '')}">${escapeCastText(pl.emoji)} ${escapeCastText(pl.name)}</span>`).join('');
+      box.innerHTML = `
+        <div class="village-count"><b>${n}</b> / ${VILLAGE_GOAL}편</div>
+        <div class="village-bar"><span style="width:${pct}%"></span></div>
+        <p class="side-note">${n >= VILLAGE_GOAL ? '🎉 뮤니마을이 열렸어요! 마을은 곧 문을 열어요.' : `${VILLAGE_GOAL - n}편만 더 만들면 뮤니마을이 열려요!`}</p>
+        ${places ? `<div class="village-chips">${places}</div>` : ''}`;
+      return prog;
+    } catch (e) {
+      box.innerHTML = '<p class="side-note">마을 진행 상황을 불러오지 못했어요.</p>';
+      return null;
+    }
+  }
+
+  let lastVillageProgress = null;
+  let muniToastTimer = null;
+
+  // 뮤니가 화면 아래에서 살짝 알려주는 말풍선
+  function showMuniToast(html, ms = 5200) {
+    let t = document.getElementById('muniToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'muniToast';
+      t.className = 'muni-toast';
+      document.body.appendChild(t);
+    }
+    t.innerHTML = `<img src="./assets/muni.png" alt=""><div>${html}</div>`;
+    t.classList.add('show');
+    clearTimeout(muniToastTimer);
+    muniToastTimer = setTimeout(() => t.classList.remove('show'), ms);
+  }
+
+  function announceVillageProgress(prog, place) {
+    const n = prog.storyCount || 0;
+    const placeText = place ? ` ${escapeCastText(place.emoji)} <b>${escapeCastText(place.name)}</b>` : '';
+    if (n === VILLAGE_GOAL) { showVillageOpenCelebration(prog); return; }
+    if (n > VILLAGE_GOAL) { showMuniToast(`🏡 뮤니마을에 새 장소가 생겼어요!${placeText}`); return; }
+    if (n === VILLAGE_GOAL - 1) { showMuniToast(`🎉 한 편만 더 만들면 뮤니마을이 열려요! (${n}/${VILLAGE_GOAL})${placeText}`, 7000); return; }
+    showMuniToast(`🏡 뮤니마을 재료가 하나 늘었어요! (${n}/${VILLAGE_GOAL})${placeText}`);
+  }
+
+  function showVillageOpenCelebration(prog) {
+    const places = (prog.places || []).map(pl => `<span class="village-chip">${escapeCastText(pl.emoji)} ${escapeCastText(pl.name)}</span>`).join('');
+    const wrap = document.createElement('div');
+    wrap.className = 'village-celebrate';
+    wrap.innerHTML = `
+      <div class="village-celebrate-box">
+        <div class="village-confetti">🎉🎵🏡🎵🎉</div>
+        <img src="./assets/muni.png" alt="뮤니">
+        <h2>뮤니마을이 열렸어요!</h2>
+        <p>동화 ${VILLAGE_GOAL}편이 모여 마을이 생겼어요.<br>그동안 만든 동화 속 장소들이 마을이 되었어요.</p>
+        <div class="village-chips">${places}</div>
+        <p class="village-soon">🚧 마을 입장은 곧 열려요. 동화를 더 만들면 마을이 더 커져요!</p>
+        <button type="button">좋아요!</button>
+      </div>`;
+    wrap.querySelector('button').onclick = () => wrap.remove();
+    document.body.appendChild(wrap);
+  }
+  window.addEventListener('eaim-auth-changed', () => refreshVillageProgress());
+
+  // 🤖 --- AI 호출 창구 (내 키 / 무료체험) ---
+  // 모델 이름은 공통규칙 6-2 기준. 무료체험은 서버(api/fairytale-trial.js)가 같은 모델을 씁니다.
+  const AI_MODELS = { text: 'gemini-flash-latest', image: 'gemini-3.1-flash-image' };
+  let trialConfigCache = null;
+
+  async function fetchWithRetry(url, options) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const res = await fetch(url, options);
+      if ((res.status === 503 || res.status === 429) && attempt === 0) {
+        await new Promise(r => setTimeout(r, 1500));
+        continue;
+      }
+      return res;
+    }
+  }
+
+  async function callTrialServer(payload) {
+    const idToken = await window.EAIMCloud?.getIdToken?.();
+    if (!idToken) throw new Error('무료체험은 Google 로그인 후 사용할 수 있어요.');
+    const res = await fetchWithRetry('api/fairytale-trial', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...payload, idToken })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok && data.error && typeof data.error === 'string') {
+      refreshTrialStatus();
+      throw new Error(data.error);
+    }
+    return data;
+  }
+
+  async function callStoryText(aiRoute, promptText, extra = {}) {
+    const temperature = typeof extra.temperature === 'number' ? extra.temperature : undefined;
+    if (aiRoute.mode === 'trial') {
+      return callTrialServer({ action: 'text', prompt: promptText, temperature });
+    }
+    const res = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/${AI_MODELS.text}:generateContent?key=${encodeURIComponent(aiRoute.apiKey)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: promptText }] }],
+        generationConfig: { responseMimeType: 'application/json', maxOutputTokens: 8192, thinkingConfig: { thinkingBudget: 0 }, ...(temperature !== undefined ? { temperature } : {}) }
+      })
+    });
+    return res.json();
+  }
+
+  async function callImageModel(aiRoute, parts) {
+    if (aiRoute.mode === 'trial') {
+      return callTrialServer({ action: 'image', parts });
+    }
+    const res = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/${AI_MODELS.image}:generateContent?key=${encodeURIComponent(aiRoute.apiKey)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts }], generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } })
+    });
+    return res.json();
+  }
+
+  async function getTrialConfig() {
+    if (trialConfigCache) return trialConfigCache;
+    try {
+      const res = await fetch('api/fairytale-trial', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'config' })
+      });
+      trialConfigCache = res.ok ? await res.json() : { enabled: false };
+    } catch (e) {
+      trialConfigCache = { enabled: false };
+    }
+    return trialConfigCache;
+  }
+
+  async function checkTrialReady() {
+    const noKeyMsg = '🔑 Google AI Studio API Key를 입력해 주세요.';
+    const cfg = await getTrialConfig();
+    if (!cfg.enabled) return { ok: false, message: noKeyMsg };
+    if (!window.EAIMCloud?.getUser?.()) {
+      return { ok: false, message: `${noKeyMsg}\n\n🎁 키가 없다면: 위의 [Google로 로그인]을 하면 짧은 동화 1편을 무료로 만들어 볼 수 있어요.` };
+    }
+    const st = await window.EAIMCloud.getTrialStatus();
+    if (st.state === 'available' || st.state === 'active' || st.state === 'unknown') return { ok: true };
+    return { ok: false, message: '🎁 무료체험을 이미 사용했어요.\n내 API 키를 넣으면 계속 만들 수 있어요.' };
+  }
+
+  async function refreshTrialStatus() {
+    const box = document.getElementById('trialStatus');
+    if (!box) return;
+    const cfg = await getTrialConfig();
+    if (!cfg.enabled) { box.style.display = 'none'; return; }
+    box.style.display = 'block';
+    const user = window.EAIMCloud?.getUser?.();
+    if (!user) {
+      box.className = 'trial-status';
+      box.innerHTML = '🎁 <b>무료체험 1회</b> — API 키가 없어도 Google 로그인만 하면 짧은 동화(2분·4페이지) 1편을 만들어 볼 수 있어요.';
+      return;
+    }
+    const st = await window.EAIMCloud.getTrialStatus();
+    if (st.state === 'available') {
+      box.className = 'trial-status ready';
+      box.innerHTML = '🎁 <b>무료체험 사용 가능!</b> API 키 칸을 비워 두고 동화를 만들면 짧은 동화 1편이 무료로 만들어져요.';
+    } else if (st.state === 'active') {
+      box.className = 'trial-status ready';
+      box.innerHTML = '🎁 <b>무료체험 진행 중</b> — 30분 안에 이어서 만들 수 있어요.';
+    } else if (st.state === 'used') {
+      box.className = 'trial-status used';
+      box.innerHTML = '🎁 무료체험을 사용했어요. <b>내 API 키</b>를 넣으면 계속 만들 수 있어요.';
+    } else {
+      box.className = 'trial-status';
+      box.innerHTML = '🎁 무료체험 상태를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.';
+    }
+  }
+
+  window.addEventListener('eaim-auth-changed', () => refreshTrialStatus());
+
+  async function generateGeminiImage(aiRoute, prompt, cast = []) {
     const parts = [];
 
-    if (inputImageBase64) {
+    if (cast && cast.length === 1) {
+      const m = cast[0];
+      parts.push({ inlineData: { mimeType: m.mime, data: m.base64 } });
       parts.push({
-        inlineData: {
-          mimeType: childPhotoMime,
-          data: inputImageBase64
-        }
+        text: `Create a children's book illustration where ${m.name ? `the character "${m.name}"` : 'the main character'} has the exact facial appearance, hairstyle, and likeness of the child in the provided image. Scene description: ${prompt}`
+      });
+    } else if (cast && cast.length > 1) {
+      const labels = [];
+      cast.forEach((m, idx) => {
+        const label = m.name || `Character ${idx + 1}`;
+        labels.push(`Reference photo ${idx + 1} = "${label}"`);
+        parts.push({ text: `Reference photo ${idx + 1}: this is "${label}".` });
+        parts.push({ inlineData: { mimeType: m.mime, data: m.base64 } });
       });
       parts.push({
-        text: `Create a children's book illustration where the main character has the exact facial appearance, hairstyle, and likeness of the child in the provided image. Scene description: ${prompt}`
+        text: `Create a children's book illustration. The reference photos above show different people: ${labels.join(', ')}. Whenever one of these characters appears in the scene, draw them with the exact facial appearance, hairstyle, and likeness of their own reference photo. Keep each person clearly distinct — never mix or swap faces between them. Only include the characters that the scene calls for. Scene description: ${prompt}`
       });
     } else {
       parts.push({
@@ -417,13 +649,7 @@ currentStoryBookObject = {
       });
     }
 
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: parts }] })
-    });
-
-    const data = await res.json();
+    const data = await callImageModel(aiRoute, parts);
     if (data.error) throw new Error(data.error.message);
     const resParts = data.candidates?.[0]?.content?.parts || [];
     for (const part of resParts) {
@@ -497,11 +723,88 @@ currentStoryBookObject = {
     console.log("DB Init Notice:", e);
   }
 
-  function handlePhotoUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+  // 👨‍👩‍👧 --- 보호자 확인 (Gemini API 약관: 보호자용 도구로 운영) ---
+  const GUARDIAN_KEY = 'gemini_fairytale_guardian_ok';
 
-    childPhotoMime = file.type || "image/jpeg";
+  function isGuardianConfirmed() {
+    try { return localStorage.getItem(GUARDIAN_KEY) === 'yes'; } catch (e) { return false; }
+  }
+
+  function showGuardianGate() {
+    const gate = document.getElementById('guardianGate');
+    if (!gate) return;
+    const msg = document.getElementById('guardianChildMsg');
+    if (msg) msg.style.display = 'none';
+    gate.style.display = 'grid';
+  }
+
+  function confirmGuardian() {
+    try { localStorage.setItem(GUARDIAN_KEY, 'yes'); } catch (e) {}
+    const gate = document.getElementById('guardianGate');
+    if (gate) gate.style.display = 'none';
+  }
+
+  function notGuardian() {
+    const msg = document.getElementById('guardianChildMsg');
+    if (msg) msg.style.display = 'block';
+  }
+
+  if (!isGuardianConfirmed()) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', showGuardianGate);
+    else showGuardianGate();
+  }
+
+  // 👨‍👩‍👧 --- 등장인물 사진 관리 ---
+  function escapeCastText(str) {
+    return String(str || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+
+  function getActiveCast() {
+    return castMembers.filter(m => m.base64);
+  }
+
+  function buildCastPromptBlock() {
+    // 사진이 있거나 이름이 적힌 인물은 모두 이야기에 등장시킵니다.
+    const cast = castMembers.filter(m => m.base64 || m.name);
+    if (!cast.length) return '';
+    const names = cast.map((m, i) => m.name ? m.name : `사진 속 인물 ${i + 1}`);
+    if (cast.length === 1) {
+      return `- 꼭 등장할 주인공: ${names[0]} (이 인물을 주인공으로 등장시켜줘)\n`;
+    }
+    return `- 꼭 등장할 인물 ${cast.length}명: ${names.join(', ')} (첫 번째 인물이 주인공이고, 나머지도 모두 이야기에 비중 있게 함께 등장시켜줘)\n`;
+  }
+
+  function addCastMember() {
+    if (castMembers.length >= MAX_CAST) {
+      alert(`등장인물 사진은 최대 ${MAX_CAST}명까지 넣을 수 있어요.`);
+      return;
+    }
+    castMembers.push({ id: ++castIdSeq, name: '', base64: null, mime: 'image/jpeg', previewUrl: '' });
+    renderCastList();
+  }
+
+  function removeCastMember(id) {
+    castMembers = castMembers.filter(m => m.id !== id);
+    if (!castMembers.length) addCastMember();
+    else renderCastList();
+  }
+
+  function updateCastName(id, value) {
+    const m = castMembers.find(x => x.id === id);
+    if (m) m.name = value.trim();
+  }
+
+  function pickCastPhoto(id) {
+    pendingCastPhotoId = id;
+    const input = document.getElementById('castPhotoInput');
+    if (input) { input.value = ''; input.click(); }
+  }
+
+  function handleCastPhotoUpload(event) {
+    const file = event.target.files[0];
+    const targetId = pendingCastPhotoId;
+    if (!file || targetId == null) return;
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
@@ -513,32 +816,56 @@ currentStoryBookObject = {
         else if (h > maxDim) { w *= maxDim / h; h = maxDim; }
         canvas.width = w; canvas.height = h;
         const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
 
-        const dataUrl = canvas.toDataURL(childPhotoMime, 0.85);
-        childPhotoBase64 = dataUrl.split(',')[1];
-
-        const preview = document.getElementById('photoPreview');
-        if (preview) {
-          preview.src = dataUrl;
-          preview.style.display = 'block';
-        }
-        const clearBtn = document.getElementById('photoClearBtn');
-        if (clearBtn) clearBtn.style.display = 'inline-block';
+        // 어떤 형식의 사진이든 JPEG로 통일해서 전송 (용량↓, 호환성↑)
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        const m = castMembers.find(x => x.id === targetId);
+        if (!m) return;
+        m.base64 = dataUrl.split(',')[1];
+        m.mime = 'image/jpeg';
+        m.previewUrl = dataUrl;
+        renderCastList();
       };
+      img.onerror = () => alert('이 사진은 열 수 없어요. JPG나 PNG 사진으로 다시 골라주세요.');
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
   }
 
+  function renderCastList() {
+    const list = document.getElementById('castPhotoList');
+    if (!list) return;
+    list.innerHTML = castMembers.map((m, idx) => `
+      <div class="cast-card">
+        ${castMembers.length > 1 || m.base64 ? `<button type="button" class="cast-remove" title="빼기" onclick="removeCastMember(${m.id})">✕</button>` : ''}
+        <span class="cast-role">${idx === 0 ? '⭐ 주인공' : `🤝 등장인물 ${idx + 1}`}</span>
+        <button type="button" class="cast-photo" onclick="pickCastPhoto(${m.id})">
+          ${m.previewUrl ? `<img src="${m.previewUrl}" alt="${escapeCastText(m.name || '등장인물')} 사진">` : '📷<br>사진 선택'}
+        </button>
+        <input type="text" maxlength="12" placeholder="${idx === 0 ? '이름 (예: 민우)' : '이름 (예: 지아)'}"
+          value="${escapeCastText(m.name)}" oninput="updateCastName(${m.id}, this.value)">
+      </div>
+    `).join('');
+    const addBtn = document.getElementById('addCastBtn');
+    if (addBtn) {
+      addBtn.disabled = castMembers.length >= MAX_CAST;
+      addBtn.textContent = castMembers.length >= MAX_CAST ? `최대 ${MAX_CAST}명까지 넣을 수 있어요` : '＋ 등장인물 추가하기';
+    }
+  }
+
+  // 예전 함수 이름 호환용 (다른 곳에서 호출해도 안전하게)
   function clearChildPhoto() {
-    childPhotoBase64 = null;
-    const input = document.getElementById('childPhotoInput');
-    if (input) input.value = '';
-    const preview = document.getElementById('photoPreview');
-    if (preview) preview.style.display = 'none';
-    const clearBtn = document.getElementById('photoClearBtn');
-    if (clearBtn) clearBtn.style.display = 'none';
+    castMembers = [];
+    addCastMember();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { if (!castMembers.length) addCastMember(); });
+  } else {
+    addCastMember();
   }
 
   const lengthConfig = {
@@ -644,6 +971,7 @@ currentStoryBookObject = {
     if (bookContainer) bookContainer.style.display = 'block';
     const controlPanel = document.getElementById('controlPanel');
     if (controlPanel) controlPanel.style.display = 'flex';
+    if (typeof updateAiVoiceButton === 'function') updateAiVoiceButton();
   }
 
   function showPage(index) {
@@ -685,6 +1013,10 @@ currentStoryBookObject = {
     if (isBgmEnabled) {
       playBgmForCurrentStory();
     }
+    // 🎙️ AI 성우 목소리가 있으면 버튼을 누른 이 순간 재생 권한을 열어둡니다.
+    if (typeof unlockAiVoicePlayer === 'function' && currentStoryBookObject.pages.some(p => p.aiVoice?.blob)) {
+      unlockAiVoicePlayer();
+    }
 
     if (typeof window.speechSynthesis === 'undefined' || typeof SpeechSynthesisUtterance === 'undefined') {
       alert('이 브라우저는 음성 낭독 기능을 지원하지 않습니다. Safari 또는 Chrome 최신 버전으로 열어주세요.');
@@ -708,8 +1040,8 @@ currentStoryBookObject = {
     ));
     showPage(safeStartPage);
 
-    // 처음부터 들을 때만 제목을 읽습니다.
-    if (safeStartPage === 0) {
+    // 처음부터 들을 때만 제목을 읽습니다. (AI 성우 목소리는 1페이지 소리에 제목이 들어 있어요)
+    if (safeStartPage === 0 && !(typeof hasAiVoice === 'function' && hasAiVoice(0))) {
       const firstOk = await speakDynamicLine(
         'narrator',
         'excited',
@@ -727,6 +1059,13 @@ currentStoryBookObject = {
       showPage(i);
 
       const pageData = readingPages[i];
+
+      if (typeof hasAiVoice === 'function' && hasAiVoice(i)) {
+        const ok = await playPageAiVoice(i, mySession);
+        if (!ok || !isPlaying || mySession !== speechSessionId) break;
+        await new Promise(r => setTimeout(r, 350));
+        continue;
+      }
 
       if (pageData.dialogue_list && pageData.dialogue_list.length > 0) {
         for (const line of pageData.dialogue_list) {
@@ -993,6 +1332,7 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
     if (!currentStoryBookObject || !db) return;
 
     const cloudUser = window.EAIMCloud?.getUser?.() || null;
+    const wasNewInCloud = !currentStoryBookObject.cloudId;
     currentStoryBookObject.userId = getUniqueUserIdentifier();
     currentStoryBookObject.author = (document.getElementById('authorName')?.value || '').trim() || "꼬마 작가";
     currentStoryBookObject.genre = document.getElementById('storyGenre')?.value || "fantasy";
@@ -1026,12 +1366,17 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
             });
           }
           cloudSaved = true;
+          const prog = await refreshVillageProgress();
+          if (wasNewInCloud && prog) announceVillageProgress(prog, currentStoryBookObject.villagePlace);
         } catch (e) {
           console.error('Cloud save:', e);
           setCloudStatus('⚠️ 기기에는 저장됐지만 클라우드 저장에 실패했어요: ' + (e.message || e));
         }
       }
 
+      if (!cloudUser && !options.silent) {
+        showMuniToast('🏡 Google 로그인하면 만든 동화가 계정에 쌓여서 <b>뮤니마을</b>이 만들어져요!');
+      }
       if (!options.silent) {
         alert(cloudSaved
           ? `[${currentStoryBookObject.title}]이(가) 기기와 EAIM Kids 클라우드 서재에 저장되었습니다!`
@@ -1083,7 +1428,14 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
       if (cb.cloudId && byCloudId.has(cb.cloudId)) {
         const idx = byCloudId.get(cb.cloudId);
         // 클라우드 데이터가 새 기기에서도 완전한 책을 제공하도록 우선합니다.
-        merged[idx] = { ...merged[idx], ...cb, id: merged[idx].id };
+        const localPages = merged[idx].pages || [];
+        const mergedBook = { ...merged[idx], ...cb, id: merged[idx].id };
+        // 🎙️ AI 성우 목소리는 이 기기에만 저장되므로 클라우드 데이터로 덮어쓸 때 다시 붙여줍니다.
+        if (Array.isArray(mergedBook.pages)) {
+          mergedBook.pages = mergedBook.pages.map((pg, i) => localPages[i]?.aiVoice && !pg.aiVoice ? { ...pg, aiVoice: localPages[i].aiVoice } : pg);
+          mergedBook.hasAiVoice = mergedBook.pages.some(pg => pg.aiVoice?.blob);
+        }
+        merged[idx] = mergedBook;
       } else merged.push(cb);
     }
     myLibraryBooks = merged.sort((a,b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')));
@@ -1104,6 +1456,7 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
             ${book.cloudId ? '<span class="library-tag">☁️ Cloud</span>' : '<span class="library-tag">📱 기기</span>'}
             ${(book.preschoolEnglishPages?.length || book.englishPages?.length) ? '<span class="library-tag">🐣 유아 EN</span>' : ''}
             ${book.childEnglishPages?.length ? '<span class="library-tag">🌱 어린이 EN</span>' : ''}
+            ${(book.pages || []).some(pg => pg.aiVoice?.blob) ? '<span class="library-tag">🎙️ AI 성우</span>' : ''}
           </p>
         </div>
         <div class="library-actions">
@@ -1273,6 +1626,7 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
 
   function pauseVoice() {
     isSpeechPaused = true;
+    if (typeof pauseAiVoice === 'function') pauseAiVoice();
     if (typeof window.speechSynthesis !== 'undefined') {
       try { window.speechSynthesis.pause(); } catch (e) {}
     }
@@ -1284,6 +1638,7 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
 
     if (isPlaying && isSpeechPaused) {
       isSpeechPaused = false;
+      if (typeof resumeAiVoice === 'function') resumeAiVoice();
       if (typeof window.speechSynthesis !== 'undefined') {
         try { window.speechSynthesis.resume(); } catch (e) {}
       }
@@ -1318,5 +1673,6 @@ function speakDynamicLine(role, emotion, rawText, options = {}) {
     isSpeechPaused = false;
     speechSessionId += 1;
     safeCancelSpeech();
+    if (typeof stopAiVoice === 'function') stopAiVoice();
     stopBgm();
   }

@@ -1,8 +1,8 @@
-const CACHE_NAME='muni-story-v21';
+const CACHE_NAME='muni-story-v31';
 const APP_SHELL=[
   './','./index.html','./manifest.webmanifest','./css/styles.css',
-  './js/app.js','./js/pwa.js','./js/learning.js','./js/language.js','./js/firebase-sync.js',
-  './icons/icon-192.png','./icons/icon-512.png',
+  './js/app.js','./js/ai-voice.js','./js/recorder.js','./js/creator-config.js','./js/creator.js','./js/village-studio.js','./js/vendor/jszip.min.js','./js/pwa.js','./js/learning.js','./js/language.js','./js/firebase-sync.js',
+  './assets/muni.png','./icons/icon-192.png','./icons/icon-512.png',
   './assets/bgm/moonlit-forest-path.mp3','./assets/bgm/little-brave-hero.mp3',
   './assets/bgm/the-secret-in-the-box.mp3','./assets/bgm/starry-night-journey.mp3',
   './assets/bgm/sunny-bunny-trail.mp3','./assets/bgm/pudding-parade.mp3',

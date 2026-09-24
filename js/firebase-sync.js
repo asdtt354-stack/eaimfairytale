@@ -4,7 +4,7 @@ import {
   getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js';
 import {
-  getFirestore, doc, setDoc, getDocs, collection, deleteDoc, writeBatch
+  getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc, writeBatch, increment, arrayUnion
 } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -73,9 +73,49 @@ async function clearStoryPages(uid, cloudId) {
   }
 }
 
+// 🏡 뮤니마을 — 계정 기준 동화 수
+// users/{uid}/village/progress : { storyCount, places:[{storyId,title,name,emoji,type,madeAt}], updatedAt }
+// - 서재(클라우드)에 "처음" 저장된 4페이지 이상 동화만 셉니다. 동화를 지워도 마을은 줄어들지 않아요.
+const VILLAGE_MIN_PAGES = 4;
+const GENRE_PLACES = {
+  fantasy:{name:'마법의 숲',emoji:'🌳',type:'forest'}, heroic:{name:'용기의 성',emoji:'🏰',type:'castle'},
+  mystery:{name:'비밀의 골목',emoji:'🔍',type:'town'}, scifi:{name:'별빛 우주정거장',emoji:'🚀',type:'space'},
+  animal:{name:'동물 친구 들판',emoji:'🐰',type:'farm'}, comic:{name:'웃음 광장',emoji:'🎪',type:'town'},
+  custom:{name:'이야기 언덕',emoji:'📖',type:'town'}
+};
+function fallbackPlace(genre){ return GENRE_PLACES[genre] || GENRE_PLACES.custom; }
+window.villageFallbackPlace = fallbackPlace;
+
+function placeEntry(cloudId, meta){
+  const vp = meta.villagePlace || fallbackPlace(meta.genre);
+  return { storyId:cloudId, title:String(meta.title||'').slice(0,40), name:vp.name, emoji:vp.emoji, type:vp.type, madeAt:String(meta.updatedAt || meta.createdAt || '') };
+}
+
+// 진행 문서가 없으면 지금까지 클라우드에 있는 동화로 한 번 만들어 둡니다(기존 사용자 이어받기).
+async function ensureVillageProgress(uid){
+  const ref=doc(firestore,'users',uid,'village','progress');
+  const snap=await getDoc(ref);
+  if (snap.exists()) return { created:false, data:snap.data() };
+  const stories=await getDocs(collection(firestore,'users',uid,'stories'));
+  const places=[];
+  for (const d of stories.docs){
+    const m=d.data()||{};
+    if ((m.pageCount||0) >= VILLAGE_MIN_PAGES) places.push(placeEntry(d.id, m));
+  }
+  const data={ storyCount:places.length, places, updatedAt:new Date().toISOString() };
+  await setDoc(ref, data);
+  return { created:true, data };
+}
+
+async function getVillageProgress(){
+  if (!currentUser) return { storyCount:0, places:[] };
+  return (await ensureVillageProgress(currentUser.uid)).data;
+}
+
 async function saveStory(book) {
   if (!currentUser) throw new Error('Google 로그인이 필요합니다.');
   const uid=currentUser.uid;
+  const isNewStory=!book?.cloudId;
   const cloudId=makeCloudId(book);
   const storyRef=doc(firestore,'users',uid,'stories',cloudId);
 
@@ -95,7 +135,7 @@ async function saveStory(book) {
     const pageId=String(i+1).padStart(3,'0');
     const image=String(p.imageBase64 || '');
     const imageChunks=splitChunks(image);
-    const pageData=cleanForFirestore({...p, imageBase64:undefined});
+    const pageData=cleanForFirestore({...p, imageBase64:undefined, aiVoice:undefined}); // 🎙️ 목소리는 용량이 커서 이 기기에만 저장
     pageData.pageIndex=i;
     pageData.imageChunkCount=imageChunks.length;
     await setDoc(doc(firestore,'users',uid,'stories',cloudId,'pages',pageId),pageData);
@@ -109,6 +149,20 @@ async function saveStory(book) {
     }
   }
   book.cloudId=cloudId;
+
+  // 🏡 새 동화면 마을 진행에 더하기
+  if (isNewStory && pages.length >= VILLAGE_MIN_PAGES) {
+    try {
+      const r=await ensureVillageProgress(uid);   // 처음 만들면 이 동화까지 이미 포함해서 셉니다
+      if (!r.created) {
+        await setDoc(doc(firestore,'users',uid,'village','progress'), {
+          storyCount: increment(1),
+          places: arrayUnion(placeEntry(cloudId, meta)),
+          updatedAt: new Date().toISOString()
+        }, { merge:true });
+      }
+    } catch(e){ console.log('village progress notice:', e); }
+  }
   return { cloudId };
 }
 
@@ -154,8 +208,26 @@ async function login(){
 }
 async function logout(){ return signOut(auth); }
 function getUser(){ return currentUser; }
+async function getIdToken(){ return currentUser ? currentUser.getIdToken() : ''; }
 
-window.EAIMCloud={login,logout,getUser,saveStory,loadStories,deleteStory};
+// 🎁 무료체험 이용권 상태: 'available' | 'active' | 'used' | 'login'
+async function getTrialStatus(){
+  if (!currentUser) return { state:'login' };
+  try {
+    const snap = await getDoc(doc(firestore,'trials',currentUser.uid));
+    if (!snap.exists()) return { state:'available' };
+    const d = snap.data() || {};
+    const created = d.createdAt?.toMillis ? d.createdAt.toMillis() : 0;
+    const inWindow = Date.now() - created < 29 * 60 * 1000;
+    const left = (d.textUsed || 0) < 3;
+    return { state: inWindow && left ? 'active' : 'used', textUsed:d.textUsed||0, imagesUsed:d.imagesUsed||0 };
+  } catch (e) {
+    console.log('trial status notice:', e);
+    return { state:'unknown' };
+  }
+}
+
+window.EAIMCloud={login,logout,getUser,getIdToken,getTrialStatus,getVillageProgress,saveStory,loadStories,deleteStory};
 onAuthStateChanged(auth,(user)=>{
   currentUser=user || null;
   window.dispatchEvent(new CustomEvent('eaim-auth-changed',{detail: currentUser ? {

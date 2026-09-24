@@ -197,9 +197,16 @@ function buildEnglishPrompt(level, compactPages) {
 async function translateCurrentStoryToEnglish(level = 'preschool') {
   if (!currentStoryBookObject || isTranslatingStory) return false;
   const apiKey = (document.getElementById('apiKey')?.value || '').trim();
-  if (!apiKey) {
-    alert('영어 동화를 만들려면 Google AI Studio API Key가 필요합니다.');
-    return false;
+  let aiRoute = null;
+  if (apiKey && apiKey.length >= 5) {
+    aiRoute = { mode: 'key', apiKey };
+  } else {
+    const trial = await checkTrialReady();
+    if (!trial.ok) {
+      alert('영어 동화를 만들려면 Google AI Studio API Key가 필요합니다.');
+      return false;
+    }
+    aiRoute = { mode: 'trial' };
   }
 
   const cfg = getEnglishConfig(level);
@@ -225,15 +232,7 @@ async function translateCurrentStoryToEnglish(level = 'preschool') {
   const prompt = buildEnglishPrompt(level, compactPages);
 
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: 'application/json', temperature: 0.25 }
-      })
-    });
-    const data = await res.json();
+    const data = await callStoryText(aiRoute, prompt, { temperature: 0.25 });
     if (data.error) throw new Error(data.error.message);
     const translated = JSON.parse(data?.candidates?.[0]?.content?.parts?.[0]?.text || '{}');
     if (!translated.title || !Array.isArray(translated.pages) || translated.pages.length !== currentStoryBookObject.pages.length) {

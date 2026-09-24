@@ -76,10 +76,19 @@
     const list = [entry, ...localPublished().filter(x => x.slug !== entry.slug)].slice(0, 300);
     try { localStorage.setItem(PUB_KEY, JSON.stringify(list)); } catch (e) {}
   }
+  // 🗑️ 도서관에서 뺀 동화 번호(slug)도 기기에 기억 — GitHub에 올리기 전에 다른 동화를 묶어도 되살아나지 않게
+  const REMOVED_KEY = 'gemini_fairytale_library_removed';
+  function removedSlugs() { try { return JSON.parse(localStorage.getItem(REMOVED_KEY) || '[]'); } catch (e) { return []; } }
+  function setRemoved(list) { try { localStorage.setItem(REMOVED_KEY, JSON.stringify([...new Set(list)].slice(-300))); } catch (e) {} }
+  function forgetPublished(slug) {
+    try { localStorage.setItem(PUB_KEY, JSON.stringify(localPublished().filter(x => x.slug !== slug))); } catch (e) {}
+  }
   async function fetchIndexForPublish() {
     const idx = await fetchIndex();
+    const removed = new Set(removedSlugs());
+    idx.stories = idx.stories.filter(x => !removed.has(x.slug));
     const have = new Set(idx.stories.map(x => x.slug));
-    localPublished().forEach(x => { if (!have.has(x.slug)) idx.stories.push(x); });
+    localPublished().forEach(x => { if (!have.has(x.slug) && !removed.has(x.slug)) idx.stories.push(x); });
     return idx;
   }
 
@@ -102,7 +111,7 @@
     box.innerHTML = list.map(s => `
       <article class="ml-card">
         <button type="button" class="ml-cover" onclick="openLibraryStory('${esc(s.slug)}')">
-          <img src="${LIB}/${esc(s.cover)}" alt="${esc(s.title)}" loading="lazy">
+          <img src="${LIB}/${esc(s.cover)}" alt="${esc(s.title)}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ml-nocover',textContent:'📕 그림을 찾지 못했어요'}))">
           ${s.hasVoice ? '<span class="ml-badge">🎙️ AI 성우</span>' : ''}
         </button>
         <div class="ml-body">
@@ -114,6 +123,7 @@
             ${(s.youtube && (s.youtube.ko || s.youtube.en)) ? `<button type="button" class="ml-video" onclick="openLibraryVideo('${esc(s.slug)}')">🎬 영상 보기</button>` : ''}
           </div>
           <button type="button" class="ml-share" onclick="copyLibraryLink('${esc(s.slug)}', this)">🔗 이 동화 링크 복사</button>
+          <button type="button" class="ml-remove creator-only" onclick="removeFromLibrary('${esc(s.slug)}')">🗑️ 도서관에서 빼기 <small>(제작자)</small></button>
         </div>
       </article>`).join('');
     window.__muniLibraryIndex = list;
@@ -273,6 +283,52 @@
   };
 
   // =====================================================================
+  // 3-2) 제작자 — 🗑️ 도서관에서 빼기
+  //   목록(index.json)에서 그 동화를 뺀 묶음(zip)을 내려받아 GitHub에 library 폴더째 올린다.
+  //   동화 폴더(library/<slug>)는 GitHub 화면에서 Delete directory로 지운다(앱이 저장소를 직접 지울 수 없음).
+  //   기기에 "뺀 동화"로 기억해서, 다음에 다른 동화를 올릴 때 목록에 되살아나지 않게 한다.
+  // =====================================================================
+  window.removeFromLibrary = async function (slug) {
+    if (!document.body.classList.contains('is-creator')) return;
+    const hit = (window.__muniLibraryIndex || []).find(x => x.slug === slug) || { slug, title: slug };
+    if (!confirm(`「${hit.title}」을(를) 뮤니 도서관에서 뺄까요?\n(도서관 번호: ${slug})\n\n빼기 묶음(zip)을 내려받아 GitHub에 올리면 목록에서 사라져요.`)) return;
+    try {
+      busy(true, '도서관 목록에서 빼는 중...');
+      const JSZip = await loadJSZip();
+      setRemoved([...removedSlugs(), slug]);
+      forgetPublished(slug);
+      const idx = await fetchIndexForPublish();
+      idx.stories = idx.stories.filter(x => x.slug !== slug);
+      idx.updatedAt = new Date().toISOString();
+      let hasFolder = false;
+      try { hasFolder = (await fetch(`${LIB}/${slug}/story.json?v=${Date.now()}`, { method: 'HEAD', cache: 'no-store' })).ok; } catch (e) {}
+      const zip = new JSZip();
+      zip.folder('library').file('index.json', JSON.stringify(idx, null, 2));
+      zip.file('도서관에서_빼는법.txt', '\ufeff' + [
+        `🗑️ 뮤니 도서관에서 「${hit.title}」 빼기`, '',
+        '1. 이 zip을 풀면 library 폴더가 나와요(안에 index.json 하나).',
+        '2. GitHub 저장소(eaimfairytale) → Add file → Upload files 에 library 폴더를 통째로 끌어다 놓기 → Commit changes',
+        hasFolder
+          ? `3. GitHub에서 library → ${slug} 폴더를 열고, 오른쪽 위 … 메뉴 → Delete directory → Commit changes (그림·목소리 파일 정리)`
+          : `3. 이 동화는 저장소에 폴더(library/${slug})가 없어요. 1~2번만 하면 끝이에요.`,
+        '4. 1~2분 뒤 도서관을 Ctrl + Shift + R 로 새로고침하면 사라져요.', '',
+        '※ 이 기기는 이 동화를 "뺀 동화"로 기억해요. 다른 동화를 올려도 다시 끼어들지 않아요.',
+        '※ 같은 원본 동화를 다시 "도서관에 올리기" 하면 목록에 돌아와요.',
+        '※ index.json 은 직접 고치지 말고 이 묶음으로 바꿔 주세요.'
+      ].join('\r\n'));
+      const out = await zip.generateAsync({ type: 'blob' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(out);
+      a.download = `muni-library_빼기_${String(hit.title).replace(/[\\/:*?"<>|]/g, '').slice(0, 24)}.zip`;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      busy(false);
+      alert(`✅ 빼기 묶음을 내려받았어요.\n\n1) library 폴더째 GitHub에 올리기${hasFolder ? `\n2) GitHub에서 library/${slug} 폴더 → … → Delete directory` : ''}\n\n자세한 순서는 zip 안의 '도서관에서_빼는법.txt'를 보세요.`);
+    } catch (e) {
+      busy(false);
+      alert(`⚠️ ${e.message}`);
+    }
+  };
+
+  // =====================================================================
   // 4) 올리는 쪽(제작자) — 도서관 묶음 만들기
   // =====================================================================
   window.openLibraryPublish = function () {
@@ -358,6 +414,7 @@
     if (old && old.publishedAt) entry.publishedAt = old.publishedAt; // 순서 유지
     idx.stories = [entry, ...idx.stories.filter(s => s.slug !== slug)];
     rememberPublished(entry);
+    setRemoved(removedSlugs().filter(x => x !== slug)); // 뺐던 동화를 다시 올리면 목록에 돌아와요
     idx.updatedAt = publishedAt;
     zip.folder('library').file('index.json', JSON.stringify(idx, null, 2));
     zip.file('도서관_올리는법.txt', '\ufeff' + [

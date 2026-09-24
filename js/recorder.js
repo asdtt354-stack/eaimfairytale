@@ -118,6 +118,10 @@
       introCheck.checked = saved !== 'off';
       introCheck.onchange = () => { try { localStorage.setItem(INTRO_PREF_KEY, introCheck.checked ? 'on' : 'off'); } catch (e) {} };
     }
+    // 인트로 영상을 미리 불러 두기 (시작할 때 바로 재생되게)
+    if (document.body.classList.contains('is-creator')) {
+      try { const pre = document.createElement('video'); pre.preload = 'auto'; pre.src = INTRO_SRC; pre.load(); stageEl.__introPre = pre; } catch (e) {}
+    }
     $('.rec-start-btn').onclick = beginPlayback;
     $('.rec-cancel-btn').onclick = () => finishRecording(true);
     $('.rec-close').onclick = () => finishRecording(false);
@@ -252,7 +256,13 @@
       if (stageEl.requestFullscreen) await stageEl.requestFullscreen();
     } catch (e) { console.log('fullscreen notice:', e); }
 
+    // 전체화면 전환 모습·크롬 안내 문구("Esc를 눌러…")·준비 창이 영상 첫 화면에 찍히지 않도록
+    // 제목 카드를 띄운 채 화면이 가라앉을 때까지 기다렸다가 녹화를 시작한다.
+    showCard('title');
+    const withIntro = wantIntro();
     if (stageMode === 'record' && captureStream) {
+      await new Promise(r => setTimeout(r, 2600));
+      if (!stageEl) return;
       recordedChunks = [];
       recordedMime = pickMimeType();
       try {
@@ -266,8 +276,7 @@
       mediaRecorder.start(1000);
     }
 
-    const withIntro = wantIntro();
-    // 전체화면 전환이 끝난 뒤 (인트로 →) 제목 카드부터 낭독 시작
+    // 녹화가 시작된 뒤 (인트로 →) 제목 카드부터 낭독 시작
     setTimeout(async () => {
       if (!stageEl) return;
       if (withIntro) {
@@ -276,7 +285,7 @@
       }
       showCard('title');
       startContinuousReading(onStoryDone, 0);
-    }, withIntro ? 500 : 900);
+    }, stageMode === 'record' ? 300 : (withIntro ? 500 : 900));
   }
 
   function onStoryDone() {

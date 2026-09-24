@@ -454,3 +454,29 @@ body.viewing-library-book .save-btn,body.viewing-library-book #aiVoiceAddBtn,bod
 .ml-form label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:#4f5870}
 .ml-form input{border:1px solid #e3e6ee;border-radius:9px;padding:8px;font-size:13.5px;font-family:inherit}
 @media (max-width:760px){.tab-nav{grid-template-columns:1fr 1fr 1fr;gap:6px}.tab-btn{font-size:12.5px;padding:10px 4px}.ml-hero{flex-direction:column;text-align:center}}
+
+/* 🪞 증강 동화 모드 */
+.controls .hud-btn{grid-column:1/-1;background:#12101c;color:#fff;font-size:15px;border:1.5px solid #3b2f6b}
+.hud-stage{position:fixed;inset:0;z-index:100009;background:#000;overflow:hidden;cursor:pointer}
+.hud-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3vh;transition:transform .3s ease}
+.hud-img{width:min(62vh,78vw);height:min(62vh,78vw);object-fit:cover;opacity:0;
+  -webkit-mask-image:radial-gradient(circle at center,#000 52%,transparent 72%);mask-image:radial-gradient(circle at center,#000 52%,transparent 72%);
+  animation:hudFloat 5s ease-in-out infinite alternate;filter:saturate(1.25) brightness(1.1)}
+.hud-img.in{opacity:1;transition:opacity 1s ease}
+@keyframes hudFloat{from{transform:translateY(-1.2vh)}to{transform:translateY(1.2vh)}}
+.hud-sub{max-width:86vw;text-align:center;color:#fff;font-weight:900;font-size:clamp(18px,3.4vh,40px);line-height:1.45;word-break:keep-all;
+  text-shadow:0 0 12px rgba(180,150,255,.9),0 0 26px rgba(120,90,255,.6);min-height:1.5em}
+.hud-sub.talk{color:#ffe98a;text-shadow:0 0 12px rgba(255,210,90,.9),0 0 26px rgba(255,170,60,.6)}
+.hud-sub.title{font-size:clamp(24px,5vh,56px);color:#ffd6f2;text-shadow:0 0 16px rgba(255,120,210,.9),0 0 34px rgba(200,90,255,.7)}
+.hud-guide{position:absolute;inset:0;background:rgba(0,0,0,.72);display:grid;place-items:center;z-index:3;cursor:default}
+.hud-guide-box{background:#fff;border-radius:22px;padding:20px 22px;width:min(460px,92vw);word-break:keep-all}
+.hud-guide-box b{color:#4a2f8f;font-size:18px}
+.hud-guide-box ol{padding-left:20px;color:#4b5570;font-size:14px;line-height:1.65;margin:10px 0 14px}
+.hud-start{width:100%;border:0;border-radius:14px;padding:13px;font-size:16px;font-weight:900;color:#fff;background:linear-gradient(100deg,#7651e8,#c84fd0);cursor:pointer}
+.hud-bar{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;z-index:2;opacity:0;pointer-events:none;transition:opacity .3s}
+.hud-stage.show-bar .hud-bar,.hud-guide:not([style*="none"]) ~ .hud-bar{opacity:1;pointer-events:auto}
+.hud-bar button{border:1px solid #444;background:#1a1726;color:#ddd;border-radius:10px;padding:9px 12px;font-weight:800;cursor:pointer;font-size:13px}
+.hud-bar button.on{background:#4a2f8f;color:#fff;border-color:#7651e8}
+
+.ml-share{border:1px dashed #d9cdf3;background:#fff;color:#6a47de;border-radius:10px;padding:7px 10px;font-weight:800;font-size:12.5px;cursor:pointer;margin-top:4px}
+.ml-share-lib{margin-top:10px}

@@ -1,0 +1,451 @@
+{
+  "version": 1,
+  "slug": "smufmjzxr",
+  "title": "도토리 한 알의 마법 선물",
+  "author": "뮤토책방",
+  "theme": "",
+  "genre": "animal",
+  "villagePlace": null,
+  "summary": "박을 타자 무엇이 나왔을까요? 그리고 욕심쟁이 놀부 형은 어떻게 됐을까요?",
+  "origin": "전래동화",
+  "youtube": {
+    "ko": "",
+    "en": ""
+  },
+  "publishedAt": "2026-09-24T14:25:58.611Z",
+  "bgm": {
+    "file": "bgm.mp3",
+    "name": "도토리 한 알의 마법 선물 배경음악 (리리아)"
+  },
+  "pages": [
+    {
+      "page_num": 1,
+      "full_text": "햇살 바람 숲에 아침이 밝았어요! 꼬마 다람쥐 '다람이'는 오늘 아주 특별한 걸 발견했답니다. 바로 반짝반짝 빛나는 커다란 황금 도토리였죠! \"우와! 이렇게 크고 예쁜 도토리는 처음 봐! 이건 나 혼자만 가질 거야!\" 다람이는 너무 신나서 깡충깡충 뛰었어요.",
+      "dialogue_list": [
+        {
+          "role": "narrator",
+          "emotion": "excited",
+          "text": "햇살 바람 숲에 아침이 밝았어요! 꼬마 다람쥐 다람이는 오늘 아주 특별한 걸 발견했답니다."
+        },
+        {
+          "text": "우와! 이렇게 크고 예쁜 도토리는 처음 봐! 이건 나 혼자만 가질 거야!",
+          "role": "hero",
+          "emotion": "excited"
+        },
+        {
+          "emotion": "happy",
+          "text": "다람이는 너무 신나서 깡충깡충 뛰었답니다.",
+          "role": "narrator"
+        }
+      ],
+      "image": "p01.jpg",
+      "voice": {
+        "file": "v01.wav",
+        "lines": [
+          {
+            "role": "narrator",
+            "text": "제목: 도토리 한 알의 마법 선물"
+          },
+          {
+            "role": "narrator",
+            "text": "햇살 바람 숲에 아침이 밝았어요! 꼬마 다람쥐 다람이는 오늘 아주 특별한 걸 발견했답니다."
+          },
+          {
+            "role": "hero",
+            "text": "우와! 이렇게 크고 예쁜 도토리는 처음 봐! 이건 나 혼자만 가질 거야!"
+          },
+          {
+            "role": "narrator",
+            "text": "다람이는 너무 신나서 깡충깡충 뛰었답니다."
+          }
+        ]
+      }
+    },
+    {
+      "page_num": 2,
+      "full_text": "하지만 큰 문제가 생겼어요. 황금 도토리가 너무 무거워서 도저히 집으로 가져갈 수가 없었거든요. \"끙차! 으쌰! 왜 이렇게 안 움직이지?\" 다람이는 땀을 뻘뻘 흘리며 도토리를 밀어보았지만, 도토리는 꿈쩍도 하지 않았어요. 그때 숲속 친구들이 다가왔어요.",
+      "dialogue_list": [
+        {
+          "emotion": "urgent",
+          "text": "하지만 큰 문제가 생겼어요. 황금 도토리가 너무 무거워서 도저히 집으로 가져갈 수가 없었거든요.",
+          "role": "narrator"
+        },
+        {
+          "role": "hero",
+          "emotion": "urgent",
+          "text": "끙차! 으쌰! 왜 이렇게 안 움직이지? 조금만 더 가면 되는데!"
+        },
+        {
+          "emotion": "calm",
+          "role": "narrator",
+          "text": "다람이는 땀을 뻘뻘 흘리며 도토리를 밀어보았지만, 도토리는 꿈쩍도 하지 않았어요."
+        }
+      ],
+      "image": "p02.jpg",
+      "voice": {
+        "file": "v02.wav",
+        "lines": [
+          {
+            "role": "narrator",
+            "text": "하지만 큰 문제가 생겼어요. 황금 도토리가 너무 무거워서 도저히 집으로 가져갈 수가 없었거든요."
+          },
+          {
+            "role": "hero",
+            "text": "끙차! 으쌰! 왜 이렇게 안 움직이지? 조금만 더 가면 되는데!"
+          },
+          {
+            "role": "narrator",
+            "text": "다람이는 땀을 뻘뻘 흘리며 도토리를 밀어보았지만, 도토리는 꿈쩍도 하지 않았어요."
+          }
+        ]
+      }
+    },
+    {
+      "page_num": 3,
+      "full_text": "토끼 '토순이'와 거북 '거북 할아버지'가 다람이를 보고 멈춰 섰어요. \"다람아, 우리가 좀 도와줄까?\" 토순이가 다정하게 물었지만, 욕심이 난 다람이는 소리쳤어요. \"아니야! 이건 내 거야! 건드리지 마!\" 거북 할아버지는 허허 웃으며 말씀하셨죠. \"허허, 무거운 짐은 함께 나누면 가벼워지는 법이란다.\"",
+      "dialogue_list": [
+        {
+          "text": "다람아, 무슨 일이야? 우리가 좀 도와줄까?",
+          "emotion": "curious",
+          "role": "friend"
+        },
+        {
+          "text": "아니야! 이건 내 거야! 아무도 건드리지 마!",
+          "role": "hero",
+          "emotion": "angry"
+        },
+        {
+          "text": "허허, 다람아. 무거운 짐은 함께 나누면 가벼워지는 법이란다.",
+          "role": "elder",
+          "emotion": "calm"
+        }
+      ],
+      "image": "p03.jpg",
+      "voice": {
+        "file": "v03.wav",
+        "lines": [
+          {
+            "role": "friend",
+            "text": "다람아, 무슨 일이야? 우리가 좀 도와줄까?"
+          },
+          {
+            "role": "hero",
+            "text": "아니야! 이건 내 거야! 아무도 건드리지 마!"
+          },
+          {
+            "role": "elder",
+            "text": "허허, 다람아. 무거운 짐은 함께 나누면 가벼워지는 법이란다."
+          }
+        ]
+      }
+    },
+    {
+      "page_num": 4,
+      "full_text": "해는 지고 배는 고파지자 다람이는 결국 친구들에게 도움을 청했어요. 셋이서 힘을 합쳐 도토리를 밀자, 도토리는 떼구르르 굴러가 멋진 보석 나무 아래 도착했답니다. 사실 황금 도토리는 친구들과 함께 나눌 때 열리는 '우정의 씨앗'이었거든요! 다람이는 친구들과 도토리 속의 달콤한 열매를 나눠 먹으며 환하게 웃었답니다. \"함께하니까 정말 행복해!\"",
+      "dialogue_list": [
+        {
+          "emotion": "whisper",
+          "role": "narrator",
+          "text": "해는 지고 배는 고파지자 다람이는 결국 친구들에게 도움을 청했어요."
+        },
+        {
+          "text": "얘들아 미안해, 그리고 도와줘서 정말 고마워! 함께하니까 정말 행복해!",
+          "role": "hero",
+          "emotion": "happy"
+        },
+        {
+          "emotion": "happy",
+          "text": "혼자일 때보다 함께일 때 더 큰 기쁨을 찾은 다람이의 따뜻한 하루였답니다.",
+          "role": "narrator"
+        }
+      ],
+      "image": "p04.jpg",
+      "voice": {
+        "file": "v04.wav",
+        "lines": [
+          {
+            "role": "narrator",
+            "text": "해는 지고 배는 고파지자 다람이는 결국 친구들에게 도움을 청했어요."
+          },
+          {
+            "role": "hero",
+            "text": "얘들아 미안해, 그리고 도와줘서 정말 고마워! 함께하니까 정말 행복해!"
+          },
+          {
+            "role": "narrator",
+            "text": "혼자일 때보다 함께일 때 더 큰 기쁨을 찾은 다람이의 따뜻한 하루였답니다."
+          }
+        ]
+      }
+    }
+  ],
+  "english": {
+    "preschoolEnglishTitle": "The Golden Acorn",
+    "preschoolEnglishPages": [
+      {
+        "page_num": 1,
+        "full_text": "Good morning, forest! Squirrel finds a big acorn. It shines like gold!",
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "emotion": "excited",
+            "text": "Squirrel finds a big acorn!"
+          },
+          {
+            "role": "hero",
+            "emotion": "excited",
+            "text": "Wow! It is mine!"
+          },
+          {
+            "role": "narrator",
+            "emotion": "happy",
+            "text": "Squirrel jumps with joy."
+          }
+        ]
+      },
+      {
+        "page_num": 2,
+        "full_text": "Oh no! The acorn is heavy. Squirrel pushes it hard. But it does not move.",
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "emotion": "urgent",
+            "text": "The acorn is too heavy!"
+          },
+          {
+            "role": "hero",
+            "emotion": "urgent",
+            "text": "Oof! Push! Push! Move!"
+          },
+          {
+            "role": "narrator",
+            "emotion": "calm",
+            "text": "The acorn does not move."
+          }
+        ]
+      },
+      {
+        "page_num": 3,
+        "full_text": "Friends come by. Squirrel is not happy. He shouts loudly.",
+        "dialogue_list": [
+          {
+            "role": "friend",
+            "emotion": "curious",
+            "text": "Can we help you?"
+          },
+          {
+            "role": "hero",
+            "emotion": "angry",
+            "text": "No! It is mine!"
+          },
+          {
+            "role": "elder",
+            "emotion": "calm",
+            "text": "Together is better, little one."
+          }
+        ]
+      },
+      {
+        "page_num": 4,
+        "full_text": "They push together. Roll, roll, roll! They share the sweet treat.",
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "emotion": "whisper",
+            "text": "Now they push together."
+          },
+          {
+            "role": "hero",
+            "emotion": "happy",
+            "text": "Thank you, my friends!"
+          },
+          {
+            "role": "narrator",
+            "emotion": "happy",
+            "text": "Sharing is so sweet!"
+          }
+        ]
+      }
+    ],
+    "preschoolEnglishCreatedAt": "2026-09-24T14:20:13.076Z",
+    "preschoolEnglishVersion": "preschool-easy-v3-short",
+    "englishTitle": "The Golden Acorn",
+    "englishPages": [
+      {
+        "page_num": 1,
+        "full_text": "Good morning, forest! Squirrel finds a big acorn. It shines like gold!",
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "emotion": "excited",
+            "text": "Squirrel finds a big acorn!"
+          },
+          {
+            "role": "hero",
+            "emotion": "excited",
+            "text": "Wow! It is mine!"
+          },
+          {
+            "role": "narrator",
+            "emotion": "happy",
+            "text": "Squirrel jumps with joy."
+          }
+        ]
+      },
+      {
+        "page_num": 2,
+        "full_text": "Oh no! The acorn is heavy. Squirrel pushes it hard. But it does not move.",
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "emotion": "urgent",
+            "text": "The acorn is too heavy!"
+          },
+          {
+            "role": "hero",
+            "emotion": "urgent",
+            "text": "Oof! Push! Push! Move!"
+          },
+          {
+            "role": "narrator",
+            "emotion": "calm",
+            "text": "The acorn does not move."
+          }
+        ]
+      },
+      {
+        "page_num": 3,
+        "full_text": "Friends come by. Squirrel is not happy. He shouts loudly.",
+        "dialogue_list": [
+          {
+            "role": "friend",
+            "emotion": "curious",
+            "text": "Can we help you?"
+          },
+          {
+            "role": "hero",
+            "emotion": "angry",
+            "text": "No! It is mine!"
+          },
+          {
+            "role": "elder",
+            "emotion": "calm",
+            "text": "Together is better, little one."
+          }
+        ]
+      },
+      {
+        "page_num": 4,
+        "full_text": "They push together. Roll, roll, roll! They share the sweet treat.",
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "emotion": "whisper",
+            "text": "Now they push together."
+          },
+          {
+            "role": "hero",
+            "emotion": "happy",
+            "text": "Thank you, my friends!"
+          },
+          {
+            "role": "narrator",
+            "emotion": "happy",
+            "text": "Sharing is so sweet!"
+          }
+        ]
+      }
+    ],
+    "englishCreatedAt": "2026-09-24T14:20:13.076Z",
+    "englishAdaptationVersion": "preschool-easy-v3-short",
+    "childEnglishTitle": "The Magic Golden Acorn",
+    "childEnglishPages": [
+      {
+        "page_num": 1,
+        "full_text": "Morning came to the sunny forest. Little squirrel Daram found something special. It was a big, shiny golden acorn! \"Wow, it is so big and pretty! This is all mine!\" Daram jumped up and down with joy.",
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "emotion": "excited",
+            "text": "Morning came to the sunny forest! Little squirrel Daram found something special today."
+          },
+          {
+            "role": "hero",
+            "emotion": "excited",
+            "text": "Wow! I have never seen such a big acorn! It is all mine!"
+          },
+          {
+            "role": "narrator",
+            "emotion": "happy",
+            "text": "Daram was so excited and jumped up and down."
+          }
+        ]
+      },
+      {
+        "page_num": 2,
+        "full_text": "But there was a big problem. The golden acorn was too heavy. Daram could not carry it home. \"One, two, heave-ho! Why won't it move?\" Daram pushed hard and sweated, but the acorn did not move. Just then, his forest friends came by.",
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "emotion": "urgent",
+            "text": "But there was a big problem. The golden acorn was too heavy to carry home."
+          },
+          {
+            "role": "hero",
+            "emotion": "urgent",
+            "text": "Heave-ho! Why won't it move? Just a little more!"
+          },
+          {
+            "role": "narrator",
+            "emotion": "calm",
+            "text": "Daram pushed hard and sweated, but the acorn did not move at all."
+          }
+        ]
+      },
+      {
+        "page_num": 3,
+        "full_text": "Tosun the rabbit and Grandpa Turtle stopped to look. \"Daram, do you need some help?\" Tosun asked kindly. But greedy Daram shouted loudly. \"No! This is mine! Do not touch it!\" Grandpa Turtle smiled gently. \"A heavy load becomes light when shared.\"",
+        "dialogue_list": [
+          {
+            "role": "friend",
+            "emotion": "curious",
+            "text": "Daram, what is wrong? Do you want some help?"
+          },
+          {
+            "role": "hero",
+            "emotion": "angry",
+            "text": "No! This is mine! Nobody touch it!"
+          },
+          {
+            "role": "elder",
+            "emotion": "calm",
+            "text": "Ho ho, Daram. A heavy load becomes light when we share."
+          }
+        ]
+      },
+      {
+        "page_num": 4,
+        "full_text": "The sun went down and Daram was hungry. Finally, he asked his friends for help. Together, they pushed the acorn, and it rolled away! It stopped under a lovely jewel tree. The golden acorn was a magical seed of friendship! Daram shared the sweet treats inside with his friends. \"Being together makes me so happy!\"",
+        "dialogue_list": [
+          {
+            "role": "narrator",
+            "emotion": "whisper",
+            "text": "The sun went down and he felt hungry, so Daram finally asked for help."
+          },
+          {
+            "role": "hero",
+            "emotion": "happy",
+            "text": "I am sorry, and thank you for your help! Being together makes me so happy!"
+          },
+          {
+            "role": "narrator",
+            "emotion": "happy",
+            "text": "Daram learned that sharing with friends brings the greatest joy."
+          }
+        ]
+      }
+    ],
+    "childEnglishCreatedAt": "2026-09-24T14:20:28.906Z",
+    "childEnglishVersion": "child-easy-v1"
+  }
+}

@@ -2,6 +2,23 @@
   "version": 1,
   "stories": [
     {
+      "slug": "smufmjzxr",
+      "title": "도토리 한 알의 마법 선물",
+      "cover": "smufmjzxr/p01.jpg",
+      "summary": "박을 타자 무엇이 나왔을까요? 그리고 욕심쟁이 놀부 형은 어떻게 됐을까요?",
+      "origin": "전래동화",
+      "theme": "",
+      "genre": "animal",
+      "hasVoice": true,
+      "hasEnglish": true,
+      "youtube": {
+        "ko": "",
+        "en": ""
+      },
+      "author": "뮤토책방",
+      "publishedAt": "2026-09-24T14:25:58.611Z"
+    },
+    {
       "slug": "smufm9hiw",
       "title": "흥부 놀부의 알록달록 보물 박",
       "cover": "smufm9hiw/p01.jpg",
@@ -53,5 +70,5 @@
       "publishedAt": "2026-09-24T11:32:27.972Z"
     }
   ],
-  "updatedAt": "2026-09-24T14:17:55.771Z"
+  "updatedAt": "2026-09-24T14:25:58.611Z"
 }

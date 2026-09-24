@@ -267,6 +267,7 @@
             <button type="button" class="pdf-btn" onclick="exportToPDF()">📄 PDF 다운로드</button>
             <button type="button" class="ai-voice-btn" id="aiVoiceAddBtn" style="display:none" onclick="addAiVoiceToCurrentStory(this)">🎙️ AI 성우 목소리 입히기</button>
             <button type="button" class="rec-btn" onclick="openStoryRecorder()">🎬 동화 녹화하기</button>
+            <button type="button" class="hud-btn" onclick="openHudMode()">🪞 증강 동화로 보기 (투명 아크릴)</button>
             <button type="button" class="capcut-btn creator-only publish-btn" onclick="openLibraryPublish()">📚 뮤니 도서관에 올리기 (제작자)</button>
             <button type="button" class="capcut-btn creator-only" id="customBgmBtn" onclick="openCreatorMusicShelf()">🎵 이 동화의 배경음악 고르기 (제작자)</button>
             <button type="button" class="capcut-btn creator-only" onclick="exportCapCutKit(this)">🎞️ 캡컷용 재료 내려받기 (제작자)</button>
@@ -322,6 +323,7 @@
         <div>
           <h2>🏛️ 뮤니 도서관</h2>
           <p>뮤니가 골라 둔 동화를 <b>누구나 무료로</b> 보고 들을 수 있어요. 로그인도, API 키도 필요 없어요.<br>동화책으로 읽고, 🎬 영상으로도 만나 보세요!</p>
+          <button type="button" class="ml-share ml-share-lib" onclick="copyLibraryLink('', this)">🔗 도서관 주소 복사</button>
         </div>
       </div>
       <div id="muniLibraryList" class="ml-grid"></div>
@@ -345,6 +347,7 @@
 <script src="./js/creator.js"></script>
 <script src="./js/creator-music.js"></script>
 <script src="./js/muni-library.js"></script>
+<script src="./js/hud.js"></script>
 <script src="./js/village-studio.js"></script>
 
 <script src="./js/pwa.js"></script>

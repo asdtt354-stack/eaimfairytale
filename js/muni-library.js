@@ -137,6 +137,22 @@
   }
   window.showMuniLibrary = showMuniLibrary;
 
+  // 📖 첫 화면 "무료 동화 읽기 → 뮤니 도서관으로 고고!" 띠
+  window.goMuniLibrary = function () {
+    showMuniLibrary();
+    const v = document.getElementById('muni-library-view');
+    if (v) setTimeout(() => v.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+  };
+  // 띠에 도서관 동화 수 표시 (예: · 지금 4편)
+  (async () => {
+    try {
+      const idx = await fetchIndex();
+      const n = (idx.stories || []).length;
+      const el = document.getElementById('goLibCount');
+      if (el && n) el.textContent = ` · 지금 ${n}편`;
+    } catch (e) {}
+  })();
+
   // 🔗 바로 가는 주소: …/?library (도서관) · …/?story=<slug> (그 동화 바로 열기)
   function siteBase() { return `${location.origin}${location.pathname.replace(/index\.html$/, '')}`; }
   // 인스타 등은 주소의 '?' 뒤를 잘라내므로, 물음표 없는 주소를 우선 복사합니다.

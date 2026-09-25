@@ -70,14 +70,24 @@
     </div>
   </section>
 
+  <!-- 📖 처음 온 사람도 무료 동화를 바로 찾도록 — 뮤니 도서관 바로가기 -->
+  <button type="button" class="go-lib-banner" onclick="goMuniLibrary()">
+    <span class="go-lib-icon">📖</span>
+    <span class="go-lib-text">
+      <b>무료 동화 읽기</b>
+      <small>로그인·API 키 없이 바로 보고 들어요<span id="goLibCount"></span></small>
+    </span>
+    <span class="go-lib-go">뮤니 도서관으로 고고! 🚀</span>
+  </button>
+
   <div class="guardian-notice">
     👨‍👩‍👧 <b>뮤니의 동화마을은 보호자가 사용하는 동화 제작 도구예요.</b>
     동화 만들기·API 키·로그인은 보호자가 하고, 아이는 보호자와 함께 완성된 동화를 보고 들어요.
   </div>
 
   <nav class="tab-nav">
-    <button type="button" class="tab-btn active" id="tabCreateBtn" onclick="switchTab('create')">✨ 새 동화 만들기</button>
-    <button type="button" class="tab-btn" id="tabLibraryBtn" onclick="switchTab('library')">📚 내 서재 보관함</button>
+    <button type="button" class="tab-btn active" id="tabCreateBtn" onclick="requireGuardian() && switchTab('create')">✨ 새 동화 만들기</button>
+    <button type="button" class="tab-btn" id="tabLibraryBtn" onclick="requireGuardian() && switchTab('library')">📚 내 서재 보관함</button>
     <button type="button" class="tab-btn tab-muni-lib" id="tabMuniLibraryBtn" onclick="showMuniLibrary()">🏛️ 뮤니 도서관</button>
   </nav>
 
@@ -365,6 +375,7 @@
       <li>아이 사진은 보호자가 직접 고른 경우에만 삽화 만들기에 쓰이고, 저장되지 않아요.</li>
     </ul>
     <button type="button" class="guardian-yes" onclick="confirmGuardian()">네, 보호자예요 (만 18세 이상)</button>
+    <button type="button" class="guardian-lib" onclick="skipGuardianToLibrary()">📖 무료 동화만 볼래요 → 뮤니 도서관으로 고고!</button>
     <button type="button" class="guardian-no" onclick="notGuardian()">아니에요</button>
     <p class="guardian-child-msg" id="guardianChildMsg" style="display:none">🙂 보호자님을 불러와 주세요!<br>함께 동화를 만들어요.</p>
   </div>

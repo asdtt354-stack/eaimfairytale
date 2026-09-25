@@ -489,3 +489,17 @@ body.viewing-library-book .save-btn,body.viewing-library-book #aiVoiceAddBtn,bod
 .rl-hint{font-weight:600 !important;color:#8a6a3a !important}
 .rl-preview{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px}
 .rl-preview video{max-height:52vh;border-radius:14px;background:#000}
+
+/* 📖 첫 화면 뮤니 도서관 바로가기 띠 */
+.go-lib-banner{display:flex;align-items:center;gap:14px;width:calc(100% - 60px);margin:14px 30px 4px;padding:14px 18px;border:3px solid #fff;border-radius:22px;background:linear-gradient(100deg,#fb8ec5,#b28bf5);color:#fff;cursor:pointer;text-align:left;box-shadow:0 8px 22px rgba(140,70,200,.25);font-family:inherit;transition:transform .15s ease}
+.go-lib-banner:hover{transform:translateY(-2px)}
+.go-lib-icon{font-size:34px;line-height:1}
+.go-lib-text{flex:1;display:flex;flex-direction:column;gap:2px}
+.go-lib-text b{font-size:20px;font-weight:900;text-shadow:0 2px 0 rgba(90,40,130,.35)}
+.go-lib-text small{font-size:13px;font-weight:700;opacity:.95}
+.go-lib-go{background:#fff;color:#8d3199;font-weight:900;font-size:15px;padding:10px 16px;border-radius:999px;white-space:nowrap;animation:goLibBounce 1.6s ease-in-out infinite}
+@keyframes goLibBounce{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+@media (max-width:760px){.go-lib-banner{width:calc(100% - 28px);margin:12px 14px 2px}}
+@media (max-width:560px){.go-lib-banner{flex-wrap:wrap;padding:12px 14px;gap:10px}.go-lib-icon{font-size:28px}.go-lib-text b{font-size:17px}.go-lib-go{width:100%;text-align:center;font-size:14.5px}}
+@media (prefers-reduced-motion:reduce){.go-lib-go{animation:none}}
+.guardian-lib{width:100%;margin-top:8px;border:2px solid #efc8f7;border-radius:14px;padding:12px;font-size:15px;font-weight:900;color:#8d3199;background:linear-gradient(100deg,#fff8e6,#fdf4ff);cursor:pointer}

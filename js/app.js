@@ -240,6 +240,7 @@ window.addEventListener('beforeunload', (e) => {
 
   // 💡 [동화 제작 함수]
   async function generateStoryAndImages() {
+    if (!requireGuardian()) return;
     try {
       const apiKeyEl = document.getElementById('apiKey');
       const authorEl = document.getElementById('authorName');
@@ -842,12 +843,27 @@ currentStoryBookObject = {
     if (gate) gate.style.display = 'none';
   }
 
+  // 📖 무료 동화(뮤니 도서관)만 보려는 분은 보호자 확인 없이 도서관으로 — AI를 쓰지 않는 공간이라서.
+  //    동화 만들기·서재 탭으로 가거나 만들기 버튼을 누르면 보호자 확인 창이 다시 나온다.
+  function skipGuardianToLibrary() {
+    const gate = document.getElementById('guardianGate');
+    if (gate) gate.style.display = 'none';
+    if (typeof goMuniLibrary === 'function') goMuniLibrary();
+    else if (typeof showMuniLibrary === 'function') showMuniLibrary();
+  }
+  function requireGuardian() {
+    if (isGuardianConfirmed()) return true;
+    showGuardianGate();
+    return false;
+  }
+
   function notGuardian() {
     const msg = document.getElementById('guardianChildMsg');
     if (msg) msg.style.display = 'block';
   }
 
-  if (!isGuardianConfirmed()) {
+  const __libDeepLink = /[?&](library|story=)/.test(location.search);
+  if (!isGuardianConfirmed() && !__libDeepLink) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', showGuardianGate);
     else showGuardianGate();
   }
@@ -1118,9 +1134,25 @@ currentStoryBookObject = {
       unlockAiVoicePlayer();
     }
 
+    // 📱 카카오톡·네이버·인스타 같은 앱 안의 브라우저는 기본 음성(speechSynthesis)이 없는 경우가 많다.
+    //    모든 페이지에 🎙️ AI 성우 목소리가 있으면 기본 음성 없이도 끝까지 들을 수 있으니 막지 않는다.
     if (typeof window.speechSynthesis === 'undefined' || typeof SpeechSynthesisUtterance === 'undefined') {
-      alert('이 브라우저는 음성 낭독 기능을 지원하지 않습니다. Safari 또는 Chrome 최신 버전으로 열어주세요.');
-      return;
+      const total = getActiveStoryPages(currentStoryBookObject).length;
+      let allAi = total > 0;
+      for (let i = 0; i < total; i++) { if (!(typeof hasAiVoice === 'function' && hasAiVoice(i))) { allAi = false; break; } }
+      if (!allAi) {
+        const ua = navigator.userAgent || '';
+        if (/KAKAOTALK/i.test(ua)) {
+          if (confirm('카카오톡 안에서는 동화 읽어주기 소리가 나오지 않아요.\n\n[확인]을 누르면 크롬·사파리 같은 인터넷 앱으로 열어요.')) {
+            location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.href);
+          }
+        } else if (/NAVER|Instagram|FBAN|FBAV|Line\//i.test(ua)) {
+          alert('이 앱 안의 화면에서는 동화 읽어주기 소리가 나오지 않아요.\n\n오른쪽 위(또는 아래) ⋮ 메뉴 → [다른 브라우저로 열기]를 눌러 크롬이나 사파리로 열어 주세요.');
+        } else {
+          alert('이 브라우저는 동화 읽어주기 소리를 지원하지 않아요.\n크롬이나 사파리 최신 버전으로 열어 주세요.');
+        }
+        return;
+      }
     }
 
     // 중요: 예전 코드는 unlockMobileAudio() 직후 stopVoice()가 speak()를 cancel하여
